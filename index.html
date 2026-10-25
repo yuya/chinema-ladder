@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ミルマエ</title>
+<title>Cinema Ladder</title>
+<meta name="description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
 <style>
 :root{
   --bg:#F4F4F7;--surface:#FFFFFF;--fg:#17171C;--muted:#5E5E6B;--line:#E1E1E8;
@@ -24,7 +25,7 @@ button{cursor:pointer}
 header{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 12px}
 .hd{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
-.logo{font-weight:800;font-size:19px;letter-spacing:.04em;display:flex;align-items:baseline;gap:8px}
+.logo{font-weight:800;font-size:19px;letter-spacing:.01em;flex-wrap:wrap;display:flex;align-items:baseline;gap:8px}
 .logo b{color:var(--accent)}
 .logo small{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.08em}
 .sbox{position:relative}
@@ -86,6 +87,8 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 .set input{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;min-width:0}
 .set button{align-self:flex-start;border:0;background:var(--accent);color:var(--surface);border-radius:8px;padding:6px 14px;font-weight:700}
 .status{font-size:12px}
+.emptyst{display:flex;flex-direction:column;gap:4px;padding:32px 0;color:var(--muted)}
+.emptyst b{color:var(--fg);font-size:17px}
 .top ol{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column}
 .top button{width:100%;display:grid;grid-template-columns:22px 32px minmax(0,1fr);gap:10px;align-items:center;border:0;background:transparent;text-align:left;padding:6px 4px;border-radius:8px}
 .top button:hover,.top button.on{background:var(--accent-soft)}
@@ -100,7 +103,7 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 <body>
 <header>
   <div class="hd">
-    <div class="logo"><span>ミル<b>マエ</b></span><small>1回の検索で、全部のサイトへ</small></div>
+    <div class="logo"><span>Cinema <b>Ladder</b></span><small>映画の評判を、はしごする</small></div>
     <div class="sbox">
       <form class="search" id="f" role="search">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -118,7 +121,7 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 
 <footer>
   <details id="settings">
-    <summary>TMDB の設定</summary>
+    <summary>開発者向け：TMDB の設定</summary>
     <div class="set">
       <label for="tok">API Read Access Token（このブラウザにだけ保存されます）</label>
       <input id="tok" type="password" placeholder="eyJhbGciOi..." autocomplete="off">
@@ -133,7 +136,7 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 /* ===== 設定 =====
    TMDB_PROXY に Cloudflare Workers などの中継URLを入れると、トークンをブラウザに置かずに済みます（本番はこちら）。
    空のままなら、下の「TMDB の設定」に入れたトークンで TMDB を直接呼びます（自分だけで試す用）。 */
-const TMDB_PROXY = "";   // 例: "https://mirumae-api.あなたのサブドメイン.workers.dev/search"
+const TMDB_PROXY = "";   // 例: "https://cinema-ladder-api.あなたのサブドメイン.workers.dev/search"
 const IMG = "https://image.tmdb.org/t/p/w92";
 
 const g=(site,q)=>"https://www.google.com/search?q="+encodeURIComponent(`site:${site} ${q}`);
@@ -167,7 +170,6 @@ const clean=s=>s.normalize("NFKC").replace(/\s+/g," ").trim();
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let hist=store.get("mirumae_hist",[]);
 let token=store.get("mirumae_tmdb","");
-const EXAMPLE="千と千尋の神隠し";   // 話題作が取れないときの予備
 /* X検索で除外する語。増やすほど安全ですが、普通の感想も減ります。 */
 const SPOILER_WORDS=["ネタバレ","結末","犯人","ラスト","オチ","真相","正体","黒幕","伏線回収","考察","どんでん返し","死亡","生存"];
 
@@ -198,7 +200,7 @@ async function searchTMDB(q){
 let trendList=null;
 /* 日本語タイトルが未登録だと、TMDBは原題（タミル語など）を返すため、
    日本語・英数字以外の文字を含むタイトルはTOP10から外す */
-const readable=t=>!!t&&!/[^\u0000-ɏ -⁯⺀-ヿ㐀-鿿豈-﫿＀-￯]/.test(t);
+const readable=t=>!!t&&!/[^\u0000-\u024F\u2000-\u206F\u2E80-\u30FF\u3400-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(t);
 const simp=m=>({id:m.id,title:m.title,original:m.original_title,date:m.release_date,poster:m.poster_path,pop:m.popularity});
 async function tmdbGet(path){
   const r=await fetch("https://api.themoviedb.org/3"+path,{headers:{Authorization:"Bearer "+token,accept:"application/json"}});
@@ -206,6 +208,12 @@ async function tmdbGet(path){
 }
 async function getTrending(){
   if(trendList)return trendList;
+  // 1. GitHub Actions が毎日作る data/trending.json（トークン不要・誰でも見られる）
+  try{
+    const r=await fetch("data/trending.json",{cache:"no-cache"});
+    if(r.ok){const j=await r.json();if(j.items?.length){trendList=j.items;return trendList}}
+  }catch(e){}
+  // 2. 中継サーバー、3. 自分のトークン（開発用）
   if(TMDB_PROXY){
     const r=await fetch(TMDB_PROXY.replace(/search$/,"trending"));
     if(!r.ok)throw new Error(r.status);
@@ -233,7 +241,7 @@ async function showTrending(){
       render(m.title,"trend",m);return;
     }
   }catch(e){}
-  if($("#q").value===before){$("#q").value="";render(EXAMPLE,true)}
+  if($("#q").value===before){$("#q").value="";renderEmpty()}
 }
 let trendOpen=store.get("mirumae_trendOpen",false);
 const isUpcoming=d=>d&&d>new Date().toISOString().slice(0,10);
@@ -288,6 +296,7 @@ function renderHist(){$("#hist").innerHTML=hist.length?'<span class="lbl">最近
 function saveHist(){store.set("mirumae_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
+function renderEmpty(){cur=null;$("#out").innerHTML='<div class="emptyst"><b>観たい映画の名前を入れてください</b><span>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</span></div>'}
 function render(q,isExample,movie){
   cur=[q,isExample,movie];
   let h=trendHTML()+`<div class="now">${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="" width="64" height="96">`:'<span></span>'}<div><span class="k">検索中の作品</span><h1>${esc(q)}</h1>${movie?.date?`<span class="ex">${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}</span>`:""}${isExample==="trend"?'<span class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></span>':isExample?'<span class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</span>':""}</div></div>`;
@@ -328,13 +337,11 @@ $("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending(
   const t=e.target.closest("[data-tid]");if(t){const m=trendList.find(x=>x.id===+t.dataset.tid);if(m){$("#q").value=m.title;remember(m.title);render(m.title,false,m);collapseTop();window.scrollTo({top:0,behavior:"smooth"})}return}const a=e.target.closest("a.go");if(a)remember(a.dataset.q)});
 $("#tok").value=token;
 $("#saveTok").onclick=()=>{token=$("#tok").value.trim();store.set("mirumae_tmdb",token);cache.clear();trendList=null;if(token&&!clean($("#q").value))showTrending();$("#tokStatus").textContent=token?"保存しました。検索欄に作品名を入れると候補が出ます。":"トークンを削除しました。"};
-if(!token&&!TMDB_PROXY)$("#settings").open=true;
 
 renderHist();
 if(hist[0]){$("#q").value=hist[0];render(hist[0]);
-  if(token||TMDB_PROXY)getTrending().then(()=>cur&&render(...cur)).catch(()=>{})}   // TOP10リストだけ後から読み込む
-else if(token||TMDB_PROXY){$("#out").innerHTML='<div style="color:var(--muted);padding:24px 0">話題作を読み込み中…</div>';showTrending()}
-else render(EXAMPLE,true);
+  getTrending().then(()=>cur&&render(...cur)).catch(()=>{})}   // TOP10リストだけ後から読み込む
+else{$("#out").innerHTML='<div class="emptyst"><span>いま話題の映画を読み込み中…</span></div>';showTrending()}
 </script>
 </body>
 </html>

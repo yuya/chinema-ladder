@@ -1,10 +1,10 @@
-// ミルマエ用 TMDB 中継（Cloudflare Workers）
+// Cinema Ladder 用 TMDB 中継（Cloudflare Workers）
 // 目的: TMDB のトークンをブラウザやアプリに置かず、サーバー側だけに持たせる。
 // 使い方:
 //   1. Cloudflare ダッシュボード → Workers & Pages → Create → 「Hello World」で作成し、このコードを貼り付けて Deploy
 //   2. Settings → Variables and Secrets → Secret として TMDB_TOKEN（API Read Access Token）を追加
 //   3. 下の ALLOWED_ORIGINS に自分のサイトのURLを入れる
-//   4. mirumae-tmdb.html の TMDB_PROXY に「https://<worker名>.<サブドメイン>.workers.dev/search」を設定
+//   4. index.html の TMDB_PROXY に「https://<worker名>.<サブドメイン>.workers.dev/search」を設定
 
 const ALLOWED_ORIGINS = ["https://example.com", "http://localhost:8000"]; // 自分のサイトに書き換え
 
