@@ -6,7 +6,7 @@
 //   3. 下の ALLOWED_ORIGINS に自分のサイトのURLを入れる
 //   4. index.html の TMDB_PROXY に「https://<worker名>.<サブドメイン>.workers.dev/search」を設定
 
-const ALLOWED_ORIGINS = ["https://example.com", "http://localhost:8000"]; // 自分のサイトに書き換え
+const ALLOWED_ORIGINS = ["https://yuya.github.io", "http://localhost:8000"]; // 独自ドメインにしたら追加する
 
 export default {
   async fetch(req, env) {
