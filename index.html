@@ -83,10 +83,6 @@ a.go.main .n{color:var(--accent)}
 footer{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px 32px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:10px}
 details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
 summary{cursor:pointer;font-weight:700;color:var(--fg)}
-.set{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-.set input{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;min-width:0}
-.set button{align-self:flex-start;border:0;background:var(--accent);color:var(--surface);border-radius:8px;padding:6px 14px;font-weight:700}
-.status{font-size:12px}
 .emptyst{display:flex;flex-direction:column;gap:4px;padding:32px 0;color:var(--muted)}
 .emptyst b{color:var(--fg);font-size:17px}
 .top ol{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column}
@@ -120,26 +116,16 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 <main id="out"></main>
 
 <footer>
-  <details id="settings">
-    <summary>開発者向け：TMDB の設定</summary>
-    <div class="set">
-      <label for="tok">API Read Access Token（このブラウザにだけ保存されます）</label>
-      <input id="tok" type="password" placeholder="eyJhbGciOi..." autocomplete="off">
-      <button type="button" id="saveTok">保存</button>
-      <span class="status" id="tokStatus"></span>
-    </div>
-  </details>
   <div>作品情報とポスター画像は TMDB から取得しています。This product uses the TMDB API but is not endorsed or certified by TMDB.</div>
 </footer>
 
 <script>
 /* ===== 設定 =====
-   TMDB_PROXY に Cloudflare Workers などの中継URLを入れると、トークンをブラウザに置かずに済みます（本番はこちら）。
-   空のままなら、下の「TMDB の設定」に入れたトークンで TMDB を直接呼びます（自分だけで試す用）。 */
+   TMDB のトークンはブラウザに置かない。サジェストは Cloudflare Workers の中継、
+   話題作TOP10と予備の作品一覧は GitHub Actions が毎日作る data/*.json を使う。 */
 const TMDB_PROXY = "https://cinema-ladder-api.twilightwind.workers.dev/search";   // Cloudflare Workers の中継（worker/worker.js）
 const IMG = "https://image.tmdb.org/t/p/w92";
 
-const g=(site,q)=>"https://www.google.com/search?q="+encodeURIComponent(`site:${site} ${q}`);
 const E=encodeURIComponent;
 const GROUPS=[
  {h:"レビュー",note:"星とレビューを見る",items:[
@@ -148,6 +134,8 @@ const GROUPS=[
   {n:"Movie Walker",d:"評価・ニュース",u:q=>"https://press.moviewalker.jp/search/free_search.cgi?keyword="+E(q)},
   {n:"映画ランド",d:"評価・上映情報",u:q=>"https://eigaland.com/movie?sort=openDate&q="+E(q)},
   {n:"KINENOTE",d:"キネマ旬報の評価",u:q=>"https://www.kinenote.com/sp/public/cinema/search_result.aspx?key="+E(q)},
+  // p=検索語、ei=文字コード。ほかのパラメータ（ai, ts, aq, fr など）は Yahoo の計測用なので不要
+  {n:"Yahoo!検索",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
  ]},
  {h:"チケット・上映館",note:"",items:[
   {n:"ムビチケ",d:"前売券を買う",pr:1,u:q=>"https://store.moviewalker.jp/search?keyword=name:"+E(q)},
@@ -162,11 +150,6 @@ const GROUPS=[
   {n:"Prime Video",d:"見放題・レンタル",pr:1,u:q=>"https://www.amazon.co.jp/s?i=instant-video&k="+E(q)},
   {n:"Netflix",d:"見放題",u:q=>"https://www.netflix.com/search?q="+E(q)},
  ]},
- {h:"ウェブ検索",note:"「映画」を付けて同名の別物を避ける",items:[
-  // p=検索語、ei=文字コード。Yahooのほかのパラメータ（ai, ts, aq, fr など）は計測用なので不要
-  {n:"Yahoo!検索",d:"ニュース・まとめ記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
-  {n:"Google",d:"ニュース・まとめ記事",u:q=>"https://www.google.com/search?q="+E(withEiga(q))},
- ]},
 ];
 
 const $=s=>document.querySelector(s);
@@ -174,9 +157,10 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 const clean=s=>s.normalize("NFKC").replace(/\s+/g," ").trim();
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let hist=store.get("mirumae_hist",[]);
-let token=store.get("mirumae_tmdb","");
+try{localStorage.removeItem("mirumae_tmdb")}catch(e){}   // 以前の開発用トークンが残っていれば消す
+// Yahoo!検索用：同名の本や曲を避けるため「映画」を付ける（タイトルに入っていれば付けない）
+const withEiga=q=>q.includes("映画")?q:q+" 映画";
 /* X検索で除外する語。増やすほど安全ですが、普通の感想も減ります。 */
-const withEiga=q=>q.includes("映画")?q:q+" 映画";   // タイトルに「映画」が入っていれば付けない
 const SPOILER_WORDS=["ネタバレ","結末","犯人","ラスト","オチ","真相","正体","黒幕","伏線回収","考察","どんでん返し","死亡","生存"];
 
 /* ===== TMDB サジェスト ===== */
@@ -211,40 +195,21 @@ async function searchLocal(q){
 
 async function searchTMDB(q){
   if(cache.has(q))return cache.get(q);
-  if(!TMDB_PROXY&&!token){const r=await searchLocal(q);cache.set(q,r);return r}
   ctrl?.abort();ctrl=new AbortController();
   let res;
-  if(TMDB_PROXY){
-    try{
-      const r=await fetch(TMDB_PROXY+"?q="+E(q),{signal:ctrl.signal});
-      if(!r.ok)throw new Error(r.status);
-      res=await r.json();
-      if(!Array.isArray(res))throw new Error("bad");
-    }catch(e){
-      if(e.name==="AbortError")throw e;
-      res=await searchLocal(q);   // 中継が使えないときは作品一覧から候補を出す
-    }
-  }else{
-    if(!token)throw new Error("NO_TOKEN");
-    const url="https://api.themoviedb.org/3/search/movie?query="+E(q)+"&language=ja-JP&region=JP&include_adult=false&page=1";
-    const r=await fetch(url,{signal:ctrl.signal,headers:{Authorization:"Bearer "+token,accept:"application/json"}});
-    if(r.status===401)throw new Error("BAD_TOKEN");
+  try{
+    const r=await fetch(TMDB_PROXY+"?q="+E(q),{signal:ctrl.signal});
     if(!r.ok)throw new Error(r.status);
-    const j=await r.json();
-    res=(j.results||[]).slice(0,8).map(m=>({id:m.id,title:m.title,original:m.original_title,date:m.release_date,poster:m.poster_path}));
+    res=await r.json();
+    if(!Array.isArray(res))throw new Error("bad");
+  }catch(e){
+    if(e.name==="AbortError")throw e;
+    res=await searchLocal(q);   // 中継が使えないときは作品一覧から候補を出す
   }
   cache.set(q,res);return res;
 }
 /* ===== 話題作TOP10（日本で上映中＋公開予定を人気順に） ===== */
 let trendList=null;
-/* 日本語タイトルが未登録だと、TMDBは原題（タミル語など）を返すため、
-   日本語・英数字以外の文字を含むタイトルはTOP10から外す */
-const readable=t=>!!t&&!/[^\u0000-\u024F\u2000-\u206F\u2E80-\u30FF\u3400-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(t);
-const simp=m=>({id:m.id,title:m.title,original:m.original_title,date:m.release_date,poster:m.poster_path,pop:m.popularity});
-async function tmdbGet(path){
-  const r=await fetch("https://api.themoviedb.org/3"+path,{headers:{Authorization:"Bearer "+token,accept:"application/json"}});
-  if(!r.ok)throw new Error(r.status);return r.json();
-}
 async function getTrending(){
   if(trendList)return trendList;
   // 1. GitHub Actions が毎日作る data/trending.json（トークン不要・誰でも見られる）
@@ -252,19 +217,10 @@ async function getTrending(){
     const r=await fetch("data/trending.json",{cache:"no-cache"});
     if(r.ok){const j=await r.json();if(j.items?.length){trendList=j.items;return trendList}}
   }catch(e){}
-  // 2. 中継サーバー、3. 自分のトークン（開発用）
-  if(TMDB_PROXY){
-    const r=await fetch(TMDB_PROXY.replace(/search$/,"trending"));
-    if(!r.ok)throw new Error(r.status);
-    trendList=await r.json();
-  }else{
-    if(!token)throw new Error("NO_TOKEN");
-    const q="?language=ja-JP&region=JP&page=";
-    // 除外する分を見込んで上映中は2ページ分取る
-    const pages=await Promise.all([tmdbGet("/movie/now_playing"+q+1),tmdbGet("/movie/now_playing"+q+2),tmdbGet("/movie/upcoming"+q+1)]);
-    const map=new Map();pages.flatMap(p=>p.results||[]).filter(m=>readable(m.title)).forEach(m=>map.set(m.id,simp(m)));
-    trendList=[...map.values()].sort((a,b)=>b.pop-a.pop).slice(0,10);
-  }
+  // 2. ファイルが読めないときは中継サーバーから
+  const r=await fetch(TMDB_PROXY.replace(/search$/,"trending"));
+  if(!r.ok)throw new Error(r.status);
+  trendList=await r.json();
   return trendList;
 }
 let lastPick=null;
@@ -321,8 +277,7 @@ function onType(){
     }catch(e){
       if(e.name==="AbortError")return;
       items=[];
-            if(e.message==="BAD_TOKEN")showSug('<li class="msg">トークンが正しくありません。「TMDB の設定」を確認してください。</li>');
-      else showSug('<li class="msg">候補を取得できませんでした。そのまま検索はできます。</li>');
+      showSug('<li class="msg">候補を取得できませんでした。そのまま検索はできます。</li>');
     }
   },250);
 }
@@ -370,11 +325,9 @@ $("#hist").addEventListener("click",e=>{
     delTimer=setTimeout(()=>{all.classList.remove("warn");all.textContent="履歴をすべて削除"},3000);return;
   }
   const b=e.target.closest("[data-q]");if(!b)return;$("#q").value=b.dataset.q;remember(b.dataset.q);render(b.dataset.q)});
-$("#q").addEventListener("focus",()=>{$("#q").select();if(!TMDB_PROXY&&!token)loadTitles().catch(()=>{})});   // 一覧は最初に検索欄を触ったときに読み込む   // タップで全選択し、すぐ打ち替えられるように
+$("#q").addEventListener("focus",()=>$("#q").select());   // タップで全選択し、すぐ打ち替えられるように
 $("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending();return}
   const t=e.target.closest("[data-tid]");if(t){const m=trendList.find(x=>x.id===+t.dataset.tid);if(m){$("#q").value=m.title;remember(m.title);render(m.title,false,m);collapseTop();window.scrollTo({top:0,behavior:"smooth"})}return}const a=e.target.closest("a.go");if(a)remember(a.dataset.q)});
-$("#tok").value=token;
-$("#saveTok").onclick=()=>{token=$("#tok").value.trim();store.set("mirumae_tmdb",token);cache.clear();trendList=null;if(token&&!clean($("#q").value))showTrending();$("#tokStatus").textContent=token?"保存しました。検索欄に作品名を入れると候補が出ます。":"トークンを削除しました。"};
 
 renderHist();
 if(hist[0]){$("#q").value=hist[0];render(hist[0]);
