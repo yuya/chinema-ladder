@@ -136,7 +136,7 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 /* ===== 設定 =====
    TMDB_PROXY に Cloudflare Workers などの中継URLを入れると、トークンをブラウザに置かずに済みます（本番はこちら）。
    空のままなら、下の「TMDB の設定」に入れたトークンで TMDB を直接呼びます（自分だけで試す用）。 */
-const TMDB_PROXY = "";   // 例: "https://cinema-ladder-api.あなたのサブドメイン.workers.dev/search"
+const TMDB_PROXY = "https://cinema-ladder-api.twilightwind.workers.dev/search";   // Cloudflare Workers の中継（worker/worker.js）
 const IMG = "https://image.tmdb.org/t/p/w92";
 
 const g=(site,q)=>"https://www.google.com/search?q="+encodeURIComponent(`site:${site} ${q}`);
@@ -209,9 +209,15 @@ async function searchTMDB(q){
   ctrl?.abort();ctrl=new AbortController();
   let res;
   if(TMDB_PROXY){
-    const r=await fetch(TMDB_PROXY+"?q="+E(q),{signal:ctrl.signal});
-    if(!r.ok)throw new Error(r.status);
-    res=await r.json();
+    try{
+      const r=await fetch(TMDB_PROXY+"?q="+E(q),{signal:ctrl.signal});
+      if(!r.ok)throw new Error(r.status);
+      res=await r.json();
+      if(!Array.isArray(res))throw new Error("bad");
+    }catch(e){
+      if(e.name==="AbortError")throw e;
+      res=await searchLocal(q);   // 中継が使えないときは作品一覧から候補を出す
+    }
   }else{
     if(!token)throw new Error("NO_TOKEN");
     const url="https://api.themoviedb.org/3/search/movie?query="+E(q)+"&language=ja-JP&region=JP&include_adult=false&page=1";
