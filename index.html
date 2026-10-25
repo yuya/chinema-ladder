@@ -134,6 +134,8 @@ const GROUPS=[
   {n:"Movie Walker",d:"評価・ニュース",u:q=>"https://press.moviewalker.jp/search/free_search.cgi?keyword="+E(q)},
   {n:"映画ランド",d:"評価・上映情報",u:q=>"https://eigaland.com/movie?sort=openDate&q="+E(q)},
   {n:"KINENOTE",d:"キネマ旬報の評価",u:q=>"https://www.kinenote.com/sp/public/cinema/search_result.aspx?key="+E(q)},
+  // IMDb は日本語タイトルだと見つからないことが多いので、TMDB の原題が分かればそちらで検索する。s=tt&ttype=ft は「映画作品だけ」に絞る指定
+  {n:"IMDb",d:"海外の評価",u:(q,m)=>"https://www.imdb.com/find/?q="+E(m?.original||q)+"&s=tt&ttype=ft"},
   // p=検索語、ei=文字コード。ほかのパラメータ（ai, ts, aq, fr など）は Yahoo の計測用なので不要
   {n:"Yahoo!検索",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
  ]},
@@ -290,12 +292,24 @@ function saveHist(){store.set("mirumae_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
 function renderEmpty(){cur=null;$("#out").innerHTML='<div class="emptyst"><b>観たい映画の名前を入れてください</b><span>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</span></div>'}
+/* 作品名から TMDB の情報（原題・ポスター・公開年）を探す。履歴から開いたときなどに使う */
+function findMovie(q){
+  for(const m of trendList||[])if(m.title===q)return m;
+  for(const list of cache.values())for(const m of list||[])if(m.title===q)return m;
+  for(const m of titles||[])if(m.title===q)return m;
+  return null;
+}
 function render(q,isExample,movie){
+  if(!movie&&q){
+    movie=findMovie(q);
+    // 見つからなければ作品一覧を読み込んでもう一度探す（IMDb の原題検索とポスター表示のため）
+    if(!movie&&!titles)loadTitles().then(()=>{const m=findMovie(q);if(m&&cur&&cur[0]===q&&!cur[2])render(q,cur[1],m)}).catch(()=>{});
+  }
   cur=[q,isExample,movie];
   let h=trendHTML()+`<div class="now">${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="" width="64" height="96">`:'<span></span>'}<div><span class="k">検索中の作品</span><h1>${esc(q)}</h1>${movie?.date?`<span class="ex">${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}</span>`:""}${isExample==="trend"?'<span class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></span>':isExample?'<span class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</span>':""}</div></div>`;
   GROUPS.forEach((gr,i)=>{
     h+=`<section class="grp"><h2>${gr.h}${gr.note?`<small>${gr.note}</small>`:""}</h2><div class="grid">${gr.items.map(it=>
-      `<a class="go${it.main?" main":""}" href="${esc(it.u(q))}" target="_blank" rel="noopener" data-q="${esc(q)}"><span class="n">${it.n}${it.pr?'<span class="pr">PR</span>':""}</span><span class="d">${it.d}</span></a>`).join("")}</div></section>`;
+      `<a class="go${it.main?" main":""}" href="${esc(it.u(q,movie))}" target="_blank" rel="noopener" data-q="${esc(q)}"><span class="n">${it.n}${it.pr?'<span class="pr">PR</span>':""}</span><span class="d">${it.d}</span></a>`).join("")}</div></section>`;
     if(i===1)h+='<div class="ad"><b>広告</b>ここにバナー広告（例：320×100）</div>';
   });
   $("#out").innerHTML=h;
