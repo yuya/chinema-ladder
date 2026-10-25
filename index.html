@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ミルマエ</title>
+<style>
+:root{
+  --bg:#F4F4F7;--surface:#FFFFFF;--fg:#17171C;--muted:#5E5E6B;--line:#E1E1E8;
+  --accent:#B4233C;--accent-soft:#F8E4E8;--ad:#EEF0F5;
+  --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI",Meiryo,system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#111115;--surface:#1A1A20;--fg:#ECECF1;--muted:#A0A0AC;--line:#2C2C35;--accent:#E8607A;--accent-soft:#3A1D25;--ad:#202029;color-scheme:dark}}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.6}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 12px}
+.hd{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.logo{font-weight:800;font-size:19px;letter-spacing:.04em;display:flex;align-items:baseline;gap:8px}
+.logo b{color:var(--accent)}
+.logo small{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.08em}
+.sbox{position:relative}
+form.search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 6px 0 12px}
+form.search:focus-within{border-color:var(--accent)}
+.search input{flex:1;min-width:0;border:0;background:transparent;padding:11px 0;outline:none;font-size:16px}
+.search svg{flex:none;width:17px;height:17px;stroke:var(--muted)}
+.clear{border:0;background:transparent;color:var(--muted);padding:6px 8px;font-size:13px}
+
+/* サジェスト */
+.sug{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);overflow:hidden;max-height:60vh;overflow-y:auto;z-index:6;margin:0;padding:4px;list-style:none}
+.sug li{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;align-items:center;padding:6px 8px;border-radius:8px;cursor:pointer}
+.sug li[aria-selected="true"],.sug li:hover{background:var(--accent-soft)}
+.sug img,.sug .noimg{width:36px;height:54px;border-radius:4px;object-fit:cover;background:var(--bg)}
+.sug .t{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sug .o{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sug .msg{display:block;padding:10px;color:var(--muted);font-size:13px;cursor:default}
+.sug .msg:hover{background:none}
+
+.hist{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.hist .lbl{font-size:12px;color:var(--muted);flex:none;align-self:center}
+.hist .hc{flex:none;display:flex;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:999px;font-size:13px}
+.hist .hc button{border:0;background:transparent;border-radius:999px}
+.hist .hc [data-q]{padding:3px 2px 3px 11px}
+.hist .x{padding:3px 10px 3px 6px;color:var(--muted);line-height:1}
+.hist .x:hover{color:var(--accent)}
+.hist .delall{flex:none;border:0;background:transparent;color:var(--muted);font-size:12px;text-decoration:underline;padding:3px 6px;white-space:nowrap}
+.hist .delall.warn{color:var(--accent);font-weight:700;text-decoration:none}
+
+main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 24px;
+  display:flex;flex-direction:column;gap:18px}
+.now{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center}
+.now img{width:64px;height:96px;object-fit:cover;border-radius:6px;background:var(--surface)}
+.now .k{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:700}
+.now h1{margin:0;font-size:24px;line-height:1.3;text-wrap:balance;word-break:break-word}
+.now .ex{font-size:12px;color:var(--muted)}
+
+.grp{display:flex;flex-direction:column;gap:8px}
+.grp h2{margin:0;font-size:12px;letter-spacing:.12em;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;gap:8px}
+.grp h2 small{font-weight:500;letter-spacing:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+a.go{display:flex;flex-direction:column;gap:1px;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:64px;justify-content:center;transition:border-color .12s,transform .12s}
+a.go:hover{border-color:var(--accent)}
+a.go:active{transform:scale(.98)}
+a.go .n{font-weight:700;display:flex;align-items:center;gap:6px}
+a.go .n::after{content:"↗";font-size:12px;color:var(--muted);margin-left:auto}
+a.go .d{font-size:12px;color:var(--muted)}
+a.go.main{border-color:var(--accent);background:var(--accent-soft)}
+a.go.main .n{color:var(--accent)}
+.pr{font-size:10px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px;line-height:1.5}
+.ad{background:var(--ad);border:1px dashed var(--line);border-radius:12px;padding:14px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:80px}
+.ad b{font-size:10px;letter-spacing:.14em}
+
+footer{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px 32px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:10px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+summary{cursor:pointer;font-weight:700;color:var(--fg)}
+.set{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.set input{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;min-width:0}
+.set button{align-self:flex-start;border:0;background:var(--accent);color:var(--surface);border-radius:8px;padding:6px 14px;font-weight:700}
+.status{font-size:12px}
+.top ol{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column}
+.top button{width:100%;display:grid;grid-template-columns:22px 32px minmax(0,1fr);gap:10px;align-items:center;border:0;background:transparent;text-align:left;padding:6px 4px;border-radius:8px}
+.top button:hover,.top button.on{background:var(--accent-soft)}
+.top button.on .rk,.top button.on b{color:var(--accent)}
+.top .rk{font-weight:800;color:var(--accent);text-align:center;font-variant-numeric:tabular-nums}
+.top img,.top .noimg{width:32px;height:48px;border-radius:3px;object-fit:cover;background:var(--bg)}
+.top b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top small{color:var(--muted);font-size:12px}
+@media (prefers-reduced-motion:reduce){a.go{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <div class="logo"><span>ミル<b>マエ</b></span><small>1回の検索で、全部のサイトへ</small></div>
+    <div class="sbox">
+      <form class="search" id="f" role="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" enterkeyhint="search" placeholder="作品名を入力" autocomplete="off" aria-label="作品名"
+          role="combobox" aria-expanded="false" aria-controls="sug" aria-autocomplete="list">
+        <button class="clear" type="button" id="clr">消す</button>
+      </form>
+      <ul class="sug" id="sug" role="listbox" hidden></ul>
+    </div>
+    <div class="hist" id="hist"></div>
+  </div>
+</header>
+
+<main id="out"></main>
+
+<footer>
+  <details id="settings">
+    <summary>TMDB の設定</summary>
+    <div class="set">
+      <label for="tok">API Read Access Token（このブラウザにだけ保存されます）</label>
+      <input id="tok" type="password" placeholder="eyJhbGciOi..." autocomplete="off">
+      <button type="button" id="saveTok">保存</button>
+      <span class="status" id="tokStatus"></span>
+    </div>
+  </details>
+  <div>作品情報とポスター画像は TMDB から取得しています。This product uses the TMDB API but is not endorsed or certified by TMDB.</div>
+</footer>
+
+<script>
+/* ===== 設定 =====
+   TMDB_PROXY に Cloudflare Workers などの中継URLを入れると、トークンをブラウザに置かずに済みます（本番はこちら）。
+   空のままなら、下の「TMDB の設定」に入れたトークンで TMDB を直接呼びます（自分だけで試す用）。 */
+const TMDB_PROXY = "";   // 例: "https://mirumae-api.あなたのサブドメイン.workers.dev/search"
+const IMG = "https://image.tmdb.org/t/p/w92";
+
+const g=(site,q)=>"https://www.google.com/search?q="+encodeURIComponent(`site:${site} ${q}`);
+const E=encodeURIComponent;
+const GROUPS=[
+ {h:"レビュー",note:"星とレビューを見る",items:[
+  {n:"Filmarks",d:"レビュー数が多い",main:1,u:q=>"https://filmarks.com/search/movies?q="+E(q)},
+  {n:"映画.com",d:"評価・作品情報",u:q=>"https://eiga.com/search/"+E(q)+"/"},
+  {n:"Movie Walker",d:"評価・ニュース",u:q=>"https://press.moviewalker.jp/search/free_search.cgi?keyword="+E(q)},
+  {n:"映画ランド",d:"評価・上映情報",u:q=>"https://eigaland.com/movie?sort=openDate&q="+E(q)},
+  {n:"KINENOTE",d:"キネマ旬報の評価",u:q=>"https://www.kinenote.com/sp/public/cinema/search_result.aspx?key="+E(q)},
+ ]},
+ {h:"チケット・上映館",note:"",items:[
+  {n:"ムビチケ",d:"前売券を買う",pr:1,u:q=>"https://store.moviewalker.jp/search?keyword=name:"+E(q)},
+  {n:"上映館を探す",d:"映画.comの上映中検索",u:q=>"https://eiga.com/now/q/?title="+E(q)+"&region=&pref=&area=&genre=on&sort=release"},
+ ]},
+ {h:"SNSの声",note:"ネタバレ語を除外して検索",items:[
+  {n:"X",d:"ネタバレになりやすい語を除外",u:q=>"https://x.com/search?f=live&q="+E(`"${q}" `+SPOILER_WORDS.map(w=>"-"+w).join(" "))},
+  {n:"Instagram",d:"ハッシュタグ",u:q=>"https://www.instagram.com/explore/tags/"+E(q.replace(/[\s・:：!！?？、。「」『』\-]/g,""))+"/"},
+ ]},
+ {h:"配信",note:"",items:[
+  {n:"U-NEXT",d:"見放題・レンタル",pr:1,u:q=>"https://video.unext.jp/freeword?query="+E(q)},
+  {n:"Prime Video",d:"見放題・レンタル",pr:1,u:q=>"https://www.amazon.co.jp/s?i=instant-video&k="+E(q)},
+  {n:"Netflix",d:"見放題",u:q=>"https://www.netflix.com/search?q="+E(q)},
+ ]},
+];
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clean=s=>s.normalize("NFKC").replace(/\s+/g," ").trim();
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let hist=store.get("mirumae_hist",[]);
+let token=store.get("mirumae_tmdb","");
+const EXAMPLE="千と千尋の神隠し";   // 話題作が取れないときの予備
+/* X検索で除外する語。増やすほど安全ですが、普通の感想も減ります。 */
+const SPOILER_WORDS=["ネタバレ","結末","犯人","ラスト","オチ","真相","正体","黒幕","伏線回収","考察","どんでん返し","死亡","生存"];
+
+/* ===== TMDB サジェスト ===== */
+const cache=new Map();
+let ctrl=null,timer=null,items=[],active=-1;
+
+async function searchTMDB(q){
+  if(cache.has(q))return cache.get(q);
+  ctrl?.abort();ctrl=new AbortController();
+  let res;
+  if(TMDB_PROXY){
+    const r=await fetch(TMDB_PROXY+"?q="+E(q),{signal:ctrl.signal});
+    if(!r.ok)throw new Error(r.status);
+    res=await r.json();
+  }else{
+    if(!token)throw new Error("NO_TOKEN");
+    const url="https://api.themoviedb.org/3/search/movie?query="+E(q)+"&language=ja-JP&region=JP&include_adult=false&page=1";
+    const r=await fetch(url,{signal:ctrl.signal,headers:{Authorization:"Bearer "+token,accept:"application/json"}});
+    if(r.status===401)throw new Error("BAD_TOKEN");
+    if(!r.ok)throw new Error(r.status);
+    const j=await r.json();
+    res=(j.results||[]).slice(0,8).map(m=>({id:m.id,title:m.title,original:m.original_title,date:m.release_date,poster:m.poster_path}));
+  }
+  cache.set(q,res);return res;
+}
+/* ===== 話題作TOP10（日本で上映中＋公開予定を人気順に） ===== */
+let trendList=null;
+/* 日本語タイトルが未登録だと、TMDBは原題（タミル語など）を返すため、
+   日本語・英数字以外の文字を含むタイトルはTOP10から外す */
+const readable=t=>!!t&&!/[^\u0000-ɏ -⁯⺀-ヿ㐀-鿿豈-﫿＀-￯]/.test(t);
+const simp=m=>({id:m.id,title:m.title,original:m.original_title,date:m.release_date,poster:m.poster_path,pop:m.popularity});
+async function tmdbGet(path){
+  const r=await fetch("https://api.themoviedb.org/3"+path,{headers:{Authorization:"Bearer "+token,accept:"application/json"}});
+  if(!r.ok)throw new Error(r.status);return r.json();
+}
+async function getTrending(){
+  if(trendList)return trendList;
+  if(TMDB_PROXY){
+    const r=await fetch(TMDB_PROXY.replace(/search$/,"trending"));
+    if(!r.ok)throw new Error(r.status);
+    trendList=await r.json();
+  }else{
+    if(!token)throw new Error("NO_TOKEN");
+    const q="?language=ja-JP&region=JP&page=";
+    // 除外する分を見込んで上映中は2ページ分取る
+    const pages=await Promise.all([tmdbGet("/movie/now_playing"+q+1),tmdbGet("/movie/now_playing"+q+2),tmdbGet("/movie/upcoming"+q+1)]);
+    const map=new Map();pages.flatMap(p=>p.results||[]).filter(m=>readable(m.title)).forEach(m=>map.set(m.id,simp(m)));
+    trendList=[...map.values()].sort((a,b)=>b.pop-a.pop).slice(0,10);
+  }
+  return trendList;
+}
+let lastPick=null;
+async function showTrending(){
+  const before=$("#q").value;
+  try{
+    const list=await getTrending();
+    if($("#q").value!==before)return;   // 読み込み中に入力されたら上書きしない
+    if(list.length){
+      const pool=list.length>1?list.filter(m=>m.id!==lastPick):list;   // 同じ作品が連続しないように
+      const m=pool[Math.floor(Math.random()*pool.length)];lastPick=m.id;
+      $("#q").value=m.title;   // 検索ボックスにも同じ作品名を入れる
+      render(m.title,"trend",m);return;
+    }
+  }catch(e){}
+  if($("#q").value===before){$("#q").value="";render(EXAMPLE,true)}
+}
+let trendOpen=store.get("mirumae_trendOpen",false);
+const isUpcoming=d=>d&&d>new Date().toISOString().slice(0,10);
+/* TOP10を閉じるアニメーション：高さを0に縮めながら薄くし、終わったら details を閉じる */
+function collapseTop(){
+  const d=$("#top"),ol=d?.querySelector("ol");
+  if(!d||!d.open)return;
+  if(!ol||!ol.animate||matchMedia("(prefers-reduced-motion: reduce)").matches){d.open=false;return}
+  ol.style.overflow="hidden";
+  const a=ol.animate([{height:ol.offsetHeight+"px",opacity:1,marginTop:"8px"},{height:"0px",opacity:0,marginTop:"0px"}],
+    {duration:320,delay:120,easing:"cubic-bezier(.4,0,.2,1)",fill:"forwards"});   // 選んだ行の色が一瞬見えてから閉じる
+  a.onfinish=()=>{d.open=false;a.cancel();ol.style.overflow=""};
+}
+function trendHTML(){
+  if(!trendList?.length)return "";
+  return `<details class="top" id="top"${trendOpen?" open":""}><summary>いま話題の映画 TOP${trendList.length}</summary><ol>${trendList.map((m,i)=>
+    `<li><button type="button" data-tid="${m.id}"${cur&&cur[0]===m.title?' class="on" aria-current="true"':""}><span class="rk">${i+1}</span>${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="32" height="48">`:'<span class="noimg"></span>'}<span style="min-width:0"><b>${esc(m.title)}</b><small>${isUpcoming(m.date)?`公開予定 ${+m.date.slice(5,7)}月${+m.date.slice(8,10)}日`:"上映中"}</small></span></button></li>`).join("")}</ol></details>`;
+}
+
+function showSug(html){const s=$("#sug");s.innerHTML=html;s.hidden=!html;$("#q").setAttribute("aria-expanded",String(!!html))}
+function hideSug(){showSug("");items=[];active=-1}
+function drawSug(){
+  showSug(items.map((m,i)=>`<li role="option" id="opt${i}" data-i="${i}" aria-selected="${i===active}">
+    ${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="36" height="54">`:'<span class="noimg"></span>'}
+    <span style="min-width:0"><div class="t">${esc(m.title)}</div><div class="o">${m.date?m.date.slice(0,4)+"年":"公開年不明"}${m.original&&m.original!==m.title?"・"+esc(m.original):""}</div></span></li>`).join(""));
+  $("#q").setAttribute("aria-activedescendant",active>=0?"opt"+active:"");
+}
+function onType(){
+  const q=clean($("#q").value);
+  clearTimeout(timer);
+  if(q.length<1){hideSug();return}
+  timer=setTimeout(async()=>{
+    try{
+      const r=await searchTMDB(q);
+      if(clean($("#q").value)!==q)return;
+      items=r;active=-1;
+      r.length?drawSug():showSug('<li class="msg">候補が見つかりません。そのまま検索もできます。</li>');
+    }catch(e){
+      if(e.name==="AbortError")return;
+      items=[];
+      if(e.message==="NO_TOKEN")showSug('<li class="msg">候補を出すには、ページ下の「TMDB の設定」にトークンを入れてください。</li>');
+      else if(e.message==="BAD_TOKEN")showSug('<li class="msg">トークンが正しくありません。「TMDB の設定」を確認してください。</li>');
+      else showSug('<li class="msg">候補を取得できませんでした。そのまま検索はできます。</li>');
+    }
+  },250);
+}
+function pick(m){$("#q").value=m.title;hideSug();remember(m.title);render(m.title,false,m);$("#q").blur()}
+
+/* ===== 画面 ===== */
+function remember(q){hist=[q,...hist.filter(x=>x!==q)].slice(0,8);store.set("mirumae_hist",hist);renderHist()}
+function renderHist(){$("#hist").innerHTML=hist.length?'<span class="lbl">最近</span>'+hist.map(h=>`<span class="hc"><button type="button" data-q="${esc(h)}">${esc(h)}</button><button type="button" class="x" data-del="${esc(h)}" aria-label="「${esc(h)}」を履歴から削除">×</button></span>`).join("")+'<button type="button" class="delall" id="delall">履歴をすべて削除</button>':""}
+function saveHist(){store.set("mirumae_hist",hist);renderHist()}
+let delTimer=null;
+let cur=null;
+function render(q,isExample,movie){
+  cur=[q,isExample,movie];
+  let h=trendHTML()+`<div class="now">${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="" width="64" height="96">`:'<span></span>'}<div><span class="k">検索中の作品</span><h1>${esc(q)}</h1>${movie?.date?`<span class="ex">${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}</span>`:""}${isExample==="trend"?'<span class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></span>':isExample?'<span class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</span>':""}</div></div>`;
+  GROUPS.forEach((gr,i)=>{
+    h+=`<section class="grp"><h2>${gr.h}${gr.note?`<small>${gr.note}</small>`:""}</h2><div class="grid">${gr.items.map(it=>
+      `<a class="go${it.main?" main":""}" href="${esc(it.u(q))}" target="_blank" rel="noopener" data-q="${esc(q)}"><span class="n">${it.n}${it.pr?'<span class="pr">PR</span>':""}</span><span class="d">${it.d}</span></a>`).join("")}</div></section>`;
+    if(i===1)h+='<div class="ad"><b>広告</b>ここにバナー広告（例：320×100）</div>';
+  });
+  $("#out").innerHTML=h;
+  const d=$("#top");if(d)d.addEventListener("toggle",()=>{trendOpen=d.open;store.set("mirumae_trendOpen",trendOpen)});
+}
+
+/* ===== イベント ===== */
+$("#q").addEventListener("input",onType);
+$("#q").addEventListener("keydown",e=>{
+  if($("#sug").hidden||!items.length)return;
+  if(e.key==="ArrowDown"){e.preventDefault();active=(active+1)%items.length;drawSug()}
+  else if(e.key==="ArrowUp"){e.preventDefault();active=(active-1+items.length)%items.length;drawSug()}
+  else if(e.key==="Enter"&&active>=0){e.preventDefault();pick(items[active])}
+  else if(e.key==="Escape"){hideSug()}
+});
+$("#sug").addEventListener("mousedown",e=>{const li=e.target.closest("li[data-i]");if(li){e.preventDefault();pick(items[+li.dataset.i])}});
+$("#q").addEventListener("blur",()=>setTimeout(hideSug,120));
+$("#f").addEventListener("submit",e=>{e.preventDefault();const q=clean($("#q").value);if(!q)return;hideSug();remember(q);render(q);$("#q").blur()});
+$("#clr").onclick=()=>{$("#q").value="";hideSug();$("#q").focus()};   // 入力欄だけ空にして、画面はそのまま
+$("#hist").addEventListener("click",e=>{
+  const x=e.target.closest("[data-del]");
+  if(x){hist=hist.filter(h=>h!==x.dataset.del);saveHist();return}
+  const all=e.target.closest("#delall");
+  if(all){   // 誤タップ防止：1回目で確認表示、3秒以内にもう1回押すと削除
+    if(all.classList.contains("warn")){clearTimeout(delTimer);hist=[];saveHist();return}
+    all.classList.add("warn");all.textContent="もう一度押すと全部消えます";
+    delTimer=setTimeout(()=>{all.classList.remove("warn");all.textContent="履歴をすべて削除"},3000);return;
+  }
+  const b=e.target.closest("[data-q]");if(!b)return;$("#q").value=b.dataset.q;remember(b.dataset.q);render(b.dataset.q)});
+$("#q").addEventListener("focus",()=>$("#q").select());   // タップで全選択し、すぐ打ち替えられるように
+$("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending();return}
+  const t=e.target.closest("[data-tid]");if(t){const m=trendList.find(x=>x.id===+t.dataset.tid);if(m){$("#q").value=m.title;remember(m.title);render(m.title,false,m);collapseTop();window.scrollTo({top:0,behavior:"smooth"})}return}const a=e.target.closest("a.go");if(a)remember(a.dataset.q)});
+$("#tok").value=token;
+$("#saveTok").onclick=()=>{token=$("#tok").value.trim();store.set("mirumae_tmdb",token);cache.clear();trendList=null;if(token&&!clean($("#q").value))showTrending();$("#tokStatus").textContent=token?"保存しました。検索欄に作品名を入れると候補が出ます。":"トークンを削除しました。"};
+if(!token&&!TMDB_PROXY)$("#settings").open=true;
+
+renderHist();
+if(hist[0]){$("#q").value=hist[0];render(hist[0]);
+  if(token||TMDB_PROXY)getTrending().then(()=>cur&&render(...cur)).catch(()=>{})}   // TOP10リストだけ後から読み込む
+else if(token||TMDB_PROXY){$("#out").innerHTML='<div style="color:var(--muted);padding:24px 0">話題作を読み込み中…</div>';showTrending()}
+else render(EXAMPLE,true);
+</script>
+</body>
+</html>
