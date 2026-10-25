@@ -20,6 +20,6 @@
 ## TMDB
 話題作TOP10は、リポジトリの Secret `TMDB_TOKEN` を使って Actions が取得するので、訪問者はトークン不要。
 
-サジェストも `data/titles.json` から出すので、訪問者はトークン不要。一覧にないマイナー作品まで候補に出したい場合は、`worker/` を Cloudflare Workers に置き、`index.html` の `TMDB_PROXY` に URL を設定する（TMDB の検索を直接使う）。
+サジェストは Cloudflare Workers の中継（`worker/`）経由で TMDB の検索を使う。中継が応答しないときは `data/titles.json` から候補を出す。トークンはブラウザに一切置かない。
 
 This product uses the TMDB API but is not endorsed or certified by TMDB.
