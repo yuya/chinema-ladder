@@ -162,6 +162,11 @@ const GROUPS=[
   {n:"Prime Video",d:"見放題・レンタル",pr:1,u:q=>"https://www.amazon.co.jp/s?i=instant-video&k="+E(q)},
   {n:"Netflix",d:"見放題",u:q=>"https://www.netflix.com/search?q="+E(q)},
  ]},
+ {h:"ウェブ検索",note:"「映画」を付けて同名の別物を避ける",items:[
+  // p=検索語、ei=文字コード。Yahooのほかのパラメータ（ai, ts, aq, fr など）は計測用なので不要
+  {n:"Yahoo!検索",d:"ニュース・まとめ記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(q+" 映画")+"&ei=UTF-8"},
+  {n:"Google",d:"ニュース・まとめ記事",u:q=>"https://www.google.com/search?q="+E(q+" 映画")},
+ ]},
 ];
 
 const $=s=>document.querySelector(s);
