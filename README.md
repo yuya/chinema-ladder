@@ -8,8 +8,9 @@
 - `index.html` … サイト本体（1ファイル完結。ライブラリなし）
 - `worker/worker.js` … 本番用の TMDB 中継（Cloudflare Workers）。トークンをブラウザに置かないため
 - `data/trending.json` … 話題作TOP10。GitHub Actions が毎日自動更新（手で編集しない）
-- `scripts/fetch-trending.mjs` … 上の JSON を作るスクリプト
-- `.github/workflows/trending.yml` … 毎日 6:17（日本時間）に上のスクリプトを実行
+- `data/titles.json` … 検索ボックスのサジェスト用の作品一覧（数千本）。Actions が毎日自動更新
+- `scripts/fetch-trending.mjs` / `scripts/fetch-titles.mjs` … 上の2つの JSON を作るスクリプト
+- `.github/workflows/trending.yml` … 毎日 6:17（日本時間）に上のスクリプトを実行。定期実行は既定ブランチの設定しか動かないため、このファイルは main にも置く
 - `.nojekyll` … GitHub Pages で Jekyll 変換を無効化
 
 ## ブランチ
@@ -19,6 +20,6 @@
 ## TMDB
 話題作TOP10は、リポジトリの Secret `TMDB_TOKEN` を使って Actions が取得するので、訪問者はトークン不要。
 
-作品のサジェストは、いまは開発用としてページ下の「開発者向け：TMDB の設定」にトークンを入れたときだけ動く。誰でも使えるようにするには `worker/` を Cloudflare Workers に置き、`index.html` の `TMDB_PROXY` に URL を設定する。
+サジェストも `data/titles.json` から出すので、訪問者はトークン不要。一覧にないマイナー作品まで候補に出したい場合は、`worker/` を Cloudflare Workers に置き、`index.html` の `TMDB_PROXY` に URL を設定する（TMDB の検索を直接使う）。
 
 This product uses the TMDB API but is not endorsed or certified by TMDB.

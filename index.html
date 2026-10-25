@@ -177,8 +177,35 @@ const SPOILER_WORDS=["ネタバレ","結末","犯人","ラスト","オチ","真�
 const cache=new Map();
 let ctrl=null,timer=null,items=[],active=-1;
 
+/* 作品名一覧（data/titles.json）から候補を出す。トークン不要で誰でも使える。
+   GitHub Actions が毎日、人気作・評価の多い作品・上映中・公開予定の数千本を書き出している。 */
+let titles=null,titlesLoading=null;
+// 表記ゆれ対策：全角半角・カタカナひらがな・記号や空白の違いを無視して比べる
+const norm=s=>(s||"").normalize("NFKC").toLowerCase()
+  .replace(/[\u30a1-\u30f6]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60))
+  .replace(/[\s・･:：\-‐－ー〜~!！?？、。,.「」『』（）()\/／&＆'"]/g,"");
+function loadTitles(){
+  if(titles)return Promise.resolve(titles);
+  return titlesLoading??=fetch("data/titles.json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(j=>{
+    titles=j.items.map(([id,title,year,poster,original])=>({id,title,date:year,poster,original:original||title,k:norm(title),ko:original?norm(original):""}));
+    return titles;
+  }).catch(e=>{titlesLoading=null;throw e});
+}
+async function searchLocal(q){
+  const list=await loadTitles(),k=norm(q);
+  if(!k)return [];
+  const head=[],mid=[];   // 前方一致を先に、部分一致を後に（どちらも人気順）
+  for(const m of list){
+    if(m.k.startsWith(k)||m.ko.startsWith(k))head.push(m);
+    else if(m.k.includes(k)||m.ko.includes(k))mid.push(m);
+    if(head.length>=8)break;
+  }
+  return head.concat(mid).slice(0,8);
+}
+
 async function searchTMDB(q){
   if(cache.has(q))return cache.get(q);
+  if(!TMDB_PROXY&&!token){const r=await searchLocal(q);cache.set(q,r);return r}
   ctrl?.abort();ctrl=new AbortController();
   let res;
   if(TMDB_PROXY){
@@ -278,12 +305,11 @@ function onType(){
       const r=await searchTMDB(q);
       if(clean($("#q").value)!==q)return;
       items=r;active=-1;
-      r.length?drawSug():showSug('<li class="msg">候補が見つかりません。そのまま検索もできます。</li>');
+      r.length?drawSug():showSug('<li class="msg">候補にありません。Enter でそのまま検索できます。</li>');
     }catch(e){
       if(e.name==="AbortError")return;
       items=[];
-      if(e.message==="NO_TOKEN")showSug('<li class="msg">候補を出すには、ページ下の「TMDB の設定」にトークンを入れてください。</li>');
-      else if(e.message==="BAD_TOKEN")showSug('<li class="msg">トークンが正しくありません。「TMDB の設定」を確認してください。</li>');
+            if(e.message==="BAD_TOKEN")showSug('<li class="msg">トークンが正しくありません。「TMDB の設定」を確認してください。</li>');
       else showSug('<li class="msg">候補を取得できませんでした。そのまま検索はできます。</li>');
     }
   },250);
@@ -332,7 +358,7 @@ $("#hist").addEventListener("click",e=>{
     delTimer=setTimeout(()=>{all.classList.remove("warn");all.textContent="履歴をすべて削除"},3000);return;
   }
   const b=e.target.closest("[data-q]");if(!b)return;$("#q").value=b.dataset.q;remember(b.dataset.q);render(b.dataset.q)});
-$("#q").addEventListener("focus",()=>$("#q").select());   // タップで全選択し、すぐ打ち替えられるように
+$("#q").addEventListener("focus",()=>{$("#q").select();if(!TMDB_PROXY&&!token)loadTitles().catch(()=>{})});   // 一覧は最初に検索欄を触ったときに読み込む   // タップで全選択し、すぐ打ち替えられるように
 $("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending();return}
   const t=e.target.closest("[data-tid]");if(t){const m=trendList.find(x=>x.id===+t.dataset.tid);if(m){$("#q").value=m.title;remember(m.title);render(m.title,false,m);collapseTop();window.scrollTo({top:0,behavior:"smooth"})}return}const a=e.target.closest("a.go");if(a)remember(a.dataset.q)});
 $("#tok").value=token;
