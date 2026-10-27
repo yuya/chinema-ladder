@@ -14,6 +14,11 @@
 <link rel="preconnect" href="https://image.tmdb.org">
 <link rel="dns-prefetch" href="https://cinema-ladder-api.twilightwind.workers.dev">
 <meta name="description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
+<link rel="canonical" href="./">
+<meta property="og:site_name" content="Chinemaladder">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Chinemaladder">
+<meta property="og:description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
 <style>
 :root{
   --bg:#F4F4F7;--surface:#FFFFFF;--fg:#17171C;--muted:#5E5E6B;--line:#E1E1E8;
@@ -30,19 +35,25 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-
 button,input{font:inherit;color:inherit}
 button{cursor:pointer}
 [hidden]{display:none!important}
+p,figure,ul,ol,hgroup{margin:0}
+ul,ol{padding:0;list-style:none}
+search{display:block}
+/* 画面には出さず、読み上げ・検索エンジン向けにだけ残す */
+.vh{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-header{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);
+body > header{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 12px}
 .hd{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
-.logo{font-weight:800;font-size:19px;letter-spacing:.01em;flex-wrap:wrap;display:flex;align-items:baseline;gap:8px}
-.logo b{color:var(--brand)}
+.brand{flex-wrap:wrap;display:flex;align-items:baseline;gap:8px}
+.logo{font-weight:800;font-size:19px;letter-spacing:.01em;color:inherit;text-decoration:none}
+.logo .lad{color:var(--brand)}
 .logo .name{white-space:nowrap}
 .logo .mark{width:24px;height:24px;vertical-align:-5px;margin-right:7px;border-radius:6px;box-shadow:0 0 0 1px var(--line)}   /* brand/icon.svg と同じ絵（通信を増やさないよう直接埋め込み） */
-.logo small{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.08em;font-feature-settings:"palt" 1}   /* palt で「、」の後ろの空きを詰める */
+.tagline{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.08em;font-feature-settings:"palt" 1}   /* palt で「、」の後ろの空きを詰める */
 .sbox{position:relative}
-form.search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 6px 0 12px}
-form.search:focus-within{border-color:var(--accent)}
+.search form{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 6px 0 12px}
+.search form:focus-within{border-color:var(--accent)}
 .search input{flex:1;min-width:0;border:0;background:transparent;padding:11px 0;outline:none;font-size:16px}
 .search svg{flex:none;width:17px;height:17px;stroke:var(--muted)}
 .clear{border:0;background:transparent;color:var(--muted);padding:6px 8px;font-size:13px}
@@ -53,17 +64,17 @@ form.search:focus-within{border-color:var(--accent)}
 .sug li{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;align-items:center;padding:6px 8px;border-radius:8px;cursor:pointer}
 .sug li[aria-selected="true"],.sug li:hover{background:var(--accent-soft)}
 .sug img,.sug .noimg{width:36px;height:54px;border-radius:4px;object-fit:cover;background:var(--bg)}
-.sug .t{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sug .o{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sug .t{display:block;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sug .o{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sug .msg{display:block;padding:10px;color:var(--muted);font-size:13px;cursor:default}
 .sug .msg:hover{background:none}
 
 /* 履歴：チップの列だけ横スクロールし、全削除ボタンは右端に固定して見切れないようにする */
 .hist{display:flex;gap:6px;align-items:center}
-.hist .hl{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
+.hist .hl{flex:1;min-width:0;display:flex;margin:0;gap:6px;overflow-x:auto;scrollbar-width:none;
   -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);padding-right:20px}
 .hist .hl::-webkit-scrollbar{display:none}
-.hist .lbl{font-size:12px;color:var(--muted);flex:none;align-self:center}
+.hist .lbl{font-size:12px;font-weight:400;margin:0;color:var(--muted);flex:none;align-self:center}
 .hist .hc{flex:none;display:flex;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:999px;font-size:13px}
 .hist .hc button{border:0;background:transparent;border-radius:999px}
 .hist .hc [data-q]{padding:3px 2px 3px 11px}
@@ -76,6 +87,7 @@ form.search:focus-within{border-color:var(--accent)}
 
 main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 24px;
   display:flex;flex-direction:column;gap:18px}
+.movie{display:flex;flex-direction:column;gap:18px}
 .now{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center}
 /* 共有は控えめに：枠なし・アイコンだけ・作品欄の右下（押せる範囲は 32px 確保） */
 .share{align-self:end;display:grid;place-items:center;width:32px;height:32px;margin:0 -6px -4px 0;border:0;background:transparent;color:var(--muted);border-radius:8px;padding:0}
@@ -94,8 +106,11 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .now .ex{font-size:12px;color:var(--muted)}
 
 .grp{display:flex;flex-direction:column;gap:8px}
-.grp h2{margin:0;font-size:12px;letter-spacing:.12em;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;gap:8px}
-.grp h2 small{font-weight:500;letter-spacing:0}
+.grp hgroup{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.grp h2{margin:0;font-size:12px;letter-spacing:.12em;color:var(--muted);font-weight:700}
+.grp hgroup p{font-size:12px;color:var(--muted)}
+.grid li{display:flex;min-width:0}
+.grid li > a{flex:1;min-width:0}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 a.go{display:flex;flex-direction:column;gap:1px;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 12px;min-height:64px;justify-content:center;transition:border-color .12s,transform .12s}
 a.go:hover{border-color:var(--accent)}
@@ -132,15 +147,15 @@ a.go:hover .n::after{background:var(--accent)}
 a.go .d{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pr{font-size:10px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px;line-height:1.5}
 .ad{background:var(--ad);border:1px dashed var(--line);border-radius:12px;padding:14px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:80px}
-.ad b{font-size:10px;letter-spacing:.14em}
+.ad .adl{font-size:10px;font-weight:700;letter-spacing:.14em}
 
-footer a{color:inherit;text-decoration:underline;text-underline-offset:2px}
-footer a:hover{color:var(--accent)}
-footer{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px 32px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:10px}
+body > footer a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+body > footer a:hover{color:var(--accent)}
+body > footer{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px 32px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:10px}
 details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
 summary{cursor:pointer;font-weight:700;color:var(--fg)}
 .emptyst{display:flex;flex-direction:column;gap:4px;padding:32px 0;color:var(--muted)}
-.emptyst b{color:var(--fg);font-size:17px}
+.emptyst h1{margin:0;color:var(--fg);font-size:17px}
 .topwrap{position:relative}
 .top ol{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column}
 .toplink{position:absolute;top:6px;right:8px;width:32px;height:32px;display:grid;place-items:center;border-radius:8px;color:var(--muted)}
@@ -166,36 +181,40 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 .top .msg{padding:8px 4px;color:var(--muted);font-size:13px}
 .top button{width:100%;display:grid;grid-template-columns:22px 32px minmax(0,1fr);gap:10px;align-items:center;border:0;background:transparent;text-align:left;padding:6px 4px;border-radius:8px}
 .top button:hover,.top button.on{background:var(--accent-soft)}
-.top button.on .rk,.top button.on b{color:var(--accent)}
+.top button.on .rk,.top button.on .tt{color:var(--accent)}
 .top .rk{font-weight:800;color:var(--accent);text-align:center;font-variant-numeric:tabular-nums}
 .top img,.top .noimg{width:32px;height:48px;border-radius:3px;object-fit:cover;background:var(--bg)}
-.top b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.top small{color:var(--muted);font-size:12px}
+.top .tt{display:block;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top small{display:block;color:var(--muted);font-size:12px}
 @media (prefers-reduced-motion:reduce){a.go{transition:none}}
 </style>
 </head>
 <body>
 <header>
   <div class="hd">
-    <div class="logo"><span class="name"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg>Chinema<b>ladder</b></span><small>映画の評判を、はしごする</small></div>
-    <div class="sbox">
-      <form class="search" id="f" role="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="q" type="search" enterkeyhint="search" placeholder="作品名を入力" autocomplete="off" aria-label="作品名"
+    <div class="brand"><a class="logo" href="./" aria-label="Chinemaladder トップへ"><span class="name"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg>Chinema<span class="lad">ladder</span></span></a><p class="tagline">映画の評判を、はしごする</p></div>
+    <search class="sbox search">
+      <form id="f" action="./" method="get">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <label for="q" class="vh">映画の作品名で検索</label>
+        <input id="q" name="q" type="search" enterkeyhint="search" placeholder="作品名を入力" autocomplete="off"
           role="combobox" aria-expanded="false" aria-controls="sug" aria-autocomplete="list">
         <button class="clear" type="button" id="clr">消す</button>
       </form>
-      <ul class="sug" id="sug" role="listbox" hidden></ul>
-    </div>
-    <div class="hist" id="hist"></div>
+      <ul class="sug" id="sug" role="listbox" aria-label="作品の候補" hidden></ul>
+    </search>
+    <nav class="hist" id="hist" aria-labelledby="hist-lbl"></nav>
   </div>
 </header>
 
-<main id="out"></main>
+<main id="out">
+  <p class="emptyst">読み込み中…</p>
+  <noscript><p class="emptyst">このサイトを使うには JavaScript を有効にしてください。</p></noscript>
+</main>
 
 <footer>
-  <div id="affnote" hidden>当サイトはアフィリエイトプログラムに参加しており、「PR」の付いたリンクから申し込みや購入があると、運営者が紹介料を受け取ることがあります。<span id="amznote" hidden>Amazonのアソシエイトとして、当サイトは適格販売により収入を得ています。</span></div>
-  <div>作品情報とポスター画像は <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> から取得しています。This product uses the <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> API but is not endorsed or certified by TMDB.</div>
+  <p id="affnote" hidden>当サイトはアフィリエイトプログラムに参加しており、「PR」の付いたリンクから申し込みや購入があると、運営者が紹介料を受け取ることがあります。<span id="amznote" hidden>Amazonのアソシエイトとして、当サイトは適格販売により収入を得ています。</span></p>
+  <p>作品情報とポスター画像は <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> から取得しています。This product uses the <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> API but is not endorsed or certified by TMDB.</p>
 </footer>
 
 <script>
@@ -366,11 +385,11 @@ let trendFailed=false;
 function trendHTML(){
   // 閉じた details の中身は隠れるので、リンクは details の外（外枠の右上）に置く
   const link=`<a class="toplink" href="${TOP_SOURCE}" target="_blank" rel="noopener" aria-label="TMDB の上映中の映画一覧を開く" title="TMDB の上映中の映画一覧"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>`;
-  const head=`<div class="topwrap">${link}<details class="top" id="top"${trendOpen?" open":""}><summary>いま話題の映画 TOP10</summary>`;
+  const head=`<aside class="topwrap" aria-label="いま話題の映画">${link}<details class="top" id="top"${trendOpen?" open":""}><summary>いま話題の映画 TOP10</summary>`;
   // 読み込み前も同じ高さの仮の行を出しておき、届いたときに下の内容がずれないようにする
-  if(!trendList?.length)return head+(trendFailed?'<ol><li class="msg">読み込めませんでした。時間をおいて開き直してください。</li></ol></details></div>':`<ol aria-busy="true">${'<li><div class="sk"><span class="rk"></span><span class="noimg"></span><span><i></i><i></i></span></div></li>'.repeat(10)}</ol></details></div>`);
+  if(!trendList?.length)return head+(trendFailed?'<ol><li class="msg">読み込めませんでした。時間をおいて開き直してください。</li></ol></details></aside>':`<ol aria-busy="true">${'<li><div class="sk"><span class="rk"></span><span class="noimg"></span><span><i></i><i></i></span></div></li>'.repeat(10)}</ol></details></aside>`);
   return head+`<ol>${trendList.map((m,i)=>
-    `<li><button type="button" data-tid="${m.id}"${cur&&cur[0]===m.title?' class="on" aria-current="true"':""}><span class="rk">${i+1}</span>${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="32" height="48">`:'<span class="noimg"></span>'}<span style="min-width:0"><b>${esc(m.title)}</b><small>${isUpcoming(m.date)?`公開予定 ${+m.date.slice(5,7)}月${+m.date.slice(8,10)}日`:"上映中"}</small></span></button></li>`).join("")}</ol></details></div>`;
+    `<li><button type="button" data-tid="${m.id}"${cur&&cur[0]===m.title?' class="on" aria-current="true"':""}><span class="rk">${i+1}</span>${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="32" height="48">`:'<span class="noimg"></span>'}<span style="min-width:0"><span class="tt">${esc(m.title)}</span><small>${isUpcoming(m.date)?`公開予定 ${+m.date.slice(5,7)}月${+m.date.slice(8,10)}日`:"上映中"}</small></span></button></li>`).join("")}</ol></details></aside>`;
 }
 
 function showSug(html){const s=$("#sug");s.innerHTML=html;s.hidden=!html;$("#q").setAttribute("aria-expanded",String(!!html))}
@@ -378,7 +397,7 @@ function hideSug(){showSug("");items=[];active=-1}
 function drawSug(){
   showSug(items.map((m,i)=>`<li role="option" id="opt${i}" data-i="${i}" aria-selected="${i===active}">
     ${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="36" height="54">`:'<span class="noimg"></span>'}
-    <span style="min-width:0"><div class="t">${esc(m.title)}</div><div class="o">${m.date?m.date.slice(0,4)+"年":"公開年不明"}${m.original&&m.original!==m.title?"・"+esc(m.original):""}</div></span></li>`).join(""));
+    <span style="min-width:0"><span class="t">${esc(m.title)}</span><span class="o">${m.date?m.date.slice(0,4)+"年":"公開年不明"}${m.original&&m.original!==m.title?"・"+esc(m.original):""}</span></span></li>`).join(""));
   $("#q").setAttribute("aria-activedescendant",active>=0?"opt"+active:"");
 }
 function onType(){
@@ -402,11 +421,11 @@ function pick(m){$("#q").value=m.title;hideSug();remember(m.title);saveMeta(m.ti
 
 /* ===== 画面 ===== */
 function remember(q){hist=[q,...hist.filter(x=>x!==q)].slice(0,8);store.set("cl_hist",hist);renderHist()}
-function renderHist(){$("#hist").innerHTML=hist.length?'<span class="lbl">最近</span><div class="hl">'+hist.map(h=>`<span class="hc"><button type="button" data-q="${esc(h)}">${esc(h)}</button><button type="button" class="x" data-del="${esc(h)}" aria-label="「${esc(h)}」を履歴から削除">×</button></span>`).join("")+'</div><button type="button" class="delall" id="delall" aria-label="履歴をすべて削除" title="履歴をすべて削除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>':""}
+function renderHist(){$("#hist").hidden=!hist.length;$("#hist").innerHTML=hist.length?'<p class="lbl" id="hist-lbl">最近</p><ul class="hl">'+hist.map(h=>`<li class="hc"><button type="button" data-q="${esc(h)}">${esc(h)}</button><button type="button" class="x" data-del="${esc(h)}" aria-label="「${esc(h)}」を履歴から削除">×</button></li>`).join("")+'</ul><button type="button" class="delall" id="delall" aria-label="履歴をすべて削除" title="履歴をすべて削除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>':""}
 function saveHist(){store.set("cl_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
-function renderEmpty(){cur=null;document.title="Chinemaladder";$("#out").innerHTML='<div class="emptyst"><b>観たい映画の名前を入れてください</b><span>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</span></div>'}
+function renderEmpty(){cur=null;document.title="Chinemaladder";setMeta("",false);$("#out").innerHTML='<section class="emptyst"><h1>観たい映画の名前を入れてください</h1><p>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</p></section>'}
 /* 作品名から TMDB の情報を、手元にない場合に取りに行く。
    1. 作品一覧（data/titles.json） 2. 中継サーバーで検索し、タイトルが完全に一致したもの */
 async function lookupMovie(q){
@@ -418,7 +437,7 @@ async function lookupMovie(q){
   return null;
 }
 function nowHTML(q,isExample,movie){
-  return `<div class="now"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</div><div><span class="k">検索中の作品</span><h1>${esc(q)}</h1><span class="ex yr">${movie?.date?`${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}`:""}</span>${isExample==="trend"?'<span class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></span>':isExample?'<span class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</span>':""}</div><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>`;
+  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${esc(q)}</h1><p class="ex yr">${movie?.date?`${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}`:""}</p>${isExample==="trend"?'<p class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></header>`;
 }
 /* ===== 作品ごとの URL（?q=作品名&id=TMDBの番号）とページタイトル =====
    サーバーの処理なしで動くよう、クエリ文字列で作品を表す。ブックマーク・共有・戻るボタンに対応。
@@ -430,8 +449,18 @@ function urlFor(q,movie){
   u.searchParams.set("q",q);if(movie?.id)u.searchParams.set("id",movie.id);
   return u.toString();
 }
+const DESC=document.querySelector('meta[name="description"]').content;
+function setMeta(q,isExample){
+  const desc=q&&!isExample?`「${q}」の評判を、Filmarks・映画.com・Yahoo! など各サイトの検索結果からまとめて確認できます。チケット、SNS、配信サービスへもすぐ移動できます。`:DESC;
+  document.querySelector('meta[name="description"]').content=desc;
+  document.querySelector('meta[property="og:description"]').content=desc;
+  document.querySelector('meta[property="og:title"]').content=document.title;
+  // 作品ページは自分自身を正規URLに、おすすめ表示のトップはトップを正規URLにする
+  document.querySelector('link[rel="canonical"]').href=q&&!isExample?urlFor(q,null):new URL("./",location.href).href;
+}
 function syncNav(q,isExample,movie){
   document.title=q?`${q} - Chinemaladder`:"Chinemaladder";
+  setMeta(q,isExample);
   const st={q,isExample,movie:slim(movie)};
   try{
     if(isExample||navMode==="none")history.replaceState(st,"",location.href);   // おすすめ表示などは URL を変えない
@@ -454,7 +483,7 @@ async function share(){
 function fillMovie(m){
   const [q,isExample]=cur;cur[2]=m;
   if(hist.includes(q))saveMeta(q,m);
-  const now=$("#out > .now");
+  const now=$("#out .now");
   if(now){const t=document.createElement("div");t.innerHTML=nowHTML(q,isExample,m);now.replaceWith(t.firstElementChild)}
   const links=[...document.querySelectorAll("#out a.go")],all=GROUPS.flatMap(g=>g.items);
   links.forEach((a,i)=>{if(all[i])a.href=all[i].u(q,m)});
@@ -465,7 +494,7 @@ function fillMovie(m){
 let ngOpen=false;
 function ngHTML(){
   return `<details class="ng" id="ng"${ngOpen?" open":""}><summary>X で除外する言葉 <span class="cnt">${ngWords.length}語</span></summary>
-  <div class="ngbody"><div class="chips">${ngWords.length?ngWords.map(w=>`<span class="chip">${esc(w)}<button type="button" data-ngdel="${esc(w)}" aria-label="「${esc(w)}」を除外しない">×</button></span>`).join(""):'<span class="ngnone">除外する言葉はありません</span>'}</div>
+  <div class="ngbody">${ngWords.length?`<ul class="chips" aria-label="除外する言葉">${ngWords.map(w=>`<li class="chip">${esc(w)}<button type="button" data-ngdel="${esc(w)}" aria-label="「${esc(w)}」を除外しない">×</button></li>`).join("")}</ul>`:'<p class="ngnone">除外する言葉はありません</p>'}
   <form class="ngadd" id="ngadd"><input id="ngin" type="text" maxlength="20" placeholder="言葉を追加（例：泣ける）" autocomplete="off" enterkeyhint="done" aria-label="除外する言葉"><button type="submit">追加</button></form>
   <button type="button" class="ngreset" id="ngreset">初期設定に戻す</button></div></details>`;
 }
@@ -480,7 +509,7 @@ function refreshNg(keepFocus){
 const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)");
 function playSwap(){
   if(reduceMotion.matches||!Element.prototype.animate)return;
-  const els=[...document.querySelectorAll("#out > .now, #out > .grp, #out > .ad")];
+  const els=[...document.querySelectorAll("#out .movie > *")];
   els.forEach((el,i)=>el.animate(
     [{opacity:0,transform:"translateY(10px)"},{opacity:1,transform:"none"}],
     {duration:280,delay:Math.min(i,5)*45,easing:"cubic-bezier(.2,.7,.3,1)",fill:"backwards"}));
@@ -505,13 +534,14 @@ function render(q,isExample,movie){
   const changed=!cur||cur[0]!==q;   // 作品が変わったときだけ切り替えのアニメーションを付ける
   cur=[q,isExample,movie];
   syncNav(q,isExample,movie);
-  let h=trendHTML()+nowHTML(q,isExample,movie);
+  let h=trendHTML()+`<article class="movie" aria-labelledby="mt">`+nowHTML(q,isExample,movie);
   GROUPS.forEach((gr,i)=>{
-    h+=`<section class="grp"><h2>${gr.h}${gr.note?`<small>${gr.note}</small>`:""}</h2><div class="grid">${gr.items.map(it=>
-      `<a class="go" href="${esc(it.u(q,movie))}" target="_blank" rel="${it.pr?.()?"noopener sponsored":"noopener"}" data-q="${esc(q)}"><span class="n"><span class="fav fav-${it.ic}" aria-hidden="true"></span><span class="nm">${it.n}</span></span><span class="d">${it.pr?.()?'<span class="pr">PR</span>':""}${it.d}</span></a>`).join("")}</div>${gr.items.some(it=>it.ic==="x")?ngHTML():""}</section>`;
-    if(i===1)h+='<div class="ad"><b>広告</b>ここにバナー広告（例：320×100）</div>';
+    const hd=`<h2 id="g${i}">${gr.h}</h2>`;
+    h+=`<section class="grp" aria-labelledby="g${i}">${gr.note?`<hgroup>${hd}<p>${gr.note}</p></hgroup>`:hd}<ul class="grid">${gr.items.map(it=>
+      `<li><a class="go" href="${esc(it.u(q,movie))}" target="_blank" rel="${it.pr?.()?"noopener sponsored":"noopener"}" data-q="${esc(q)}"><span class="n"><span class="fav fav-${it.ic}" aria-hidden="true"></span><span class="nm">${it.n}</span></span><span class="d">${it.pr?.()?'<span class="pr">PR</span>':""}${it.d}</span></a></li>`).join("")}</ul>${gr.items.some(it=>it.ic==="x")?ngHTML():""}</section>`;
+    if(i===1)h+='<aside class="ad" aria-label="広告"><span class="adl">広告</span>ここにバナー広告（例：320×100）</aside>';
   });
-  $("#out").innerHTML=h;
+  $("#out").innerHTML=h+`</article>`;
   if(changed)playSwap();
   bindTop();
 }
@@ -580,7 +610,7 @@ if(startQ){   // 共有・ブックマークされた URL から開いたとき
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}
 else if(hist[0]){$("#q").value=hist[0];navMode="none";render(hist[0]);
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}   // TOP10リストだけ後から差し替える（画面全体は描き直さない）
-else{$("#out").innerHTML='<div class="emptyst"><span>いま話題の映画を読み込み中…</span></div>';showTrending()}
+else{$("#out").innerHTML='<p class="emptyst">いま話題の映画を読み込み中…</p>';showTrending()}
 </script>
 </body>
 </html>
