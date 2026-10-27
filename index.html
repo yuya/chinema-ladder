@@ -102,10 +102,11 @@ a.go .fav{width:16px;height:16px;border-radius:3px;flex:none;background-position
 .fav-x{background-image:url(data:image/webp;base64,UklGRvAAAABXRUJQVlA4TOMAAAAvH8AHAIWr2Hbj5kEQBEEwBEMIhEIQBEEwg0AwBEMwBEEQhNfV6f4d0f8JwF/YeXdbm9wWJNLdM3Wl0bFaacCJY8HpWG8swE57YOw4KBECidQ7hSFHUNmAynGjEYrjjRVoNEAjFU+UGQKZqTJZ8dTCDpScOw1PNhpgpOPpIxUYrM/THIBmyNNgNMDYnqfJAnTWZ8lkhkAi5EmdZmxAZXuO04HOCjRuz3A2ABIhkEg5tnHitnIHCschzdA7aDwBRjugEYr7EqnASF2SYMHjygFojqVOw2rj7j5pC07HsgRvUx/9dgA=)}
 .fav-yahoo{background-image:url(data:image/webp;base64,UklGRjABAABXRUJQVlA4TCMBAAAvH8AHEBJJkiS5VuT3v/ZTsGKbiGD02PzPDFQLAAg4Z9uXbNu274ZmpzUvsdk2/sC20qW9NTUvmhOwN7/f/H/3ZWx3sVu9efh2yEYLHjlgJQDn7qr8bsVOfXPtmfnK/3/cZ98BQC9WvjT6xC6XerzyntucMMGyKi8dBpiPKs+f7PsrPziybW6s/Gb2yUzzjf/LlQfjvZ6PzNzR55WbdmmVX8sf1m/m+iIPA7bjT//WHyCv5rzqj0n2+MU/rtq5Kypn765HKmf8+d9Zu/RSeXu3gfCg/8t/v3dptN/yt6X35lTl2107Xe7Z08o3NzydH4x/HXNd7TQArwGQBXtukdsr39n031RAtn3kjIseeMpvXbsBgM175dwH3d5mlss8D8iDNywA)}
 /* ICONS:END */
-a.go .n::after{content:"↗";font-size:12px;color:var(--muted);position:absolute;top:8px;right:10px;line-height:1}
+/* 外部リンクのアイコン（TOP10 の右上と同じ形）。mask にして文字色に合わせる */
+:root{--ext:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'/%3E%3C/svg%3E")}
+a.go .n::after{content:"";position:absolute;top:9px;right:9px;width:14px;height:14px;background:var(--muted);-webkit-mask:var(--ext) center/contain no-repeat;mask:var(--ext) center/contain no-repeat}
+a.go:hover .n::after{background:var(--accent)}
 a.go .d{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-a.go.main{border-color:var(--accent);background:var(--accent-soft)}
-a.go.main .n{color:var(--accent)}
 .pr{font-size:10px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px;line-height:1.5}
 .ad{background:var(--ad);border:1px dashed var(--line);border-radius:12px;padding:14px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:80px}
 .ad b{font-size:10px;letter-spacing:.14em}
@@ -122,6 +123,19 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 .toplink{position:absolute;top:6px;right:8px;width:32px;height:32px;display:grid;place-items:center;border-radius:8px;color:var(--muted)}
 .toplink:hover{color:var(--accent);background:var(--accent-soft)}
 .toplink svg{width:16px;height:16px}
+.ng{margin-top:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px}
+.ng summary{font-weight:700;font-size:13px}
+.ng .cnt{font-weight:500;color:var(--muted);margin-left:4px}
+.ngbody{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 2px 2px 10px;font-size:13px;line-height:1.5}
+.chip button{border:0;background:transparent;color:var(--muted);width:24px;height:24px;border-radius:50%;font-size:14px;line-height:1}
+.chip button:hover{color:var(--accent);background:var(--accent-soft)}
+.ngnone{color:var(--muted)}
+.ngadd{display:flex;gap:6px}
+.ngadd input{flex:1;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 10px;font-size:16px}
+.ngadd button{flex:none;border:0;background:var(--accent);color:var(--surface);border-radius:8px;padding:0 14px;font-weight:700}
+.ngreset{align-self:flex-start;border:0;background:transparent;color:var(--muted);font-size:12px;text-decoration:underline;padding:0}
 .top summary{padding-right:36px}
 .top .sk{display:grid;grid-template-columns:22px 32px minmax(0,1fr);gap:10px;align-items:center;padding:6px 4px}
 .top .sk i{display:block;height:10px;border-radius:5px;background:var(--bg);width:70%}
@@ -185,7 +199,7 @@ const IMG = "https://image.tmdb.org/t/p/w92";
 const E=encodeURIComponent;
 const GROUPS=[
  {h:"レビュー",note:"星とレビューを見る",items:[
-  {n:"Filmarks",ic:"filmarks",d:"レビュー数が多い",main:1,u:q=>"https://filmarks.com/search/movies?q="+E(q)},
+  {n:"Filmarks",ic:"filmarks",d:"レビュー数が多い",u:q=>"https://filmarks.com/search/movies?q="+E(q)},
   {n:"映画.com",ic:"eiga",d:"評価・作品情報",u:q=>"https://eiga.com/search/"+E(q)+"/"},
   {n:"Movie Walker",ic:"moviewalker",d:"評価・ニュース",u:q=>"https://press.moviewalker.jp/search/free_search.cgi?keyword="+E(q)},
   {n:"映画ランド",ic:"eigaland",d:"評価・上映情報",u:q=>"https://eigaland.com/movie?sort=openDate&q="+E(q)},
@@ -194,13 +208,14 @@ const GROUPS=[
   {n:"IMDb",ic:"imdb",d:"海外の評価",u:(q,m)=>"https://www.imdb.com/find/?q="+E(m?.original||q)+"&s=tt&ttype=ft"},
   // p=検索語、ei=文字コード。ほかのパラメータ（ai, ts, aq, fr など）は Yahoo の計測用なので不要
   {n:"Yahoo!検索",ic:"yahoo",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
+  {n:"Google",ic:"google",d:"ネットの記事",u:q=>"https://www.google.com/search?q="+E(withEiga(q))+"&hl=ja"},
  ]},
  {h:"チケット・上映館",note:"",items:[
   {n:"ムビチケ",ic:"mvtk",d:"前売券を買う",pr:()=>!!AFF.mvtk,u:q=>affWrap(AFF.mvtk,"https://store.moviewalker.jp/search?keyword=name:"+E(q))},
   {n:"上映館を探す",ic:"eiga",d:"映画.comの上映中検索",u:q=>"https://eiga.com/now/q/?title="+E(q)+"&region=&pref=&area=&genre=on&sort=release"},
  ]},
  {h:"SNSの声",note:"",items:[
-  {n:"X",ic:"x",d:"ネタバレ語を除外",u:q=>"https://x.com/search?f=live&q="+E(`"${q}" `+SPOILER_WORDS.map(w=>"-"+w).join(" "))},
+  {n:"X",ic:"x",d:"ネタバレ語を除外",u:q=>"https://x.com/search?f=live&q="+E(`"${q}" `+ngQuery())},
   {n:"Instagram",ic:"instagram",d:"ハッシュタグ",u:q=>"https://www.instagram.com/explore/tags/"+E(q.replace(/[\s・:：!！?？、。「」『』\-]/g,""))+"/"},
  ]},
  {h:"配信",note:"",items:[
@@ -223,10 +238,15 @@ function saveMeta(q,m){
   for(const k of Object.keys(meta))if(!hist.includes(k)&&k!==q)delete meta[k];   // 履歴から消えた分は捨てる
   store.set("cl_meta",meta);
 }
-// Yahoo!検索用：同名の本や曲を避けるため「映画」を付ける（タイトルに入っていれば付けない）
+// Yahoo!検索・Google 用：同名の本や曲を避けるため「映画」を付ける（タイトルに入っていれば付けない）
 const withEiga=q=>q.includes("映画")?q:q+" 映画";
 /* X検索で除外する語。増やすほど安全ですが、普通の感想も減ります。 */
-const SPOILER_WORDS=["ネタバレ","結末","犯人","ラスト","オチ","真相","正体","黒幕","伏線回収","考察","どんでん返し","死亡","生存"];
+const DEFAULT_NG=["ネタバレ","結末","犯人","ラスト","オチ","真相","正体","黒幕","伏線回収","考察","どんでん返し","死亡","生存"];
+// 利用者が編集した除外語（この端末にだけ保存）。未編集なら初期の語を使う
+let ngWords=(()=>{const v=store.get("cl_ng",null);return Array.isArray(v)?v:DEFAULT_NG.slice()})();
+const saveNg=()=>store.set("cl_ng",ngWords);
+// X の検索式：空白や記号を含む語は "" で囲む
+const ngQuery=()=>ngWords.map(w=>/[\s"()]/.test(w)?`-"${w.replace(/"/g,"")}"`:"-"+w).join(" ");
 
 /* ===== TMDB サジェスト ===== */
 const cache=new Map();
@@ -385,6 +405,21 @@ function fillMovie(m){
   const links=[...document.querySelectorAll("#out a.go")],all=GROUPS.flatMap(g=>g.items);
   links.forEach((a,i)=>{if(all[i])a.href=all[i].u(q,m)});
 }
+/* X の除外語の編集パネル（チップの × で削除、入力欄で追加） */
+let ngOpen=false;
+function ngHTML(){
+  return `<details class="ng" id="ng"${ngOpen?" open":""}><summary>X で除外する言葉 <span class="cnt">${ngWords.length}語</span></summary>
+  <div class="ngbody"><div class="chips">${ngWords.length?ngWords.map(w=>`<span class="chip">${esc(w)}<button type="button" data-ngdel="${esc(w)}" aria-label="「${esc(w)}」を除外しない">×</button></span>`).join(""):'<span class="ngnone">除外する言葉はありません</span>'}</div>
+  <form class="ngadd" id="ngadd"><input id="ngin" type="text" maxlength="20" placeholder="言葉を追加（例：泣ける）" autocomplete="off" enterkeyhint="done" aria-label="除外する言葉"><button type="submit">追加</button></form>
+  <button type="button" class="ngreset" id="ngreset">初期設定に戻す</button></div></details>`;
+}
+// 除外語を変えたら、パネルと X のリンクだけ更新する
+function refreshNg(keepFocus){
+  const d=$("#ng");if(!d)return;
+  const t=document.createElement("div");t.innerHTML=ngHTML();d.replaceWith(t.firstElementChild);
+  if(cur){const all=GROUPS.flatMap(g=>g.items);[...document.querySelectorAll("#out a.go")].forEach((a,i)=>{if(all[i]?.ic==="x")a.href=all[i].u(cur[0],cur[2])})}
+  if(keepFocus)$("#ngin")?.focus();
+}
 /* 作品の切り替えアニメーション：見出しと各グループが少しずつずれて、下からふわっと出る */
 const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)");
 function playSwap(){
@@ -416,7 +451,7 @@ function render(q,isExample,movie){
   let h=trendHTML()+nowHTML(q,isExample,movie);
   GROUPS.forEach((gr,i)=>{
     h+=`<section class="grp"><h2>${gr.h}${gr.note?`<small>${gr.note}</small>`:""}</h2><div class="grid">${gr.items.map(it=>
-      `<a class="go${it.main?" main":""}" href="${esc(it.u(q,movie))}" target="_blank" rel="${it.pr?.()?"noopener sponsored":"noopener"}" data-q="${esc(q)}"><span class="n"><span class="fav fav-${it.ic}" aria-hidden="true"></span><span class="nm">${it.n}</span></span><span class="d">${it.pr?.()?'<span class="pr">PR</span>':""}${it.d}</span></a>`).join("")}</div></section>`;
+      `<a class="go" href="${esc(it.u(q,movie))}" target="_blank" rel="${it.pr?.()?"noopener sponsored":"noopener"}" data-q="${esc(q)}"><span class="n"><span class="fav fav-${it.ic}" aria-hidden="true"></span><span class="nm">${it.n}</span></span><span class="d">${it.pr?.()?'<span class="pr">PR</span>':""}${it.d}</span></a>`).join("")}</div>${gr.items.some(it=>it.ic==="x")?ngHTML():""}</section>`;
     if(i===1)h+='<div class="ad"><b>広告</b>ここにバナー広告（例：320×100）</div>';
   });
   $("#out").innerHTML=h;
@@ -454,7 +489,19 @@ $("#hist").addEventListener("click",e=>{
     delTimer=setTimeout(()=>{all.classList.remove("warn");all.textContent="履歴をすべて削除"},3000);return;
   }
   const b=e.target.closest("[data-q]");if(!b)return;$("#q").value=b.dataset.q;remember(b.dataset.q);render(b.dataset.q);collapseTop()});
-$("#q").addEventListener("focus",()=>$("#q").select());   // タップで全選択し、すぐ打ち替えられるように
+$("#q").addEventListener("focus",()=>$("#q").select());
+$("#out").addEventListener("toggle",e=>{if(e.target.id==="ng")ngOpen=e.target.open},true);
+$("#out").addEventListener("submit",e=>{
+  if(e.target.id!=="ngadd")return;e.preventDefault();
+  const words=$("#ngin").value.split(/[,、，]/).map(w=>w.normalize("NFKC").trim()).filter(Boolean);
+  for(const w of words)if(!ngWords.includes(w)&&ngWords.length<40)ngWords.push(w);
+  saveNg();refreshNg(true);
+});
+$("#out").addEventListener("click",e=>{
+  const del=e.target.closest("[data-ngdel]");
+  if(del){ngWords=ngWords.filter(w=>w!==del.dataset.ngdel);saveNg();refreshNg();return}
+  if(e.target.id==="ngreset"){ngWords=DEFAULT_NG.slice();saveNg();refreshNg()}
+});   // タップで全選択し、すぐ打ち替えられるように
 $("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending();return}
   const t=e.target.closest("[data-tid]");if(t){const m=trendList.find(x=>x.id===+t.dataset.tid);if(m){$("#q").value=m.title;remember(m.title);render(m.title,false,m);collapseTop();window.scrollTo({top:0,behavior:"smooth"})}return}const a=e.target.closest("a.go");if(a)remember(a.dataset.q)});
 

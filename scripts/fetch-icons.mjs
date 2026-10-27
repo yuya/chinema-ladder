@@ -4,7 +4,7 @@ import { writeFile, mkdir, access } from "node:fs/promises";
 
 const SITES = {
   filmarks: "filmarks.com", eiga: "eiga.com", moviewalker: "moviewalker.jp", eigaland: "eigaland.com",
-  kinenote: "kinenote.com", imdb: "imdb.com", yahoo: "yahoo.co.jp", mvtk: "mvtk.jp",
+  kinenote: "kinenote.com", imdb: "imdb.com", yahoo: "yahoo.co.jp", google: "google.com", mvtk: "mvtk.jp",
   x: "x.com", instagram: "instagram.com", unext: "unext.jp", primevideo: "primevideo.com", netflix: "netflix.com",
 };
 await mkdir("icons", { recursive: true });
