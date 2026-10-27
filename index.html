@@ -37,6 +37,8 @@ header{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1
 .hd{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
 .logo{font-weight:800;font-size:19px;letter-spacing:.01em;flex-wrap:wrap;display:flex;align-items:baseline;gap:8px}
 .logo b{color:var(--brand)}
+.logo .name{white-space:nowrap}
+.logo .mark{width:24px;height:24px;vertical-align:-5px;margin-right:7px;border-radius:6px;box-shadow:0 0 0 1px var(--line)}   /* brand/icon.svg と同じ絵（通信を増やさないよう直接埋め込み） */
 .logo small{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.08em}
 .sbox{position:relative}
 form.search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 6px 0 12px}
@@ -163,7 +165,7 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 <body>
 <header>
   <div class="hd">
-    <div class="logo"><span>Chinema<b>ladder</b></span><small>映画の評判を、はしごする</small></div>
+    <div class="logo"><span class="name"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg>Chinema<b>ladder</b></span><small>映画の評判を、はしごする</small></div>
     <div class="sbox">
       <form class="search" id="f" role="search">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
