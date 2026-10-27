@@ -75,10 +75,17 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .grp h2{margin:0;font-size:12px;letter-spacing:.12em;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;gap:8px}
 .grp h2 small{font-weight:500;letter-spacing:0}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-a.go{display:flex;flex-direction:column;gap:1px;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:64px;justify-content:center;transition:border-color .12s,transform .12s}
+a.go{display:flex;flex-direction:column;gap:1px;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 12px;min-height:64px;justify-content:center;transition:border-color .12s,transform .12s}
 a.go:hover{border-color:var(--accent)}
 a.go:active{transform:scale(.98)}
-a.go .n{font-weight:700;display:flex;align-items:center;gap:6px}
+/* 1行に収める工夫：
+   - palt で和文の字間を詰める（フォントの機能を使うだけなので負荷はほぼ無い）
+   - ↗ は右上の隅に置き、名前の行の幅を空ける
+   - それでも入らない狭い画面では、改行せず末尾を「…」にする */
+a.go{position:relative;font-feature-settings:"palt" 1}
+a.go .n{font-weight:700;display:flex;align-items:center;gap:6px;min-width:0;padding-right:10px}
+a.go .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+a.go .d .pr{margin-right:5px;vertical-align:1px}
 a.go .fav{width:16px;height:16px;border-radius:3px;flex:none;background-position:center;background-size:16px 16px;background-repeat:no-repeat}
 /* ICONS:START（scripts/inline-icons.py が自動生成。手で編集しない） */
 .fav-eiga{background-image:url(data:image/webp;base64,UklGRogDAABXRUJQVlA4WAoAAAAQAAAAHwAAHwAAQUxQSGkAAAABcNsAbtzgxmDlOQRNxcrjHVRlCNUcgRVB5H+uTBcREwDAnJF9/bIz6Ibnser641oDwNxX4Z4wXqU0L005r2KGKlKVrerr37dVnaoMVVBFL025UUPD3Io9AYxVv+rLxLM5I/ubzuB5AAAAVlA4IPgCAACQEQCdASogACAAPjEWiUOiISEUBAAgAwS2AE6ZQjgbyv8M/xg59lwOAB+M/QA3AH66fqrwgH6wdYx6AHlhexL+0X7ke0pd1VU16d+OGTrfGZxH+5/jB+TOcWfLP8t+SuqSf6TIef8L7gPY785ewL/Hv6J/pfy64ztSB/7q+hwQk4q4M1n+pSWt/dCNlH2WSnHky+0FIAD+/03eojynxNmX3+DlOQ9Mm6b/jVv3xGswEf8cd+MO/MkPZAfM6c3mi7/+eWOSwyZ9JWHRVE91fqIUvSz3UosdfJs06lNFu9f9Io5EVF35lVnFyejlyR/6Xo4P8KQaroSeXXb///xdEMoJIyit2M+StOZMOYw/yR4i46LO8F//dtqIdO8IS4L6eucv2N39rXg0BWf/9ez7v/sEoJITMp1Etzh5smQ4owLx1F/9IIfpz61IKmNfDcXuuN7VZgJikEfyqHRVfVn9CyTPoGxLeXr3/0dkCYwCKZ26H4VxoDSXaEhlHkmdr95TLh75wmzV6IRST0q2Kk2LwE0uJqjn4nn/4j/aWFbpXGvAO/mrhQoE2lB8TGCMM5xm9C49QH9cJDwZ3JulFCFAJm4xuRtkgR+Aqm8iPNzsxa5hS/DDNE/9En/Q8//IjOPfjNhq94bcEDzI/O/ixDHnbI2wjtF+7HGtp5Pf4wt8hkk5Pxrx0rVn40eEgXQdj/eu/Kc0jYS/4TzoP/938oNIAta/RsnPgvsYRVVDefpq3Vhei+Sts4vZXhHbePDq77cVpkQY7CfDrrpqcIsqKtcYik6cqXnqzcWgL/7vPp3xr5B7//7vByMMAEvNR+jKZFh/0GXJDg+GS8HFEwL4QNqOz+mrpJ60Myb1ogbJEz/JlZuJ1WF36xXrdPnFP3tN+688dIorGC+UOeP2/9dZ/SAGVwl85jwRRC3lBP71+XQM//pXO+qs53Ofc/3qR+fllXAnOp3wxFxmTMiiD+jLq/guTK7u0peFK/4f92+Oe40wP56qx5+0pCEjAAAA)}
@@ -95,8 +102,8 @@ a.go .fav{width:16px;height:16px;border-radius:3px;flex:none;background-position
 .fav-x{background-image:url(data:image/webp;base64,UklGRvAAAABXRUJQVlA4TOMAAAAvH8AHAIWr2Hbj5kEQBEEwBEMIhEIQBEEwg0AwBEMwBEEQhNfV6f4d0f8JwF/YeXdbm9wWJNLdM3Wl0bFaacCJY8HpWG8swE57YOw4KBECidQ7hSFHUNmAynGjEYrjjRVoNEAjFU+UGQKZqTJZ8dTCDpScOw1PNhpgpOPpIxUYrM/THIBmyNNgNMDYnqfJAnTWZ8lkhkAi5EmdZmxAZXuO04HOCjRuz3A2ABIhkEg5tnHitnIHCschzdA7aDwBRjugEYr7EqnASF2SYMHjygFojqVOw2rj7j5pC07HsgRvUx/9dgA=)}
 .fav-yahoo{background-image:url(data:image/webp;base64,UklGRjABAABXRUJQVlA4TCMBAAAvH8AHEBJJkiS5VuT3v/ZTsGKbiGD02PzPDFQLAAg4Z9uXbNu274ZmpzUvsdk2/sC20qW9NTUvmhOwN7/f/H/3ZWx3sVu9efh2yEYLHjlgJQDn7qr8bsVOfXPtmfnK/3/cZ98BQC9WvjT6xC6XerzyntucMMGyKi8dBpiPKs+f7PsrPziybW6s/Gb2yUzzjf/LlQfjvZ6PzNzR55WbdmmVX8sf1m/m+iIPA7bjT//WHyCv5rzqj0n2+MU/rtq5Kypn765HKmf8+d9Zu/RSeXu3gfCg/8t/v3dptN/yt6X35lTl2107Xe7Z08o3NzydH4x/HXNd7TQArwGQBXtukdsr39n031RAtn3kjIseeMpvXbsBgM175dwH3d5mlss8D8iDNywA)}
 /* ICONS:END */
-a.go .n::after{content:"↗";font-size:12px;color:var(--muted);margin-left:auto}
-a.go .d{font-size:12px;color:var(--muted)}
+a.go .n::after{content:"↗";font-size:12px;color:var(--muted);position:absolute;top:8px;right:10px;line-height:1}
+a.go .d{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 a.go.main{border-color:var(--accent);background:var(--accent-soft)}
 a.go.main .n{color:var(--accent)}
 .pr{font-size:10px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px;line-height:1.5}
@@ -177,8 +184,8 @@ const GROUPS=[
   {n:"ムビチケ",ic:"mvtk",d:"前売券を買う",pr:1,u:q=>"https://store.moviewalker.jp/search?keyword=name:"+E(q)},
   {n:"上映館を探す",ic:"eiga",d:"映画.comの上映中検索",u:q=>"https://eiga.com/now/q/?title="+E(q)+"&region=&pref=&area=&genre=on&sort=release"},
  ]},
- {h:"SNSの声",note:"ネタバレ語を除外して検索",items:[
-  {n:"X",ic:"x",d:"ネタバレになりやすい語を除外",u:q=>"https://x.com/search?f=live&q="+E(`"${q}" `+SPOILER_WORDS.map(w=>"-"+w).join(" "))},
+ {h:"SNSの声",note:"",items:[
+  {n:"X",ic:"x",d:"ネタバレ語を除外",u:q=>"https://x.com/search?f=live&q="+E(`"${q}" `+SPOILER_WORDS.map(w=>"-"+w).join(" "))},
   {n:"Instagram",ic:"instagram",d:"ハッシュタグ",u:q=>"https://www.instagram.com/explore/tags/"+E(q.replace(/[\s・:：!！?？、。「」『』\-]/g,""))+"/"},
  ]},
  {h:"配信",note:"",items:[
@@ -395,7 +402,7 @@ function render(q,isExample,movie){
   let h=trendHTML()+nowHTML(q,isExample,movie);
   GROUPS.forEach((gr,i)=>{
     h+=`<section class="grp"><h2>${gr.h}${gr.note?`<small>${gr.note}</small>`:""}</h2><div class="grid">${gr.items.map(it=>
-      `<a class="go${it.main?" main":""}" href="${esc(it.u(q,movie))}" target="_blank" rel="noopener" data-q="${esc(q)}"><span class="n"><span class="fav fav-${it.ic}" aria-hidden="true"></span>${it.n}${it.pr?'<span class="pr">PR</span>':""}</span><span class="d">${it.d}</span></a>`).join("")}</div></section>`;
+      `<a class="go${it.main?" main":""}" href="${esc(it.u(q,movie))}" target="_blank" rel="noopener" data-q="${esc(q)}"><span class="n"><span class="fav fav-${it.ic}" aria-hidden="true"></span><span class="nm">${it.n}</span></span><span class="d">${it.pr?'<span class="pr">PR</span>':""}${it.d}</span></a>`).join("")}</div></section>`;
     if(i===1)h+='<div class="ad"><b>広告</b>ここにバナー広告（例：320×100）</div>';
   });
   $("#out").innerHTML=h;
