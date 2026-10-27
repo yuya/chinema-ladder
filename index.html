@@ -61,6 +61,8 @@ form.search:focus-within{border-color:var(--accent)}
 main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 24px;
   display:flex;flex-direction:column;gap:18px}
 .now{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center}
+.now img.poster{opacity:0;transition:opacity .25s}
+.now img.poster.ok{opacity:1}
 .now img{width:64px;height:96px;object-fit:cover;border-radius:6px;background:var(--surface)}
 .now .k{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:700}
 .now h1{margin:0;font-size:24px;line-height:1.3;text-wrap:balance;word-break:break-word}
@@ -177,6 +179,14 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 const clean=s=>s.normalize("NFKC").replace(/\s+/g," ").trim();
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let hist=store.get("mirumae_hist",[]);
+/* 履歴の作品ごとの TMDB 情報（ポスター・原題・公開年）。履歴から開いたときに使う */
+let meta=store.get("mirumae_meta",{});
+function saveMeta(q,m){
+  if(!m||!q)return;
+  meta[q]={id:m.id,title:m.title,original:m.original,date:m.date,poster:m.poster};
+  for(const k of Object.keys(meta))if(!hist.includes(k)&&k!==q)delete meta[k];   // 履歴から消えた分は捨てる
+  store.set("mirumae_meta",meta);
+}
 try{localStorage.removeItem("mirumae_tmdb")}catch(e){}   // 以前の開発用トークンが残っていれば消す
 // Yahoo!検索用：同名の本や曲を避けるため「映画」を付ける（タイトルに入っていれば付けない）
 const withEiga=q=>q.includes("映画")?q:q+" 映画";
@@ -301,7 +311,7 @@ function onType(){
     }
   },250);
 }
-function pick(m){$("#q").value=m.title;hideSug();remember(m.title);render(m.title,false,m);collapseTop();$("#q").blur()}
+function pick(m){$("#q").value=m.title;hideSug();remember(m.title);saveMeta(m.title,m);render(m.title,false,m);collapseTop();$("#q").blur()}
 
 /* ===== 画面 ===== */
 function remember(q){hist=[q,...hist.filter(x=>x!==q)].slice(0,8);store.set("mirumae_hist",hist);renderHist()}
@@ -310,8 +320,43 @@ function saveHist(){store.set("mirumae_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
 function renderEmpty(){cur=null;$("#out").innerHTML='<div class="emptyst"><b>観たい映画の名前を入れてください</b><span>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</span></div>'}
+/* 作品名から TMDB の情報を、手元にない場合に取りに行く。
+   1. 作品一覧（data/titles.json） 2. 中継サーバーで検索し、タイトルが完全に一致したもの */
+async function lookupMovie(q){
+  try{await loadTitles();const m=findMovie(q);if(m)return m}catch(e){}
+  try{
+    const r=await fetch(TMDB_PROXY+"?q="+E(q));
+    if(r.ok){const list=await r.json();if(Array.isArray(list)){cache.set(q,list);return list.find(m=>m.title===q)||null}}
+  }catch(e){}
+  return null;
+}
+function nowHTML(q,isExample,movie){
+  return `<div class="now">${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="" width="64" height="96" class="poster" onload="this.classList.add('ok')">`:'<span></span>'}<div><span class="k">検索中の作品</span><h1>${esc(q)}</h1>${movie?.date?`<span class="ex">${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}</span>`:""}${isExample==="trend"?'<span class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></span>':isExample?'<span class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</span>':""}</div></div>`;
+}
+/* あとから TMDB の情報が分かったとき、画面全体は描き直さず、見出しとリンクだけ差し替える
+   （切り替えアニメーションを途中で止めないため） */
+function fillMovie(m){
+  const [q,isExample]=cur;cur[2]=m;
+  if(hist.includes(q))saveMeta(q,m);
+  const now=$("#out > .now");
+  if(now){const t=document.createElement("div");t.innerHTML=nowHTML(q,isExample,m);now.replaceWith(t.firstElementChild)}
+  const links=[...document.querySelectorAll("#out a.go")],all=GROUPS.flatMap(g=>g.items);
+  links.forEach((a,i)=>{if(all[i])a.href=all[i].u(q,m)});
+}
+/* 作品の切り替えアニメーション：見出しと各グループが少しずつずれて、下からふわっと出る */
+const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)");
+function playSwap(){
+  if(reduceMotion.matches||!Element.prototype.animate)return;
+  const els=[...document.querySelectorAll("#out > .now, #out > .grp, #out > .ad")];
+  els.forEach((el,i)=>el.animate(
+    [{opacity:0,transform:"translateY(10px)"},{opacity:1,transform:"none"}],
+    {duration:280,delay:Math.min(i,5)*45,easing:"cubic-bezier(.2,.7,.3,1)",fill:"backwards"}));
+  const h1=document.querySelector("#out h1");
+  if(h1)h1.animate([{color:"var(--accent)"},{color:"var(--fg)"}],{duration:900,easing:"ease-out"});
+}
 /* 作品名から TMDB の情報（原題・ポスター・公開年）を探す。履歴から開いたときなどに使う */
 function findMovie(q){
+  if(meta[q])return meta[q];
   for(const m of trendList||[])if(m.title===q)return m;
   for(const list of cache.values())for(const m of list||[])if(m.title===q)return m;
   for(const m of titles||[])if(m.title===q)return m;
@@ -321,16 +366,19 @@ function render(q,isExample,movie){
   if(!movie&&q){
     movie=findMovie(q);
     // 見つからなければ作品一覧を読み込んでもう一度探す（IMDb の原題検索とポスター表示のため）
-    if(!movie&&!titles)loadTitles().then(()=>{const m=findMovie(q);if(m&&cur&&cur[0]===q&&!cur[2])render(q,cur[1],m)}).catch(()=>{});
+    if(!movie)lookupMovie(q).then(m=>{if(m&&cur&&cur[0]===q&&!cur[2])fillMovie(m)});
   }
+  if(movie&&hist.includes(q))saveMeta(q,movie);
+  const changed=!cur||cur[0]!==q;   // 作品が変わったときだけ切り替えのアニメーションを付ける
   cur=[q,isExample,movie];
-  let h=trendHTML()+`<div class="now">${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="" width="64" height="96">`:'<span></span>'}<div><span class="k">検索中の作品</span><h1>${esc(q)}</h1>${movie?.date?`<span class="ex">${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}</span>`:""}${isExample==="trend"?'<span class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></span>':isExample?'<span class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</span>':""}</div></div>`;
+  let h=trendHTML()+nowHTML(q,isExample,movie);
   GROUPS.forEach((gr,i)=>{
     h+=`<section class="grp"><h2>${gr.h}${gr.note?`<small>${gr.note}</small>`:""}</h2><div class="grid">${gr.items.map(it=>
       `<a class="go${it.main?" main":""}" href="${esc(it.u(q,movie))}" target="_blank" rel="noopener" data-q="${esc(q)}"><span class="n"><span class="fav fav-${it.ic}" aria-hidden="true"></span>${it.n}${it.pr?'<span class="pr">PR</span>':""}</span><span class="d">${it.d}</span></a>`).join("")}</div></section>`;
     if(i===1)h+='<div class="ad"><b>広告</b>ここにバナー広告（例：320×100）</div>';
   });
   $("#out").innerHTML=h;
+  if(changed)playSwap();
   const d=$("#top");if(d)d.addEventListener("toggle",()=>{trendOpen=d.open;store.set("mirumae_trendOpen",trendOpen)});
 }
 
