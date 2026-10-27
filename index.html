@@ -4,12 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Chinemaladder</title>
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111115" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="Chinemaladder">
 <link rel="preconnect" href="https://image.tmdb.org">
 <link rel="dns-prefetch" href="https://cinema-ladder-api.twilightwind.workers.dev">
 <meta name="description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
 <style>
 :root{
   --bg:#F4F4F7;--surface:#FFFFFF;--fg:#17171C;--muted:#5E5E6B;--line:#E1E1E8;
+  --brand:#E8607A;   /* ロゴとアイコンのピンク。ライト・ダーク共通 */
   --accent:#B4233C;--accent-soft:#F8E4E8;--ad:#EEF0F5;
   --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI",Meiryo,system-ui,sans-serif;
   color-scheme:light;
@@ -28,7 +36,7 @@ header{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 12px}
 .hd{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
 .logo{font-weight:800;font-size:19px;letter-spacing:.01em;flex-wrap:wrap;display:flex;align-items:baseline;gap:8px}
-.logo b{color:var(--accent)}
+.logo b{color:var(--brand)}
 .logo small{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.08em}
 .sbox{position:relative}
 form.search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 6px 0 12px}

@@ -9,7 +9,17 @@
 /data/*
   Cache-Control: public, max-age=3600
 
-# ファビコンの元画像（表示には使っていない）
+# アイコン類（変えるときはファイル名ごと変えるか、1週間以内の反映でよしとする）
+/favicon.*
+  Cache-Control: public, max-age=604800
+/apple-touch-icon.png
+  Cache-Control: public, max-age=604800
+/brand/*
+  Cache-Control: public, max-age=604800
+/manifest.webmanifest
+  Cache-Control: public, max-age=86400
+
+# 各サイトのファビコンの元画像（表示には使っていない）
 /icons/*
   Cache-Control: public, max-age=604800
 
