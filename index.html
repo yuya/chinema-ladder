@@ -70,7 +70,12 @@ form.search:focus-within{border-color:var(--accent)}
 
 main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 24px;
   display:flex;flex-direction:column;gap:18px}
-.now{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center}
+.now{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center}
+.share{align-self:start;display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:10px;padding:7px 8px 5px;font-size:10px;line-height:1.2;min-width:48px}
+.share:hover{color:var(--accent);border-color:var(--accent)}
+.share svg{width:18px;height:18px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:20}
+.toast.on{opacity:1;transform:translate(-50%,0)}
 /* ポスター枠は画像の有無にかかわらず常に 64×96 を確保し、読み込み後にずれないようにする */
 .now .ph{position:relative;width:64px;height:96px;flex:none;border-radius:6px;overflow:hidden;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--line)}
 .now .ph svg{width:24px;height:24px}
@@ -394,7 +399,7 @@ function renderHist(){$("#hist").innerHTML=hist.length?'<span class="lbl">最近
 function saveHist(){store.set("cl_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
-function renderEmpty(){cur=null;$("#out").innerHTML='<div class="emptyst"><b>観たい映画の名前を入れてください</b><span>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</span></div>'}
+function renderEmpty(){cur=null;document.title="Chinemaladder";$("#out").innerHTML='<div class="emptyst"><b>観たい映画の名前を入れてください</b><span>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</span></div>'}
 /* 作品名から TMDB の情報を、手元にない場合に取りに行く。
    1. 作品一覧（data/titles.json） 2. 中継サーバーで検索し、タイトルが完全に一致したもの */
 async function lookupMovie(q){
@@ -406,7 +411,36 @@ async function lookupMovie(q){
   return null;
 }
 function nowHTML(q,isExample,movie){
-  return `<div class="now"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</div><div><span class="k">検索中の作品</span><h1>${esc(q)}</h1><span class="ex yr">${movie?.date?`${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}`:""}</span>${isExample==="trend"?'<span class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></span>':isExample?'<span class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</span>':""}</div></div>`;
+  return `<div class="now"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</div><div><span class="k">検索中の作品</span><h1>${esc(q)}</h1><span class="ex yr">${movie?.date?`${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}`:""}</span>${isExample==="trend"?'<span class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></span>':isExample?'<span class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</span>':""}</div><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>共有</button></div>`;
+}
+/* ===== 作品ごとの URL（?q=作品名&id=TMDBの番号）とページタイトル =====
+   サーバーの処理なしで動くよう、クエリ文字列で作品を表す。ブックマーク・共有・戻るボタンに対応。
+   navMode："push"＝利用者が選んだ（履歴を1つ進める）、"replace"＝URL を置き換える、"none"＝URL はそのまま */
+let navMode="none";
+const slim=m=>m?{id:m.id,title:m.title,original:m.original,date:m.date,poster:m.poster}:null;
+function urlFor(q,movie){
+  const u=new URL(location.href);u.search="";u.hash="";
+  u.searchParams.set("q",q);if(movie?.id)u.searchParams.set("id",movie.id);
+  return u.toString();
+}
+function syncNav(q,isExample,movie){
+  document.title=q?`${q} - Chinemaladder`:"Chinemaladder";
+  const st={q,isExample,movie:slim(movie)};
+  try{
+    if(isExample||navMode==="none")history.replaceState(st,"",location.href);   // おすすめ表示などは URL を変えない
+    else if(navMode==="push"&&new URL(location.href).searchParams.get("q")!==q)history.pushState(st,"",urlFor(q,movie));
+    else history.replaceState(st,"",urlFor(q,movie));
+  }catch(e){}
+  navMode="push";
+}
+function shareUrl(){return cur?.[0]&&!cur[1]?location.href:cur?.[0]?urlFor(cur[0],cur[2]):location.href}
+let toastTimer=null;
+function toast(msg){let t=$("#toast");if(!t){t=document.createElement("div");t.id="toast";t.className="toast";t.setAttribute("role","status");document.body.append(t)}
+  t.textContent=msg;t.classList.add("on");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("on"),1800)}
+async function share(){
+  const url=shareUrl(),title=document.title;
+  if(navigator.share){try{await navigator.share({title,url});return}catch(e){if(e.name==="AbortError")return}}
+  try{await navigator.clipboard.writeText(url);toast("リンクをコピーしました")}catch(e){prompt?.("このリンクをコピーしてください",url)}
 }
 /* あとから TMDB の情報が分かったとき、画面全体は描き直さず、見出しとリンクだけ差し替える
    （切り替えアニメーションを途中で止めないため） */
@@ -417,6 +451,8 @@ function fillMovie(m){
   if(now){const t=document.createElement("div");t.innerHTML=nowHTML(q,isExample,m);now.replaceWith(t.firstElementChild)}
   const links=[...document.querySelectorAll("#out a.go")],all=GROUPS.flatMap(g=>g.items);
   links.forEach((a,i)=>{if(all[i])a.href=all[i].u(q,m)});
+  try{const p=new URL(location.href).searchParams;if(p.get("q")===q&&!p.get("id")&&m.id)history.replaceState({q,isExample,movie:slim(m)},"",urlFor(q,m))
+    else history.replaceState({...(history.state||{}),movie:slim(m)},"")}catch(e){}
 }
 /* X の除外語の編集パネル（チップの × で削除、入力欄で追加） */
 let ngOpen=false;
@@ -461,6 +497,7 @@ function render(q,isExample,movie){
   if(movie&&hist.includes(q))saveMeta(q,movie);
   const changed=!cur||cur[0]!==q;   // 作品が変わったときだけ切り替えのアニメーションを付ける
   cur=[q,isExample,movie];
+  syncNav(q,isExample,movie);
   let h=trendHTML()+nowHTML(q,isExample,movie);
   GROUPS.forEach((gr,i)=>{
     h+=`<section class="grp"><h2>${gr.h}${gr.note?`<small>${gr.note}</small>`:""}</h2><div class="grid">${gr.items.map(it=>
@@ -503,6 +540,13 @@ $("#hist").addEventListener("click",e=>{
   }
   const b=e.target.closest("[data-q]");if(!b)return;$("#q").value=b.dataset.q;remember(b.dataset.q);render(b.dataset.q);collapseTop()});
 $("#q").addEventListener("focus",()=>$("#q").select());
+$("#out").addEventListener("click",e=>{if(e.target.closest("#share"))share()});
+// 戻る・進む：保存しておいた状態から描き直す（URL は変えない）
+addEventListener("popstate",e=>{
+  const st=e.state;hideSug();
+  if(st?.q){navMode="none";$("#q").value=st.q;render(st.q,st.isExample,st.movie);collapseTop()}
+  else{const q=new URL(location.href).searchParams.get("q");if(q){navMode="none";$("#q").value=q;render(q)}else showTrending()}
+});
 $("#out").addEventListener("toggle",e=>{if(e.target.id==="ng")ngOpen=e.target.open},true);
 $("#out").addEventListener("submit",e=>{
   if(e.target.id!=="ngadd")return;e.preventDefault();
@@ -520,7 +564,13 @@ $("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending(
 
 $("#affnote").hidden=!(AFF.amazonTag||AFF.unext||AFF.mvtk);$("#amznote").hidden=!AFF.amazonTag;
 renderHist();
-if(hist[0]){$("#q").value=hist[0];render(hist[0]);
+const startQ=(()=>{try{return clean(new URL(location.href).searchParams.get("q")||"")}catch(e){return ""}})();
+if(startQ){   // 共有・ブックマークされた URL から開いたとき
+  const id=+new URL(location.href).searchParams.get("id")||0;
+  $("#q").value=startQ;remember(startQ);navMode="replace";
+  render(startQ,false,id&&meta[startQ]?.id===id?meta[startQ]:null);
+  getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}
+else if(hist[0]){$("#q").value=hist[0];navMode="none";render(hist[0]);
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}   // TOP10リストだけ後から差し替える（画面全体は描き直さない）
 else{$("#out").innerHTML='<div class="emptyst"><span>いま話題の映画を読み込み中…</span></div>';showTrending()}
 </script>
