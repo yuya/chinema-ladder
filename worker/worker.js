@@ -1,4 +1,4 @@
-// Cinema Ladder 用 TMDB 中継（Cloudflare Workers）
+// Chinemaladder 用 TMDB 中継（Cloudflare Workers）
 // 目的: TMDB のトークンをブラウザやアプリに置かず、サーバー側だけに持たせる。
 // 使い方:
 //   1. Cloudflare ダッシュボード → Workers & Pages → Create → 「Hello World」で作成し、このコードを貼り付けて Deploy

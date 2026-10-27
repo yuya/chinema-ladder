@@ -1,4 +1,4 @@
-# Cinema Ladder
+# Chinemaladder
 
 映画の評判を、はしごする。
 
@@ -10,7 +10,9 @@
 - `data/trending.json` … 話題作TOP10。GitHub Actions が毎日自動更新（手で編集しない）
 - `data/titles.json` … 検索ボックスのサジェスト用の作品一覧（数千本）。Actions が毎日自動更新
 - `scripts/fetch-trending.mjs` / `scripts/fetch-titles.mjs` … 上の2つの JSON を作るスクリプト
+- `scripts/fetch-icons.mjs` … ファビコンを取得するスクリプト（サイトを増やしたらここにも追加）
 - `.github/workflows/trending.yml` … 毎日 6:17（日本時間）に上のスクリプトを実行。定期実行は既定ブランチの設定しか動かないため、このファイルは main にも置く
+- `icons/` … 各サイトのファビコン（16〜32px）。Actions が足りない分だけ取得する
 - `.nojekyll` … GitHub Pages で Jekyll 変換を無効化
 
 ## ブランチ

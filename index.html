@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Cinema Ladder</title>
+<title>Chinemaladder</title>
 <meta name="description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
 <style>
 :root{
@@ -72,6 +72,7 @@ a.go{display:flex;flex-direction:column;gap:1px;text-decoration:none;color:inher
 a.go:hover{border-color:var(--accent)}
 a.go:active{transform:scale(.98)}
 a.go .n{font-weight:700;display:flex;align-items:center;gap:6px}
+a.go .fav{width:16px;height:16px;border-radius:3px;flex:none}
 a.go .n::after{content:"↗";font-size:12px;color:var(--muted);margin-left:auto}
 a.go .d{font-size:12px;color:var(--muted)}
 a.go.main{border-color:var(--accent);background:var(--accent-soft)}
@@ -99,7 +100,7 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 <body>
 <header>
   <div class="hd">
-    <div class="logo"><span>Cinema <b>Ladder</b></span><small>映画の評判を、はしごする</small></div>
+    <div class="logo"><span>Chinema<b>ladder</b></span><small>映画の評判を、はしごする</small></div>
     <div class="sbox">
       <form class="search" id="f" role="search">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -129,28 +130,28 @@ const IMG = "https://image.tmdb.org/t/p/w92";
 const E=encodeURIComponent;
 const GROUPS=[
  {h:"レビュー",note:"星とレビューを見る",items:[
-  {n:"Filmarks",d:"レビュー数が多い",main:1,u:q=>"https://filmarks.com/search/movies?q="+E(q)},
-  {n:"映画.com",d:"評価・作品情報",u:q=>"https://eiga.com/search/"+E(q)+"/"},
-  {n:"Movie Walker",d:"評価・ニュース",u:q=>"https://press.moviewalker.jp/search/free_search.cgi?keyword="+E(q)},
-  {n:"映画ランド",d:"評価・上映情報",u:q=>"https://eigaland.com/movie?sort=openDate&q="+E(q)},
-  {n:"KINENOTE",d:"キネマ旬報の評価",u:q=>"https://www.kinenote.com/sp/public/cinema/search_result.aspx?key="+E(q)},
+  {n:"Filmarks",ic:"filmarks",d:"レビュー数が多い",main:1,u:q=>"https://filmarks.com/search/movies?q="+E(q)},
+  {n:"映画.com",ic:"eiga",d:"評価・作品情報",u:q=>"https://eiga.com/search/"+E(q)+"/"},
+  {n:"Movie Walker",ic:"moviewalker",d:"評価・ニュース",u:q=>"https://press.moviewalker.jp/search/free_search.cgi?keyword="+E(q)},
+  {n:"映画ランド",ic:"eigaland",d:"評価・上映情報",u:q=>"https://eigaland.com/movie?sort=openDate&q="+E(q)},
+  {n:"KINENOTE",ic:"kinenote",d:"キネマ旬報の評価",u:q=>"https://www.kinenote.com/sp/public/cinema/search_result.aspx?key="+E(q)},
   // IMDb は日本語タイトルだと見つからないことが多いので、TMDB の原題が分かればそちらで検索する。s=tt&ttype=ft は「映画作品だけ」に絞る指定
-  {n:"IMDb",d:"海外の評価",u:(q,m)=>"https://www.imdb.com/find/?q="+E(m?.original||q)+"&s=tt&ttype=ft"},
+  {n:"IMDb",ic:"imdb",d:"海外の評価",u:(q,m)=>"https://www.imdb.com/find/?q="+E(m?.original||q)+"&s=tt&ttype=ft"},
   // p=検索語、ei=文字コード。ほかのパラメータ（ai, ts, aq, fr など）は Yahoo の計測用なので不要
-  {n:"Yahoo!検索",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
+  {n:"Yahoo!検索",ic:"yahoo",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
  ]},
  {h:"チケット・上映館",note:"",items:[
-  {n:"ムビチケ",d:"前売券を買う",pr:1,u:q=>"https://store.moviewalker.jp/search?keyword=name:"+E(q)},
-  {n:"上映館を探す",d:"映画.comの上映中検索",u:q=>"https://eiga.com/now/q/?title="+E(q)+"&region=&pref=&area=&genre=on&sort=release"},
+  {n:"ムビチケ",ic:"mvtk",d:"前売券を買う",pr:1,u:q=>"https://store.moviewalker.jp/search?keyword=name:"+E(q)},
+  {n:"上映館を探す",ic:"eiga",d:"映画.comの上映中検索",u:q=>"https://eiga.com/now/q/?title="+E(q)+"&region=&pref=&area=&genre=on&sort=release"},
  ]},
  {h:"SNSの声",note:"ネタバレ語を除外して検索",items:[
-  {n:"X",d:"ネタバレになりやすい語を除外",u:q=>"https://x.com/search?f=live&q="+E(`"${q}" `+SPOILER_WORDS.map(w=>"-"+w).join(" "))},
-  {n:"Instagram",d:"ハッシュタグ",u:q=>"https://www.instagram.com/explore/tags/"+E(q.replace(/[\s・:：!！?？、。「」『』\-]/g,""))+"/"},
+  {n:"X",ic:"x",d:"ネタバレになりやすい語を除外",u:q=>"https://x.com/search?f=live&q="+E(`"${q}" `+SPOILER_WORDS.map(w=>"-"+w).join(" "))},
+  {n:"Instagram",ic:"instagram",d:"ハッシュタグ",u:q=>"https://www.instagram.com/explore/tags/"+E(q.replace(/[\s・:：!！?？、。「」『』\-]/g,""))+"/"},
  ]},
  {h:"配信",note:"",items:[
-  {n:"U-NEXT",d:"見放題・レンタル",pr:1,u:q=>"https://video.unext.jp/freeword?query="+E(q)},
-  {n:"Prime Video",d:"見放題・レンタル",pr:1,u:q=>"https://www.amazon.co.jp/s?i=instant-video&k="+E(q)},
-  {n:"Netflix",d:"見放題",u:q=>"https://www.netflix.com/search?q="+E(q)},
+  {n:"U-NEXT",ic:"unext",d:"見放題・レンタル",pr:1,u:q=>"https://video.unext.jp/freeword?query="+E(q)},
+  {n:"Prime Video",ic:"primevideo",d:"見放題・レンタル",pr:1,u:q=>"https://www.amazon.co.jp/s?i=instant-video&k="+E(q)},
+  {n:"Netflix",ic:"netflix",d:"見放題",u:q=>"https://www.netflix.com/search?q="+E(q)},
  ]},
 ];
 
@@ -283,7 +284,7 @@ function onType(){
     }
   },250);
 }
-function pick(m){$("#q").value=m.title;hideSug();remember(m.title);render(m.title,false,m);$("#q").blur()}
+function pick(m){$("#q").value=m.title;hideSug();remember(m.title);render(m.title,false,m);collapseTop();$("#q").blur()}
 
 /* ===== 画面 ===== */
 function remember(q){hist=[q,...hist.filter(x=>x!==q)].slice(0,8);store.set("mirumae_hist",hist);renderHist()}
@@ -309,7 +310,7 @@ function render(q,isExample,movie){
   let h=trendHTML()+`<div class="now">${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="" width="64" height="96">`:'<span></span>'}<div><span class="k">検索中の作品</span><h1>${esc(q)}</h1>${movie?.date?`<span class="ex">${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}</span>`:""}${isExample==="trend"?'<span class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></span>':isExample?'<span class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</span>':""}</div></div>`;
   GROUPS.forEach((gr,i)=>{
     h+=`<section class="grp"><h2>${gr.h}${gr.note?`<small>${gr.note}</small>`:""}</h2><div class="grid">${gr.items.map(it=>
-      `<a class="go${it.main?" main":""}" href="${esc(it.u(q,movie))}" target="_blank" rel="noopener" data-q="${esc(q)}"><span class="n">${it.n}${it.pr?'<span class="pr">PR</span>':""}</span><span class="d">${it.d}</span></a>`).join("")}</div></section>`;
+      `<a class="go${it.main?" main":""}" href="${esc(it.u(q,movie))}" target="_blank" rel="noopener" data-q="${esc(q)}"><span class="n"><img class="fav" src="icons/${it.ic}.png" alt="" width="16" height="16" loading="lazy" decoding="async" onerror="this.remove()">${it.n}${it.pr?'<span class="pr">PR</span>':""}</span><span class="d">${it.d}</span></a>`).join("")}</div></section>`;
     if(i===1)h+='<div class="ad"><b>広告</b>ここにバナー広告（例：320×100）</div>';
   });
   $("#out").innerHTML=h;
@@ -327,7 +328,7 @@ $("#q").addEventListener("keydown",e=>{
 });
 $("#sug").addEventListener("mousedown",e=>{const li=e.target.closest("li[data-i]");if(li){e.preventDefault();pick(items[+li.dataset.i])}});
 $("#q").addEventListener("blur",()=>setTimeout(hideSug,120));
-$("#f").addEventListener("submit",e=>{e.preventDefault();const q=clean($("#q").value);if(!q)return;hideSug();remember(q);render(q);$("#q").blur()});
+$("#f").addEventListener("submit",e=>{e.preventDefault();const q=clean($("#q").value);if(!q)return;hideSug();remember(q);render(q);collapseTop();$("#q").blur()});
 $("#clr").onclick=()=>{$("#q").value="";hideSug();$("#q").focus()};   // 入力欄だけ空にして、画面はそのまま
 $("#hist").addEventListener("click",e=>{
   const x=e.target.closest("[data-del]");
@@ -338,7 +339,7 @@ $("#hist").addEventListener("click",e=>{
     all.classList.add("warn");all.textContent="もう一度押すと全部消えます";
     delTimer=setTimeout(()=>{all.classList.remove("warn");all.textContent="履歴をすべて削除"},3000);return;
   }
-  const b=e.target.closest("[data-q]");if(!b)return;$("#q").value=b.dataset.q;remember(b.dataset.q);render(b.dataset.q)});
+  const b=e.target.closest("[data-q]");if(!b)return;$("#q").value=b.dataset.q;remember(b.dataset.q);render(b.dataset.q);collapseTop()});
 $("#q").addEventListener("focus",()=>$("#q").select());   // タップで全選択し、すぐ打ち替えられるように
 $("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending();return}
   const t=e.target.closest("[data-tid]");if(t){const m=trendList.find(x=>x.id===+t.dataset.tid);if(m){$("#q").value=m.title;remember(m.title);render(m.title,false,m);collapseTop();window.scrollTo({top:0,behavior:"smooth"})}return}const a=e.target.closest("a.go");if(a)remember(a.dataset.q)});
