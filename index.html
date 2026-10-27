@@ -214,16 +214,15 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const clean=s=>s.normalize("NFKC").replace(/\s+/g," ").trim();
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let hist=store.get("mirumae_hist",[]);
+let hist=store.get("cl_hist",[]);
 /* 履歴の作品ごとの TMDB 情報（ポスター・原題・公開年）。履歴から開いたときに使う */
-let meta=store.get("mirumae_meta",{});
+let meta=store.get("cl_meta",{});
 function saveMeta(q,m){
   if(!m||!q)return;
   meta[q]={id:m.id,title:m.title,original:m.original,date:m.date,poster:m.poster};
   for(const k of Object.keys(meta))if(!hist.includes(k)&&k!==q)delete meta[k];   // 履歴から消えた分は捨てる
-  store.set("mirumae_meta",meta);
+  store.set("cl_meta",meta);
 }
-try{localStorage.removeItem("mirumae_tmdb")}catch(e){}   // 以前の開発用トークンが残っていれば消す
 // Yahoo!検索用：同名の本や曲を避けるため「映画」を付ける（タイトルに入っていれば付けない）
 const withEiga=q=>q.includes("映画")?q:q+" 映画";
 /* X検索で除外する語。増やすほど安全ですが、普通の感想も減ります。 */
@@ -304,7 +303,7 @@ async function showTrending(){
   }catch(e){}
   if($("#q").value===before){$("#q").value="";renderEmpty()}
 }
-let trendOpen=store.get("mirumae_trendOpen",false);
+let trendOpen=store.get("cl_trendOpen",false);
 const isUpcoming=d=>d&&d>new Date().toISOString().slice(0,10);
 /* TOP10を閉じるアニメーション：高さを0に縮めながら薄くし、終わったら details を閉じる */
 function collapseTop(){
@@ -357,9 +356,9 @@ function onType(){
 function pick(m){$("#q").value=m.title;hideSug();remember(m.title);saveMeta(m.title,m);render(m.title,false,m);collapseTop();$("#q").blur()}
 
 /* ===== 画面 ===== */
-function remember(q){hist=[q,...hist.filter(x=>x!==q)].slice(0,8);store.set("mirumae_hist",hist);renderHist()}
+function remember(q){hist=[q,...hist.filter(x=>x!==q)].slice(0,8);store.set("cl_hist",hist);renderHist()}
 function renderHist(){$("#hist").innerHTML=hist.length?'<span class="lbl">最近</span>'+hist.map(h=>`<span class="hc"><button type="button" data-q="${esc(h)}">${esc(h)}</button><button type="button" class="x" data-del="${esc(h)}" aria-label="「${esc(h)}」を履歴から削除">×</button></span>`).join("")+'<button type="button" class="delall" id="delall">履歴をすべて削除</button>':""}
-function saveHist(){store.set("mirumae_hist",hist);renderHist()}
+function saveHist(){store.set("cl_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
 function renderEmpty(){cur=null;$("#out").innerHTML='<div class="emptyst"><b>観たい映画の名前を入れてください</b><span>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</span></div>'}
@@ -424,7 +423,7 @@ function render(q,isExample,movie){
   if(changed)playSwap();
   bindTop();
 }
-function bindTop(){const d=$("#top");if(d)d.addEventListener("toggle",()=>{trendOpen=d.open;store.set("mirumae_trendOpen",trendOpen)})}
+function bindTop(){const d=$("#top");if(d)d.addEventListener("toggle",()=>{trendOpen=d.open;store.set("cl_trendOpen",trendOpen)})}
 function updateTop(){
   const d=$("#top");if(!d)return;
   const t=document.createElement("div");t.innerHTML=trendHTML();
