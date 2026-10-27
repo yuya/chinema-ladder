@@ -157,6 +157,7 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 <main id="out"></main>
 
 <footer>
+  <div id="affnote" hidden>当サイトはアフィリエイトプログラムに参加しており、「PR」の付いたリンクから申し込みや購入があると、運営者が紹介料を受け取ることがあります。<span id="amznote" hidden>Amazonのアソシエイトとして、当サイトは適格販売により収入を得ています。</span></div>
   <div>作品情報とポスター画像は <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> から取得しています。This product uses the <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> API but is not endorsed or certified by TMDB.</div>
 </footer>
 
@@ -164,6 +165,20 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 /* ===== 設定 =====
    TMDB のトークンはブラウザに置かない。サジェストは Cloudflare Workers の中継、
    話題作TOP10と予備の作品一覧は GitHub Actions が毎日作る data/*.json を使う。 */
+/* ===== アフィリエイト設定 =====
+   提携が決まったらここに入れるだけで、リンクの差し替えと「PR」表示が切り替わる。
+   空のあいだは普通のリンクで、PR も出さない（広告でないものに PR を付けないため）。
+   - amazonTag : Amazon アソシエイトのトラッキングID（例 "chinema-22"）。検索リンクに tag= を付ける
+   - unext     : ASP の広告リンク。{url} を入れると遷移先（検索結果）を埋め込む
+                 例 A8.net なら "https://px.a8.net/svt/ejp?a8mat=XXXX&a8ejpredirect={url}"
+                 {url} がなければ、ASP が決めたページ（無料体験の案内など）へそのまま飛ぶ
+   - mvtk      : ムビチケも同じ書き方（提携先が見つかったとき用） */
+const AFF={
+  amazonTag:"",
+  unext:"",
+  mvtk:"",
+};
+const affWrap=(tpl,url)=>!tpl?url:tpl.includes("{url}")?tpl.replace("{url}",encodeURIComponent(url)):tpl;
 const TMDB_PROXY = "https://cinema-ladder-api.twilightwind.workers.dev/search";   // Cloudflare Workers の中継（worker/worker.js）
 const IMG = "https://image.tmdb.org/t/p/w92";
 
@@ -181,7 +196,7 @@ const GROUPS=[
   {n:"Yahoo!検索",ic:"yahoo",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
  ]},
  {h:"チケット・上映館",note:"",items:[
-  {n:"ムビチケ",ic:"mvtk",d:"前売券を買う",pr:1,u:q=>"https://store.moviewalker.jp/search?keyword=name:"+E(q)},
+  {n:"ムビチケ",ic:"mvtk",d:"前売券を買う",pr:()=>!!AFF.mvtk,u:q=>affWrap(AFF.mvtk,"https://store.moviewalker.jp/search?keyword=name:"+E(q))},
   {n:"上映館を探す",ic:"eiga",d:"映画.comの上映中検索",u:q=>"https://eiga.com/now/q/?title="+E(q)+"&region=&pref=&area=&genre=on&sort=release"},
  ]},
  {h:"SNSの声",note:"",items:[
@@ -189,8 +204,8 @@ const GROUPS=[
   {n:"Instagram",ic:"instagram",d:"ハッシュタグ",u:q=>"https://www.instagram.com/explore/tags/"+E(q.replace(/[\s・:：!！?？、。「」『』\-]/g,""))+"/"},
  ]},
  {h:"配信",note:"",items:[
-  {n:"U-NEXT",ic:"unext",d:"見放題・レンタル",pr:1,u:q=>"https://video.unext.jp/freeword?query="+E(q)},
-  {n:"Prime Video",ic:"primevideo",d:"見放題・レンタル",pr:1,u:q=>"https://www.amazon.co.jp/s?i=instant-video&k="+E(q)},
+  {n:"U-NEXT",ic:"unext",d:"見放題・レンタル",pr:()=>!!AFF.unext,u:q=>affWrap(AFF.unext,"https://video.unext.jp/freeword?query="+E(q))},
+  {n:"Prime Video",ic:"primevideo",d:"見放題・レンタル",pr:()=>!!AFF.amazonTag,u:q=>"https://www.amazon.co.jp/s?i=instant-video&k="+E(q)+(AFF.amazonTag?"&tag="+E(AFF.amazonTag):"")},
   {n:"Netflix",ic:"netflix",d:"見放題",u:q=>"https://www.netflix.com/search?q="+E(q)},
  ]},
 ];
@@ -402,7 +417,7 @@ function render(q,isExample,movie){
   let h=trendHTML()+nowHTML(q,isExample,movie);
   GROUPS.forEach((gr,i)=>{
     h+=`<section class="grp"><h2>${gr.h}${gr.note?`<small>${gr.note}</small>`:""}</h2><div class="grid">${gr.items.map(it=>
-      `<a class="go${it.main?" main":""}" href="${esc(it.u(q,movie))}" target="_blank" rel="noopener" data-q="${esc(q)}"><span class="n"><span class="fav fav-${it.ic}" aria-hidden="true"></span><span class="nm">${it.n}</span></span><span class="d">${it.pr?'<span class="pr">PR</span>':""}${it.d}</span></a>`).join("")}</div></section>`;
+      `<a class="go${it.main?" main":""}" href="${esc(it.u(q,movie))}" target="_blank" rel="${it.pr?.()?"noopener sponsored":"noopener"}" data-q="${esc(q)}"><span class="n"><span class="fav fav-${it.ic}" aria-hidden="true"></span><span class="nm">${it.n}</span></span><span class="d">${it.pr?.()?'<span class="pr">PR</span>':""}${it.d}</span></a>`).join("")}</div></section>`;
     if(i===1)h+='<div class="ad"><b>広告</b>ここにバナー広告（例：320×100）</div>';
   });
   $("#out").innerHTML=h;
@@ -444,6 +459,7 @@ $("#q").addEventListener("focus",()=>$("#q").select());   // タップで全選�
 $("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending();return}
   const t=e.target.closest("[data-tid]");if(t){const m=trendList.find(x=>x.id===+t.dataset.tid);if(m){$("#q").value=m.title;remember(m.title);render(m.title,false,m);collapseTop();window.scrollTo({top:0,behavior:"smooth"})}return}const a=e.target.closest("a.go");if(a)remember(a.dataset.q)});
 
+$("#affnote").hidden=!(AFF.amazonTag||AFF.unext||AFF.mvtk);$("#amznote").hidden=!AFF.amazonTag;
 renderHist();
 if(hist[0]){$("#q").value=hist[0];render(hist[0]);
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}   // TOP10リストだけ後から差し替える（画面全体は描き直さない）
