@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-27T00:25:38.772Z",
+ "updated": "2026-10-27T10:59:33.884Z",
  "items": [
   {
    "id": 1400940,
@@ -7,15 +7,7 @@
    "original": "Clayface",
    "date": "2026-10-30",
    "poster": "/6ttcIVdQbS6esi5wPEUuVKQN8SX.jpg",
-   "pop": 267.4788
-  },
-  {
-   "id": 1153576,
-   "title": "ストリートファイター／ザ・ムービー",
-   "original": "Street Fighter",
-   "date": "2026-10-16",
-   "poster": "/1JBlbyXionXPRaqW1UQw7eKkxNP.jpg",
-   "pop": 191.7096
+   "pop": 237.9795
   },
   {
    "id": 1423191,
@@ -23,23 +15,15 @@
    "original": "Resident Evil",
    "date": "2026-10-09",
    "poster": "/wHXSnGH3zQtvpxPwaBXMoS9o8Vl.jpg",
-   "pop": 184.3922
+   "pop": 165.0494
   },
   {
-   "id": 1255833,
-   "title": "クジラに落ちた男",
-   "original": "Whalefall",
+   "id": 1153576,
+   "title": "ストリートファイター／ザ・ムービー",
+   "original": "Street Fighter",
    "date": "2026-10-16",
-   "poster": "/vjTYUTgh9nO88i6HZ4YPRhiFL05.jpg",
-   "pop": 133.7609
-  },
-  {
-   "id": 1248832,
-   "title": "DIGGER／ディガー",
-   "original": "Digger",
-   "date": "2026-10-09",
-   "poster": "/vi2HvWOBtR1pcr4vBoYe43ldkuu.jpg",
-   "pop": 114.0521
+   "poster": "/1JBlbyXionXPRaqW1UQw7eKkxNP.jpg",
+   "pop": 151.1143
   },
   {
    "id": 1275779,
@@ -47,7 +31,23 @@
    "original": "Disclosure Day",
    "date": "2026-10-01",
    "poster": "/vDnJLpE2jhu8OVcwpWuYCMF5hRU.jpg",
-   "pop": 107.5182
+   "pop": 101.5708
+  },
+  {
+   "id": 1255833,
+   "title": "クジラに落ちた男",
+   "original": "Whalefall",
+   "date": "2026-10-16",
+   "poster": "/vjTYUTgh9nO88i6HZ4YPRhiFL05.jpg",
+   "pop": 94.2277
+  },
+  {
+   "id": 1248832,
+   "title": "DIGGER／ディガー",
+   "original": "Digger",
+   "date": "2026-10-09",
+   "poster": "/vi2HvWOBtR1pcr4vBoYe43ldkuu.jpg",
+   "pop": 88.9653
   },
   {
    "id": 1263337,
@@ -55,7 +55,7 @@
    "original": "Heart of the Beast",
    "date": "2026-09-25",
    "poster": "/mGmnmCtodvzhpnMFQoZkeGDDVjU.jpg",
-   "pop": 85.8604
+   "pop": 80.4941
   },
   {
    "id": 1283515,
@@ -63,7 +63,7 @@
    "original": "Verity",
    "date": "2026-11-06",
    "poster": "/zPHfsaiMZT1HNz1ZS55iyLKZkFG.jpg",
-   "pop": 69.5187
+   "pop": 67.0629
   },
   {
    "id": 1381071,
@@ -71,7 +71,7 @@
    "original": "ゴジラ-0.0",
    "date": "2026-11-03",
    "poster": "/zpcoFlZwyLnBt7bb5wmvGDCdg06.jpg",
-   "pop": 40.791
+   "pop": 23.6037
   },
   {
    "id": 467905,
@@ -79,7 +79,7 @@
    "original": "How to Make a Killing",
    "date": "2026-11-13",
    "poster": "/adIG9Tsf9FkUkJ1euYjtktSMOyT.jpg",
-   "pop": 18.1814
+   "pop": 18.0953
   }
  ]
 }
