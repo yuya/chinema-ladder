@@ -39,7 +39,7 @@ header{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1
 .logo b{color:var(--brand)}
 .logo .name{white-space:nowrap}
 .logo .mark{width:24px;height:24px;vertical-align:-5px;margin-right:7px;border-radius:6px;box-shadow:0 0 0 1px var(--line)}   /* brand/icon.svg と同じ絵（通信を増やさないよう直接埋め込み） */
-.logo small{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.08em}
+.logo small{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.08em;font-feature-settings:"palt" 1}   /* palt で「、」の後ろの空きを詰める */
 .sbox{position:relative}
 form.search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 6px 0 12px}
 form.search:focus-within{border-color:var(--accent)}
@@ -218,7 +218,7 @@ const GROUPS=[
   // IMDb は日本語タイトルだと見つからないことが多いので、TMDB の原題が分かればそちらで検索する。s=tt&ttype=ft は「映画作品だけ」に絞る指定
   {n:"IMDb",ic:"imdb",d:"海外の評価",u:(q,m)=>"https://www.imdb.com/find/?q="+E(m?.original||q)+"&s=tt&ttype=ft"},
   // p=検索語、ei=文字コード。ほかのパラメータ（ai, ts, aq, fr など）は Yahoo の計測用なので不要
-  {n:"Yahoo!検索",ic:"yahoo",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
+  {n:"Yahoo! 検索",ic:"yahoo",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
   {n:"Google",ic:"google",d:"ネットの記事",u:q=>"https://www.google.com/search?q="+E(withEiga(q))+"&hl=ja"},
  ]},
  {h:"チケット・上映館",note:"",items:[
