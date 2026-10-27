@@ -1,0 +1,18 @@
+# Cloudflare Pages 用のキャッシュ設定（GitHub Pages では無視される）
+# HTML は毎回新しいか確認する。中身が変わらなければ 304 で軽く済む
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# 話題作と作品一覧は1日1回しか変わらないので1時間
+/data/*
+  Cache-Control: public, max-age=3600
+
+# ファビコンの元画像（表示には使っていない）
+/icons/*
+  Cache-Control: public, max-age=604800
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

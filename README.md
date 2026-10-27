@@ -11,13 +11,15 @@
 - `data/titles.json` … 検索ボックスのサジェスト用の作品一覧（数千本）。Actions が毎日自動更新
 - `scripts/fetch-trending.mjs` / `scripts/fetch-titles.mjs` … 上の2つの JSON を作るスクリプト
 - `scripts/fetch-icons.mjs` … ファビコンを取得するスクリプト（サイトを増やしたらここにも追加）
-- `.github/workflows/trending.yml` … 毎日 6:17（日本時間）に上のスクリプトを実行。定期実行は既定ブランチの設定しか動かないため、このファイルは main にも置く
+- `.github/workflows/trending.yml` … 毎日 6:17（日本時間）に上のスクリプトを実行し、staging と main の両方を更新。定期実行は既定ブランチの設定しか動かないため、このファイルは main にも置く
 - `icons/` … 各サイトのファビコンの元画像。Actions が足りない分だけ取得し、`scripts/inline-icons.py` が index.html の CSS に埋め込む（通信回数を減らすため。表示には icons/ を直接使わない）
 - `.nojekyll` … GitHub Pages で Jekyll 変換を無効化
 
-## ブランチ
-- `staging` … 確認用。GitHub Pages で公開
-- `main` … 本番用（今後）
+## ブランチと公開先（Cloudflare Pages）
+- `main` … 本番。独自ドメインで公開
+- `staging` … 確認用。`staging.chinemaladder.pages.dev` で公開し、Cloudflare Access で自分だけが見られるようにする
+- 修正はまず `staging` に入れ、確認できたら `main` に取り込む（`git merge -X theirs staging`。data/ の衝突は staging 側を採用）
+- `_headers` … Cloudflare Pages のキャッシュ設定
 
 ## TMDB
 話題作TOP10は、リポジトリの Secret `TMDB_TOKEN` を使って Actions が取得するので、訪問者はトークン不要。

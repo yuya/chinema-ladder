@@ -3,15 +3,20 @@
 // 使い方:
 //   1. Cloudflare ダッシュボード → Workers & Pages → Create → 「Hello World」で作成し、このコードを貼り付けて Deploy
 //   2. Settings → Variables and Secrets → Secret として TMDB_TOKEN（API Read Access Token）を追加
-//   3. 下の ALLOWED_ORIGINS に自分のサイトのURLを入れる
+//   3. 下の ALLOWED_ORIGINS に自分のサイトのURLを入れる（コードを変えたら Cloudflare で貼り直して Deploy）
 //   4. index.html の TMDB_PROXY に「https://<worker名>.<サブドメイン>.workers.dev/search」を設定
 
-const ALLOWED_ORIGINS = ["https://yuya.github.io", "http://localhost:8000"]; // 独自ドメインにしたら追加する
+// 通信を許可するサイト。独自ドメインが決まったら ALLOWED_ORIGINS に追加する
+const ALLOWED_ORIGINS = ["https://yuya.github.io", "http://localhost:8000"];
+// Cloudflare Pages の確認用URL（staging.chinemaladder.pages.dev や 1回ごとのプレビューURL）を許可
+const ALLOWED_SUFFIXES = [".chinemaladder.pages.dev"];
+const isAllowed = o => ALLOWED_ORIGINS.includes(o) || o === "https://chinemaladder.pages.dev" ||
+  (o.startsWith("https://") && ALLOWED_SUFFIXES.some(s => o.endsWith(s)));
 
 export default {
   async fetch(req, env) {
     const origin = req.headers.get("Origin") || "";
-    const allow = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+    const allow = isAllowed(origin) ? origin : ALLOWED_ORIGINS[0];
     const cors = { "Access-Control-Allow-Origin": allow, "Vary": "Origin" };
 
     const url = new URL(req.url);
