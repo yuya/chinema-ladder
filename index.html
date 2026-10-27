@@ -61,9 +61,12 @@ form.search:focus-within{border-color:var(--accent)}
 main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 24px;
   display:flex;flex-direction:column;gap:18px}
 .now{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center}
-.now img.poster{opacity:0;transition:opacity .25s}
-.now img.poster.ok{opacity:1}
-.now img{width:64px;height:96px;object-fit:cover;border-radius:6px;background:var(--surface)}
+/* ポスター枠は画像の有無にかかわらず常に 64×96 を確保し、読み込み後にずれないようにする */
+.now .ph{position:relative;width:64px;height:96px;flex:none;border-radius:6px;overflow:hidden;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--line)}
+.now .ph svg{width:24px;height:24px}
+.now .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
+.now .ph img.ok{opacity:1}
+.now .yr{display:block;min-height:1.6em}   /* 公開年の行も先に高さを確保する */
 .now .k{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:700}
 .now h1{margin:0;font-size:24px;line-height:1.3;text-wrap:balance;word-break:break-word}
 .now .ex{font-size:12px;color:var(--muted)}
@@ -331,7 +334,7 @@ async function lookupMovie(q){
   return null;
 }
 function nowHTML(q,isExample,movie){
-  return `<div class="now">${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="" width="64" height="96" class="poster" onload="this.classList.add('ok')">`:'<span></span>'}<div><span class="k">検索中の作品</span><h1>${esc(q)}</h1>${movie?.date?`<span class="ex">${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}</span>`:""}${isExample==="trend"?'<span class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></span>':isExample?'<span class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</span>':""}</div></div>`;
+  return `<div class="now"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</div><div><span class="k">検索中の作品</span><h1>${esc(q)}</h1><span class="ex yr">${movie?.date?`${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}`:""}</span>${isExample==="trend"?'<span class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></span>':isExample?'<span class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</span>':""}</div></div>`;
 }
 /* あとから TMDB の情報が分かったとき、画面全体は描き直さず、見出しとリンクだけ差し替える
    （切り替えアニメーションを途中で止めないため） */
