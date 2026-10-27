@@ -12,7 +12,7 @@
 - `scripts/fetch-trending.mjs` / `scripts/fetch-titles.mjs` … 上の2つの JSON を作るスクリプト
 - `scripts/fetch-icons.mjs` … ファビコンを取得するスクリプト（サイトを増やしたらここにも追加）
 - `.github/workflows/trending.yml` … 毎日 6:17（日本時間）に上のスクリプトを実行。定期実行は既定ブランチの設定しか動かないため、このファイルは main にも置く
-- `icons/` … 各サイトのファビコン（16〜32px）。Actions が足りない分だけ取得する
+- `icons/` … 各サイトのファビコンの元画像。Actions が足りない分だけ取得し、`scripts/inline-icons.py` が index.html の CSS に埋め込む（通信回数を減らすため。表示には icons/ を直接使わない）
 - `.nojekyll` … GitHub Pages で Jekyll 変換を無効化
 
 ## ブランチ
