@@ -103,12 +103,23 @@ a.go.main .n{color:var(--accent)}
 .ad{background:var(--ad);border:1px dashed var(--line);border-radius:12px;padding:14px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:80px}
 .ad b{font-size:10px;letter-spacing:.14em}
 
+footer a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+footer a:hover{color:var(--accent)}
 footer{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px 32px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:10px}
 details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
 summary{cursor:pointer;font-weight:700;color:var(--fg)}
 .emptyst{display:flex;flex-direction:column;gap:4px;padding:32px 0;color:var(--muted)}
 .emptyst b{color:var(--fg);font-size:17px}
+.topwrap{position:relative}
 .top ol{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column}
+.toplink{position:absolute;top:6px;right:8px;width:32px;height:32px;display:grid;place-items:center;border-radius:8px;color:var(--muted)}
+.toplink:hover{color:var(--accent);background:var(--accent-soft)}
+.toplink svg{width:16px;height:16px}
+.top summary{padding-right:36px}
+.top .sk{display:grid;grid-template-columns:22px 32px minmax(0,1fr);gap:10px;align-items:center;padding:6px 4px}
+.top .sk i{display:block;height:10px;border-radius:5px;background:var(--bg);width:70%}
+.top .sk i+i{width:30%;margin-top:8px}
+.top .msg{padding:8px 4px;color:var(--muted);font-size:13px}
 .top button{width:100%;display:grid;grid-template-columns:22px 32px minmax(0,1fr);gap:10px;align-items:center;border:0;background:transparent;text-align:left;padding:6px 4px;border-radius:8px}
 .top button:hover,.top button.on{background:var(--accent-soft)}
 .top button.on .rk,.top button.on b{color:var(--accent)}
@@ -139,7 +150,7 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 <main id="out"></main>
 
 <footer>
-  <div>作品情報とポスター画像は TMDB から取得しています。This product uses the TMDB API but is not endorsed or certified by TMDB.</div>
+  <div>作品情報とポスター画像は <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> から取得しています。This product uses the <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> API but is not endorsed or certified by TMDB.</div>
 </footer>
 
 <script>
@@ -283,10 +294,17 @@ function collapseTop(){
     {duration:320,delay:120,easing:"cubic-bezier(.4,0,.2,1)",fill:"forwards"});   // 選んだ行の色が一瞬見えてから閉じる
   a.onfinish=()=>{d.open=false;a.cancel();ol.style.overflow=""};
 }
+/* TOP10 の一覧の出典（TMDB の上映中一覧）。下の data/trending.json は日本で上映中＋公開予定を人気順に並べたもの */
+const TOP_SOURCE="https://www.themoviedb.org/movie/now-playing?language=ja-JP";
+let trendFailed=false;
 function trendHTML(){
-  if(!trendList?.length)return "";
-  return `<details class="top" id="top"${trendOpen?" open":""}><summary>いま話題の映画 TOP${trendList.length}</summary><ol>${trendList.map((m,i)=>
-    `<li><button type="button" data-tid="${m.id}"${cur&&cur[0]===m.title?' class="on" aria-current="true"':""}><span class="rk">${i+1}</span>${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="32" height="48">`:'<span class="noimg"></span>'}<span style="min-width:0"><b>${esc(m.title)}</b><small>${isUpcoming(m.date)?`公開予定 ${+m.date.slice(5,7)}月${+m.date.slice(8,10)}日`:"上映中"}</small></span></button></li>`).join("")}</ol></details>`;
+  // 閉じた details の中身は隠れるので、リンクは details の外（外枠の右上）に置く
+  const link=`<a class="toplink" href="${TOP_SOURCE}" target="_blank" rel="noopener" aria-label="TMDB の上映中の映画一覧を開く" title="TMDB の上映中の映画一覧"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>`;
+  const head=`<div class="topwrap">${link}<details class="top" id="top"${trendOpen?" open":""}><summary>いま話題の映画 TOP10</summary>`;
+  // 読み込み前も同じ高さの仮の行を出しておき、届いたときに下の内容がずれないようにする
+  if(!trendList?.length)return head+(trendFailed?'<ol><li class="msg">読み込めませんでした。時間をおいて開き直してください。</li></ol></details></div>':`<ol aria-busy="true">${'<li><div class="sk"><span class="rk"></span><span class="noimg"></span><span><i></i><i></i></span></div></li>'.repeat(10)}</ol></details></div>`);
+  return head+`<ol>${trendList.map((m,i)=>
+    `<li><button type="button" data-tid="${m.id}"${cur&&cur[0]===m.title?' class="on" aria-current="true"':""}><span class="rk">${i+1}</span>${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="32" height="48">`:'<span class="noimg"></span>'}<span style="min-width:0"><b>${esc(m.title)}</b><small>${isUpcoming(m.date)?`公開予定 ${+m.date.slice(5,7)}月${+m.date.slice(8,10)}日`:"上映中"}</small></span></button></li>`).join("")}</ol></details></div>`;
 }
 
 function showSug(html){const s=$("#sug");s.innerHTML=html;s.hidden=!html;$("#q").setAttribute("aria-expanded",String(!!html))}
@@ -382,7 +400,14 @@ function render(q,isExample,movie){
   });
   $("#out").innerHTML=h;
   if(changed)playSwap();
-  const d=$("#top");if(d)d.addEventListener("toggle",()=>{trendOpen=d.open;store.set("mirumae_trendOpen",trendOpen)});
+  bindTop();
+}
+function bindTop(){const d=$("#top");if(d)d.addEventListener("toggle",()=>{trendOpen=d.open;store.set("mirumae_trendOpen",trendOpen)})}
+function updateTop(){
+  const d=$("#top");if(!d)return;
+  const t=document.createElement("div");t.innerHTML=trendHTML();
+  const n=t.firstElementChild,w=d.closest(".topwrap");
+  if(n&&w){n.querySelector("details").open=d.open;w.replaceWith(n);bindTop()}
 }
 
 /* ===== イベント ===== */
@@ -414,7 +439,7 @@ $("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending(
 
 renderHist();
 if(hist[0]){$("#q").value=hist[0];render(hist[0]);
-  getTrending().then(()=>cur&&render(...cur)).catch(()=>{})}   // TOP10リストだけ後から読み込む
+  getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}   // TOP10リストだけ後から差し替える（画面全体は描き直さない）
 else{$("#out").innerHTML='<div class="emptyst"><span>いま話題の映画を読み込み中…</span></div>';showTrending()}
 </script>
 </body>
