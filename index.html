@@ -223,6 +223,8 @@ const GROUPS=[
   {n:"U-NEXT",ic:"unext",d:"見放題・レンタル",pr:()=>!!AFF.unext,u:q=>affWrap(AFF.unext,"https://video.unext.jp/freeword?query="+E(q))},
   {n:"Prime Video",ic:"primevideo",d:"見放題・レンタル",pr:()=>!!AFF.amazonTag,u:q=>"https://www.amazon.co.jp/s?i=instant-video&k="+E(q)+(AFF.amazonTag?"&tag="+E(AFF.amazonTag):"")},
   {n:"Netflix",ic:"netflix",d:"見放題",u:q=>"https://www.netflix.com/search?q="+E(q)},
+  // 作品ページの「配信サービス」から各社の配信状況をまとめて見られる。作品ページは ID が要るので検索結果へ飛ぶ
+  {n:"Filmarks",ic:"filmarks",d:"配信サービス一覧",u:q=>"https://filmarks.com/search/movies?q="+E(q)},
  ]},
 ];
 
