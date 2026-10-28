@@ -14,7 +14,8 @@
 <link rel="preconnect" href="https://image.tmdb.org">
 <link rel="dns-prefetch" href="https://cinemaladder-api.twilightwind.workers.dev">
 <meta name="description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
-<link rel="canonical" href="./">
+<link rel="canonical" href="https://cinemaladder.com/">
+<meta property="og:url" content="https://cinemaladder.com/">
 <meta property="og:site_name" content="Cinemaladder">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Cinemaladder">
@@ -236,6 +237,7 @@ const AFF={
 };
 const affWrap=(tpl,url)=>!tpl?url:tpl.includes("{url}")?tpl.replace("{url}",encodeURIComponent(url)):tpl;
 const TMDB_PROXY = "https://cinemaladder-api.twilightwind.workers.dev/search";   // Cloudflare Workers の中継（worker/worker.js）
+const SITE = "https://cinemaladder.com/";   // 本番の住所
 const IMG = "https://image.tmdb.org/t/p/w92";
 
 const E=encodeURIComponent;
@@ -456,7 +458,10 @@ function setMeta(q,isExample){
   document.querySelector('meta[property="og:description"]').content=desc;
   document.querySelector('meta[property="og:title"]').content=document.title;
   // 作品ページは自分自身を正規URLに、おすすめ表示のトップはトップを正規URLにする
-  document.querySelector('link[rel="canonical"]').href=q&&!isExample?urlFor(q,null):new URL("./",location.href).href;
+  // 正規URLは常に本番の独自ドメインにする（cinemaladder.pages.dev など別の住所で開かれても、検索エンジンには本番を伝える）
+  const canon=new URL(SITE);if(q&&!isExample)canon.searchParams.set("q",q);
+  document.querySelector('link[rel="canonical"]').href=canon.href;
+  document.querySelector('meta[property="og:url"]').content=canon.href;
 }
 function syncNav(q,isExample,movie){
   document.title=q?`${q} - Cinemaladder`:"Cinemaladder";

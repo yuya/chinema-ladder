@@ -18,8 +18,8 @@
 - `.nojekyll` … GitHub Pages で Jekyll 変換を無効化
 
 ## ブランチと公開先（Cloudflare Pages）
-- `main` … 本番。独自ドメインで公開
-- `staging` … 確認用。`staging.cinemaladder.pages.dev` で公開し、Cloudflare Access で自分だけが見られるようにする
+- `main` … 本番。https://cinemaladder.com で公開（cinemaladder.pages.dev でも同じものが見られる）
+- `staging` … 確認用。https://staging.cinemaladder.pages.dev で公開し、Cloudflare Access で自分だけが見られるようにする
 - 修正はまず `staging` に入れ、確認できたら `main` に取り込む（`git merge -X theirs staging`。data/ の衝突は staging 側を採用）
 - `_headers` … Cloudflare Pages のキャッシュ設定
 
