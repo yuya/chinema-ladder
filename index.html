@@ -43,9 +43,31 @@ search{display:block}
 .vh{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-body > header{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);
+body > header{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);z-index:5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 12px}
-.hd{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.hd{max-width:720px;margin:0 auto;display:flex;flex-direction:column}
+/* ヘッダーは画面上部に固定。本文はヘッダーの（広げた状態の）高さ分だけ下げて始める */
+body{padding-top:var(--hh,148px)}
+/* スクロールしたら、サイト名・キャッチコピー・履歴を隠し、アイコンと検索欄を1行にする。
+   動きはすべて transform・opacity・背景の高さだけで作り、要素の位置を組み替えない
+   （位置が変わるとブラウザが「レイアウトのずれ」として数え、表示品質の評価が下がるため） */
+body > header::before{content:"";position:absolute;inset:0 0 auto;height:100%;background:var(--surface);border-bottom:1px solid var(--line);transition:height .25s ease;z-index:-1}
+.hd{transition:transform .25s ease}
+.fold{transition:opacity .2s ease,visibility 0s}
+.fold .brand{padding-bottom:8px}
+.fold .hist{padding-top:8px}
+.srow{position:relative}
+.mini{position:absolute;left:0;top:50%;transform:translateY(-50%);display:flex;opacity:0;visibility:hidden;transition:opacity .2s ease,visibility 0s .25s}
+.mini .mark{width:28px;height:28px;border-radius:7px;box-shadow:0 0 0 1px var(--line);flex:none}
+.srow .sbox{width:100%;transition:transform .25s ease,width .25s ease}
+.compact body > header{pointer-events:none}
+.compact body > header .srow{pointer-events:auto}
+.compact body > header::before{height:var(--hc,72px)}
+.compact .hd{transform:translateY(calc(var(--brandh,40px) * -1))}
+.compact .fold{opacity:0;visibility:hidden;transition:opacity .15s ease,visibility 0s .2s}
+.compact .mini{opacity:1;visibility:visible;transition:opacity .2s ease .05s,visibility 0s}
+.compact .srow .sbox{transform:translateX(38px);width:calc(100% - 38px)}
+@media (prefers-reduced-motion:reduce){body > header::before,.hd,.fold,.mini,.srow .sbox{transition:none!important}}
 .brand{flex-wrap:wrap;display:flex;align-items:baseline;gap:8px}
 .logo{font-weight:800;font-size:19px;letter-spacing:.01em;color:inherit;text-decoration:none}
 .logo .lad{color:var(--brand)}
@@ -193,7 +215,11 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 <body>
 <header>
   <div class="hd">
+    <div class="fold"><div>
     <div class="brand"><a class="logo" href="./" aria-label="Cinemaladder トップへ"><span class="name"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg>Cinema<span class="lad">ladder</span></span></a><p class="tagline">映画の評判を、はしごする</p></div>
+    </div></div>
+    <div class="srow">
+    <a class="mini" href="./" aria-label="Cinemaladder トップへ" tabindex="-1"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg></a>
     <search class="sbox search">
       <form id="f" action="./" method="get">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -204,7 +230,8 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
       </form>
       <ul class="sug" id="sug" role="listbox" aria-label="作品の候補" hidden></ul>
     </search>
-    <nav class="hist" id="hist" aria-labelledby="hist-lbl"></nav>
+    </div>
+    <div class="fold"><div><nav class="hist" id="hist" aria-labelledby="hist-lbl"></nav></div></div>
   </div>
 </header>
 
@@ -605,6 +632,28 @@ $("#out").addEventListener("click",e=>{
 $("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending();return}
   const t=e.target.closest("[data-tid]");if(t){const m=trendList.find(x=>x.id===+t.dataset.tid);if(m){$("#q").value=m.title;remember(m.title);render(m.title,false,m);collapseTop();window.scrollTo({top:0,behavior:"smooth"})}return}const a=e.target.closest("a.go");if(a)remember(a.dataset.q)});
 
+/* ===== ヘッダーの縮小 =====
+   下にスクロールしたら縮め、上端近くに戻ったら広げる。境目でちらつかないよう、縮める位置と広げる位置をずらす */
+const hdr=document.querySelector("body > header");
+const folds=hdr.querySelectorAll(".fold");
+function measureHeader(){
+  if(document.documentElement.classList.contains("compact"))return;
+  const st=document.documentElement.style,h=hdr.offsetHeight,b=folds[0].offsetHeight,t=folds[1].offsetHeight;
+  st.setProperty("--hh",h+"px");          // 広げたときの高さ（本文の開始位置）
+  st.setProperty("--brandh",b+"px");      // 隠すサイト名の行の高さ（その分だけ上へずらす）
+  st.setProperty("--hc",(h-b-t)+"px");    // 縮めたときの背景の高さ
+}
+new ResizeObserver(measureHeader).observe(hdr);
+let ticking=false;
+addEventListener("scroll",()=>{
+  if(ticking)return;ticking=true;
+  requestAnimationFrame(()=>{
+    ticking=false;
+    const y=scrollY,c=document.documentElement.classList.contains("compact");
+    if(!c&&y>64){hideSug();document.documentElement.classList.add("compact")}
+    else if(c&&y<16){document.documentElement.classList.remove("compact")}
+  });
+},{passive:true});
 $("#affnote").hidden=!(AFF.amazonTag||AFF.unext||AFF.mvtk);$("#amznote").hidden=!AFF.amazonTag;
 renderHist();
 const startQ=(()=>{try{return clean(new URL(location.href).searchParams.get("q")||"")}catch(e){return ""}})();
