@@ -6,7 +6,7 @@
 
 ## 構成
 - `index.html` … サイト本体（1ファイル完結。ライブラリなし）
-- `worker/worker.js` … TMDB 中継（Cloudflare Workers）。https://cinema-ladder-api.twilightwind.workers.dev で稼働。サジェストに使う。コードを変えたら Cloudflare の画面で貼り直して Deploy
+- `worker/worker.js` … TMDB 中継（Cloudflare Workers）。https://chinemaladder-api.twilightwind.workers.dev で稼働。サジェストに使う。コードを変えたら Cloudflare の画面で貼り直して Deploy
 - `data/trending.json` … 話題作TOP10。GitHub Actions が毎日自動更新（手で編集しない）
 - `data/titles.json` … 検索ボックスのサジェスト用の作品一覧（数千本）。Actions が毎日自動更新
 - `scripts/fetch-trending.mjs` / `scripts/fetch-titles.mjs` … 上の2つの JSON を作るスクリプト
