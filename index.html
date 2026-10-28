@@ -3,21 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Chinemaladder</title>
+<title>Cinemaladder</title>
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111115" media="(prefers-color-scheme: dark)">
-<meta name="apple-mobile-web-app-title" content="Chinemaladder">
+<meta name="apple-mobile-web-app-title" content="Cinemaladder">
 <link rel="preconnect" href="https://image.tmdb.org">
-<link rel="dns-prefetch" href="https://chinemaladder-api.twilightwind.workers.dev">
+<link rel="dns-prefetch" href="https://cinemaladder-api.twilightwind.workers.dev">
 <meta name="description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
 <link rel="canonical" href="./">
-<meta property="og:site_name" content="Chinemaladder">
+<meta property="og:site_name" content="Cinemaladder">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Chinemaladder">
+<meta property="og:title" content="Cinemaladder">
 <meta property="og:description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
 <style>
 :root{
@@ -192,7 +192,7 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 <body>
 <header>
   <div class="hd">
-    <div class="brand"><a class="logo" href="./" aria-label="Chinemaladder トップへ"><span class="name"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg>Chinema<span class="lad">ladder</span></span></a><p class="tagline">映画の評判を、はしごする</p></div>
+    <div class="brand"><a class="logo" href="./" aria-label="Cinemaladder トップへ"><span class="name"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg>Cinema<span class="lad">ladder</span></span></a><p class="tagline">映画の評判を、はしごする</p></div>
     <search class="sbox search">
       <form id="f" action="./" method="get">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -224,7 +224,7 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
 /* ===== アフィリエイト設定 =====
    提携が決まったらここに入れるだけで、リンクの差し替えと「PR」表示が切り替わる。
    空のあいだは普通のリンクで、PR も出さない（広告でないものに PR を付けないため）。
-   - amazonTag : Amazon アソシエイトのトラッキングID（例 "chinema-22"）。検索リンクに tag= を付ける
+   - amazonTag : Amazon アソシエイトのトラッキングID（例 "cinema-22"）。検索リンクに tag= を付ける
    - unext     : ASP の広告リンク。{url} を入れると遷移先（検索結果）を埋め込む
                  例 A8.net なら "https://px.a8.net/svt/ejp?a8mat=XXXX&a8ejpredirect={url}"
                  {url} がなければ、ASP が決めたページ（無料体験の案内など）へそのまま飛ぶ
@@ -235,7 +235,7 @@ const AFF={
   mvtk:"",
 };
 const affWrap=(tpl,url)=>!tpl?url:tpl.includes("{url}")?tpl.replace("{url}",encodeURIComponent(url)):tpl;
-const TMDB_PROXY = "https://chinemaladder-api.twilightwind.workers.dev/search";   // Cloudflare Workers の中継（worker/worker.js）
+const TMDB_PROXY = "https://cinemaladder-api.twilightwind.workers.dev/search";   // Cloudflare Workers の中継（worker/worker.js）
 const IMG = "https://image.tmdb.org/t/p/w92";
 
 const E=encodeURIComponent;
@@ -425,7 +425,7 @@ function renderHist(){$("#hist").hidden=!hist.length;$("#hist").innerHTML=hist.l
 function saveHist(){store.set("cl_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
-function renderEmpty(){cur=null;document.title="Chinemaladder";setMeta("",false);$("#out").innerHTML='<section class="emptyst"><h1>観たい映画の名前を入れてください</h1><p>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</p></section>'}
+function renderEmpty(){cur=null;document.title="Cinemaladder";setMeta("",false);$("#out").innerHTML='<section class="emptyst"><h1>観たい映画の名前を入れてください</h1><p>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</p></section>'}
 /* 作品名から TMDB の情報を、手元にない場合に取りに行く。
    1. 作品一覧（data/titles.json） 2. 中継サーバーで検索し、タイトルが完全に一致したもの */
 async function lookupMovie(q){
@@ -459,7 +459,7 @@ function setMeta(q,isExample){
   document.querySelector('link[rel="canonical"]').href=q&&!isExample?urlFor(q,null):new URL("./",location.href).href;
 }
 function syncNav(q,isExample,movie){
-  document.title=q?`${q} - Chinemaladder`:"Chinemaladder";
+  document.title=q?`${q} - Cinemaladder`:"Cinemaladder";
   setMeta(q,isExample);
   const st={q,isExample,movie:slim(movie)};
   try{

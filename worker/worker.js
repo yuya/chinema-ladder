@@ -1,4 +1,4 @@
-// Chinemaladder 用 TMDB 中継（Cloudflare Workers）
+// Cinemaladder 用 TMDB 中継（Cloudflare Workers）
 // 目的: TMDB のトークンをブラウザやアプリに置かず、サーバー側だけに持たせる。
 // 使い方:
 //   1. Cloudflare ダッシュボード → Workers & Pages → Create → 「Hello World」で作成し、このコードを貼り付けて Deploy
@@ -7,10 +7,10 @@
 //   4. index.html の TMDB_PROXY に「https://<worker名>.<サブドメイン>.workers.dev/search」を設定
 
 // 通信を許可するサイト。独自ドメインが決まったら ALLOWED_ORIGINS に追加する
-const ALLOWED_ORIGINS = ["https://chinemaladder.com", "https://www.chinemaladder.com", "https://yuya.github.io", "http://localhost:8000"];
-// Cloudflare Pages の確認用URL（staging.chinemaladder.pages.dev や 1回ごとのプレビューURL）を許可
-const ALLOWED_SUFFIXES = [".chinemaladder.pages.dev"];
-const isAllowed = o => ALLOWED_ORIGINS.includes(o) || o === "https://chinemaladder.pages.dev" ||
+const ALLOWED_ORIGINS = ["https://cinemaladder.com", "https://www.cinemaladder.com", "https://yuya.github.io", "http://localhost:8000"];
+// Cloudflare Pages の確認用URL（staging.cinemaladder.pages.dev や 1回ごとのプレビューURL）を許可
+const ALLOWED_SUFFIXES = [".cinemaladder.pages.dev"];
+const isAllowed = o => ALLOWED_ORIGINS.includes(o) || o === "https://cinemaladder.pages.dev" ||
   (o.startsWith("https://") && ALLOWED_SUFFIXES.some(s => o.endsWith(s)));
 
 export default {

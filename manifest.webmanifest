@@ -1,6 +1,6 @@
 {
-  "name": "Chinemaladder",
-  "short_name": "Chinemaladder",
+  "name": "Cinemaladder",
+  "short_name": "Cinemaladder",
   "description": "作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。",
   "lang": "ja",
   "start_url": "./",

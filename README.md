@@ -1,4 +1,4 @@
-# Chinemaladder
+# Cinemaladder
 
 映画の評判を、はしごする。
 
@@ -6,7 +6,7 @@
 
 ## 構成
 - `index.html` … サイト本体（1ファイル完結。ライブラリなし）
-- `worker/worker.js` … TMDB 中継（Cloudflare Workers）。https://chinemaladder-api.twilightwind.workers.dev で稼働。サジェストに使う。コードを変えたら Cloudflare の画面で貼り直して Deploy
+- `worker/worker.js` … TMDB 中継（Cloudflare Workers）。https://cinemaladder-api.twilightwind.workers.dev で稼働。サジェストに使う。コードを変えたら Cloudflare の画面で貼り直して Deploy
 - `data/trending.json` … 話題作TOP10。GitHub Actions が毎日自動更新（手で編集しない）
 - `data/titles.json` … 検索ボックスのサジェスト用の作品一覧（数千本）。Actions が毎日自動更新
 - `scripts/fetch-trending.mjs` / `scripts/fetch-titles.mjs` … 上の2つの JSON を作るスクリプト
@@ -19,7 +19,7 @@
 
 ## ブランチと公開先（Cloudflare Pages）
 - `main` … 本番。独自ドメインで公開
-- `staging` … 確認用。`staging.chinemaladder.pages.dev` で公開し、Cloudflare Access で自分だけが見られるようにする
+- `staging` … 確認用。`staging.cinemaladder.pages.dev` で公開し、Cloudflare Access で自分だけが見られるようにする
 - 修正はまず `staging` に入れ、確認できたら `main` に取り込む（`git merge -X theirs staging`。data/ の衝突は staging 側を採用）
 - `_headers` … Cloudflare Pages のキャッシュ設定
 
