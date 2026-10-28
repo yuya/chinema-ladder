@@ -635,7 +635,7 @@ $("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending(
   const t=e.target.closest("[data-tid]");if(t){const m=trendList.find(x=>x.id===+t.dataset.tid);if(m){$("#q").value=m.title;remember(m.title);render(m.title,false,m);collapseTop();window.scrollTo({top:0,behavior:"smooth"})}return}const a=e.target.closest("a.go");if(a)remember(a.dataset.q)});
 
 /* ===== ヘッダーの縮小 =====
-   下にスクロールしたら縮め、上端近くに戻ったら広げる。境目でちらつかないよう、縮める位置と広げる位置をずらす */
+   下にスクロールし始めたら縮め、上端に戻ったら広げる。境目でちらつかないよう、縮める位置と広げる位置を少しずらす */
 const hdr=document.querySelector("body > header");
 const folds=hdr.querySelectorAll(".fold");
 function measureHeader(){
@@ -652,8 +652,9 @@ addEventListener("scroll",()=>{
   requestAnimationFrame(()=>{
     ticking=false;
     const y=scrollY,c=document.documentElement.classList.contains("compact");
-    if(!c&&y>64){hideSug();document.documentElement.classList.add("compact")}
-    else if(c&&y<16){document.documentElement.classList.remove("compact")}
+    // 広がったままスクロールすると本文がヘッダーの下に潜るので、動き始めてすぐ縮め、上端に戻ったら広げる
+    if(!c&&y>8){hideSug();document.documentElement.classList.add("compact")}
+    else if(c&&y<2){document.documentElement.classList.remove("compact")}
   });
 },{passive:true});
 $("#affnote").hidden=!(AFF.amazonTag||AFF.unext||AFF.mvtk);$("#amznote").hidden=!AFF.amazonTag;
