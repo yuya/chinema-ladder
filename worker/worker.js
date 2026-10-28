@@ -7,7 +7,7 @@
 //   4. index.html の TMDB_PROXY に「https://<worker名>.<サブドメイン>.workers.dev/search」を設定
 
 // 通信を許可するサイト。独自ドメインが決まったら ALLOWED_ORIGINS に追加する
-const ALLOWED_ORIGINS = ["https://yuya.github.io", "http://localhost:8000"];
+const ALLOWED_ORIGINS = ["https://chinemaladder.com", "https://www.chinemaladder.com", "https://yuya.github.io", "http://localhost:8000"];
 // Cloudflare Pages の確認用URL（staging.chinemaladder.pages.dev や 1回ごとのプレビューURL）を許可
 const ALLOWED_SUFFIXES = [".chinemaladder.pages.dev"];
 const isAllowed = o => ALLOWED_ORIGINS.includes(o) || o === "https://chinemaladder.pages.dev" ||
