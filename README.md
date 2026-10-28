@@ -6,6 +6,7 @@
 
 ## 構成
 - `index.html` … サイト本体（1ファイル完結。ライブラリなし）
+- `about.html` / `privacy.html` / `pages.css` … 運営者情報とプライバシーポリシー（外部送信の公表を含む）。アクセス解析・広告・アフィリエイトを入れたら privacy.html の表と説明を更新する
 - `worker/worker.js` … TMDB 中継（Cloudflare Workers）。https://cinemaladder-api.twilightwind.workers.dev で稼働。サジェストに使う。コードを変えたら Cloudflare の画面で貼り直して Deploy
 - `data/trending.json` … 話題作TOP10。GitHub Actions が毎日自動更新（手で編集しない）
 - `data/titles.json` … 検索ボックスのサジェスト用の作品一覧（数千本）。Actions が毎日自動更新
