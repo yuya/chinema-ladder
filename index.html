@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#111115" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="Chinemaladder">
 <link rel="preconnect" href="https://image.tmdb.org">
-<link rel="dns-prefetch" href="https://cinema-ladder-api.twilightwind.workers.dev">
+<link rel="dns-prefetch" href="https://chinemaladder-api.twilightwind.workers.dev">
 <meta name="description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
 <link rel="canonical" href="./">
 <meta property="og:site_name" content="Chinemaladder">
@@ -235,7 +235,7 @@ const AFF={
   mvtk:"",
 };
 const affWrap=(tpl,url)=>!tpl?url:tpl.includes("{url}")?tpl.replace("{url}",encodeURIComponent(url)):tpl;
-const TMDB_PROXY = "https://cinema-ladder-api.twilightwind.workers.dev/search";   // Cloudflare Workers の中継（worker/worker.js）
+const TMDB_PROXY = "https://chinemaladder-api.twilightwind.workers.dev/search";   // Cloudflare Workers の中継（worker/worker.js）
 const IMG = "https://image.tmdb.org/t/p/w92";
 
 const E=encodeURIComponent;
