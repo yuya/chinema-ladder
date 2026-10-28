@@ -7,7 +7,7 @@
 //   4. index.html の TMDB_PROXY に「https://<worker名>.<サブドメイン>.workers.dev/search」を設定
 
 // 通信を許可するサイト。独自ドメインが決まったら ALLOWED_ORIGINS に追加する
-const ALLOWED_ORIGINS = ["https://yuya.github.io", "http://localhost:8000"];
+const ALLOWED_ORIGINS = ["https://chinemaladder.com", "https://www.chinemaladder.com", "https://yuya.github.io", "http://localhost:8000"];
 // Cloudflare Pages の確認用URL（staging.chinemaladder.pages.dev や 1回ごとのプレビューURL）を許可
 const ALLOWED_SUFFIXES = [".chinemaladder.pages.dev"];
 const isAllowed = o => ALLOWED_ORIGINS.includes(o) || o === "https://chinemaladder.pages.dev" ||
@@ -30,7 +30,7 @@ export default {
       try {
         const q = "?language=ja-JP&region=JP&page=";
         // 日本語タイトルが未登録だと原題（タミル語など）が返るので、日本語・英数字以外を含むタイトルは除外
-        const readable = t => !!t && !/[^\u0000-ɏ -⁯⺀-ヿ㐀-鿿豈-﫿＀-￯]/.test(t);
+        const readable = t => !!t && !/[^\u0000-\u024F\u2000-\u206F\u2E80-\u30FF\u3400-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(t);
         const pages = await Promise.all([tmdb("/movie/now_playing" + q + 1), tmdb("/movie/now_playing" + q + 2), tmdb("/movie/upcoming" + q + 1)]);
         const map = new Map();
         pages.flatMap(p => p.results || []).filter(m => readable(m.title)).forEach(m => map.set(m.id, {
