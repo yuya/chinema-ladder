@@ -786,7 +786,7 @@ renderHist();
 const startQ=(()=>{try{return clean(new URL(location.href).searchParams.get("q")||"")}catch(e){return ""}})();
 if(startQ){   // 共有・ブックマークされた URL から開いたとき
   const id=+new URL(location.href).searchParams.get("id")||0;
-  setQ(startQ);remember(startQ);navMode="replace";
+  setQ(startQ,true);remember(startQ);navMode="replace";   // URL から開いたときも、自分で選んだわけではないので薄い文字で
   render(startQ,false,id&&meta[startQ]?.id===id?meta[startQ]:null);
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}
 else if(hist[0]){setQ(hist[0],true);navMode="none";render(hist[0]);
