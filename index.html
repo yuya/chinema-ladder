@@ -558,6 +558,7 @@ function infoHTML(st,d){
 }
 function setInfo(st,d){
   const el=$("#info");if(!el)return;
+  if(st==="none"){el.hidden=true;const m=$("#imeta");if(m)m.innerHTML="";return}   // 一致する作品がないときは、中身のない開閉を出さない
   const t=document.createElement("div");t.innerHTML=infoHTML(st,d);
   const n=t.firstElementChild;n.open=el.open;el.replaceWith(n);
   // 詳しい情報が届いたら「公開日・上映時間・ジャンル」に差し替える。届かなければ公開年だけを残す
