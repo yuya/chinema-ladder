@@ -32,8 +32,9 @@
   --bg:#111115;--surface:#1A1A20;--fg:#ECECF1;--muted:#A0A0AC;--line:#2C2C35;--accent:#E8607A;--accent-soft:#3A1D25;--ad:#202029;color-scheme:dark}}
 *{box-sizing:border-box}
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.6}
-button,input{font:inherit;color:inherit}
+/* 和文の字間を詰める（palt）をサイト全体にかける。部分ごとに付けると漏れが出るため */
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.6;font-feature-settings:"palt" 1}
+button,input{font:inherit;color:inherit;font-feature-settings:inherit}
 button{cursor:pointer}
 [hidden]{display:none!important}
 p,figure,ul,ol,hgroup{margin:0}
@@ -73,7 +74,7 @@ body > header::before{content:"";position:absolute;inset:0 0 auto;height:100%;ba
 .logo .lad{color:var(--brand)}
 .logo .name{white-space:nowrap}
 .logo .mark{width:24px;height:24px;vertical-align:-5px;margin-right:7px;border-radius:6px;box-shadow:0 0 0 1px var(--line)}   /* brand/icon.svg と同じ絵（通信を増やさないよう直接埋め込み） */
-.tagline{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.08em;font-feature-settings:"palt" 1}   /* palt で「、」の後ろの空きを詰める */
+.tagline{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.08em}
 .sbox{position:relative}
 .search form{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 6px 0 12px}
 .search form:focus-within{border-color:var(--accent)}
@@ -145,13 +146,13 @@ details.info{background:none;border:0;border-radius:0;padding:0;font-size:14px;m
 .info[open] .cl{display:inline}
 .info .body{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:65ch}
 .info .tag{font-weight:700;margin:0}
-.info .ov{margin:0;line-height:1.8}
+.info .ov{margin:0;line-height:1.8;letter-spacing:.02em}   /* 長い文章は詰めすぎると読みにくいので、少しだけ空ける */
 .info .lang,.info .cr,.info .src{margin:0;font-size:13px;color:var(--muted)}
 .info .ld{min-height:120px}   /* 開いた状態で読み込み中のときも高さを確保し、届いたときに下がずれにくくする */
 .info .cr + .cr{margin-top:-6px}   /* 監督・出演・製作国はひとまとまりに詰める */
 .info .src{font-size:12px}
 .info .src a{color:inherit}
-.now .ex{font-size:12px;color:var(--muted);font-feature-settings:"palt" 1}   /* 「・」「／」まわりの空きを詰める */
+.now .ex{font-size:12px;color:var(--muted)}   /* 「・」「／」まわりの空きを詰める */
 
 .grp{display:flex;flex-direction:column;gap:8px}
 .grp hgroup{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
@@ -164,10 +165,10 @@ a.go{display:flex;flex-direction:column;gap:1px;text-decoration:none;color:inher
 a.go:hover{border-color:var(--accent)}
 a.go:active{transform:scale(.98)}
 /* 1行に収める工夫：
-   - palt で和文の字間を詰める（フォントの機能を使うだけなので負荷はほぼ無い）
+   - 和文の字間は body の palt で詰めている
    - ↗ は右上の隅に置き、名前の行の幅を空ける
    - それでも入らない狭い画面では、改行せず末尾を「…」にする */
-a.go{position:relative;font-feature-settings:"palt" 1}
+a.go{position:relative}
 a.go .n{font-weight:700;display:flex;align-items:center;gap:6px;min-width:0;padding-right:10px}
 a.go .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 a.go .d .pr{margin-right:5px;vertical-align:1px}
