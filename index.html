@@ -419,19 +419,25 @@ async function searchLocal(q){
   return head.concat(mid).slice(0,8);
 }
 
+/* 入力中の候補：TMDB の検索（書いた文字の通りに探す）と、作品一覧からの検索（「・」「ー」や全角半角、
+   ひらがな・カタカナの違いを無視して探す）を同時に行い、合わせて並べる。
+   「スターウォーズ」でも「スター・ウォーズ／フォースの覚醒」などが出るようにするため */
 async function searchTMDB(q){
   if(cache.has(q))return cache.get(q);
-  ctrl?.abort();ctrl=new AbortController();
-  let res;
-  try{
-    const r=await fetch(TMDB_PROXY+"?q="+E(q),{signal:ctrl.signal});
-    if(!r.ok)throw new Error(r.status);
-    res=await r.json();
-    if(!Array.isArray(res))throw new Error("bad");
-  }catch(e){
-    if(e.name==="AbortError")throw e;
-    res=await searchLocal(q);   // 中継が使えないときは作品一覧から候補を出す
-  }
+  ctrl?.abort();ctrl=new AbortController();const sig=ctrl.signal;
+  const remote=fetch(TMDB_PROXY+"?q="+E(q),{signal:sig})
+    .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
+    .then(j=>Array.isArray(j)?j:[])
+    .catch(e=>{if(e.name==="AbortError")throw e;return []});   // 中継が使えなくても作品一覧の候補は出す
+  const local=searchLocal(q).catch(()=>[]);
+  const [r,l]=await Promise.all([remote,local]);
+  // 並べ方：入力と（記号を無視して）完全一致 → 先頭が一致 → 途中に含む → その他。同じ順位なら TMDB、作品一覧（人気順）の順
+  const k=norm(q);
+  const rank=m=>{const t=norm(m.title),o=m.original?norm(m.original):"";
+    return t===k||o===k?0:(t.startsWith(k)||o.startsWith(k))?1:(t.includes(k)||o.includes(k))?2:3};
+  const seen=new Set(),all=[];
+  for(const m of [...r,...l]){if(seen.has(m.id))continue;seen.add(m.id);all.push(m)}
+  const res=all.map((m,i)=>[rank(m),i,m]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).map(x=>x[2]).slice(0,8);
   cache.set(q,res);return res;
 }
 /* ===== 話題作TOP10（日本で上映中＋公開予定を人気順に） ===== */
