@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-29T13:33:10.188Z",
+ "updated": "2026-10-29T13:32:46.894Z",
  "items": [
   {
    "id": 1400940,
@@ -7,7 +7,38 @@
    "original": "Clayface",
    "date": "2026-10-30",
    "poster": "/6ttcIVdQbS6esi5wPEUuVKQN8SX.jpg",
-   "pop": 231.682
+   "pop": 231.682,
+   "info": {
+    "id": 1400940,
+    "title": "クレイフェイス",
+    "original": "Clayface",
+    "poster": "/6ttcIVdQbS6esi5wPEUuVKQN8SX.jpg",
+    "date": "2026-10-19",
+    "jpDate": "2026-10-30",
+    "runtime": 109,
+    "tagline": "",
+    "overview": "Matt Hagen's meteoric rise from Gotham street kid to Hollywood leading man is tragically cut short when a local crime boss's actions leave him horribly disfigured. Abandoned by his team and with nothing left, Matt seeks out a cutting edge treatment that miraculously returns him to his former self… but also unexpectedly affects his grip on reality, spiraling him down a destructive path of all-consuming revenge.",
+    "overviewLang": "en",
+    "genres": [
+     "ホラー",
+     "スリラー",
+     "サイエンスフィクション"
+    ],
+    "countries": [
+     "US"
+    ],
+    "directors": [
+     "ジェームズ・ワトキンス"
+    ],
+    "cast": [
+     "Tom Rhys Harries",
+     "ナオミ・アッキー",
+     "エディ・マーサン",
+     "マックス・ミンゲラ",
+     "デヴィッド・デンシック",
+     "Francesca Corney"
+    ]
+   }
   },
   {
    "id": 1283515,
@@ -15,7 +46,38 @@
    "original": "Verity",
    "date": "2026-11-06",
    "poster": "/rmaNMA1seHqpjtnYKzyynFAr1g8.jpg",
-   "pop": 179.6426
+   "pop": 179.6426,
+   "info": {
+    "id": 1283515,
+    "title": "ヴェリティ／真実",
+    "original": "Verity",
+    "poster": "/rmaNMA1seHqpjtnYKzyynFAr1g8.jpg",
+    "date": "2026-09-30",
+    "jpDate": "2026-11-06",
+    "runtime": 121,
+    "tagline": "",
+    "overview": "仕事にも人生にも行き詰まっている売れない作家ローウェン・アシュリー（ダコタ・ジョンソン）のもとへ、突然、驚くようなオファーが届く。それは交通事故で生死を彷徨う人気作家ヴェリティ・クロフォード（アン・ハサウェイ）のためのゴーストライター業だった。なぜ自分が選ばれたのか疑問を持ちながらも、またとないチャンスを引き受けるべく、ローウェンは人里離れたクロフォード家の邸宅へと移り住む。次第にヴェリティの夫ジェレミー（ジョシュ・ハートネット）と親密な関係になっていくローウェンだったが、ある日ヴェリティが書いたと思われる不気味な原稿を発見してしまう。そこには、夫との性愛や子供たちへの激しい感情、そして自らにまつわる衝撃の告白が記されていた── クロフォード家に一体何があったのか？ 善悪の境界線が揺らぐ中、やがてローウェンは闇深い真実に辿り着く…。",
+    "overviewLang": "ja",
+    "genres": [
+     "謎",
+     "スリラー",
+     "ドラマ"
+    ],
+    "countries": [
+     "US"
+    ],
+    "directors": [
+     "マイケル・ショウォーター"
+    ],
+    "cast": [
+     "ダコタ・ジョンソン",
+     "アン・ハサウェイ",
+     "ジョシュ・ハートネット",
+     "Brady Wagner",
+     "イスマエル・クルス・コルドヴァ",
+     "Ирина Дворовенко"
+    ]
+   }
   },
   {
    "id": 1423191,
@@ -23,7 +85,40 @@
    "original": "Resident Evil",
    "date": "2026-10-09",
    "poster": "/wHXSnGH3zQtvpxPwaBXMoS9o8Vl.jpg",
-   "pop": 143.8412
+   "pop": 143.8412,
+   "info": {
+    "id": 1423191,
+    "title": "バイオハザード",
+    "original": "Resident Evil",
+    "poster": "/wHXSnGH3zQtvpxPwaBXMoS9o8Vl.jpg",
+    "date": "2026-09-16",
+    "jpDate": "2026-10-09",
+    "runtime": 95,
+    "tagline": "",
+    "overview": "ある医療品の配送を請け負った男を襲う、地獄の一夜。 男は、己の命運を懸けた壮絶なサバイバルを余儀なくされる…",
+    "overviewLang": "ja",
+    "genres": [
+     "ホラー",
+     "サイエンスフィクション",
+     "アドベンチャー"
+    ],
+    "countries": [
+     "US",
+     "DE",
+     "FR"
+    ],
+    "directors": [
+     "ザック・クレッガー"
+    ],
+    "cast": [
+     "オースティン・エイブラムス",
+     "ポール・ウォルター・ハウザー",
+     "Kali Reis",
+     "ザック・チェリー",
+     "Johnno Wilson",
+     "Shaun W. Loeser"
+    ]
+   }
   },
   {
    "id": 1153576,
@@ -31,7 +126,38 @@
    "original": "Street Fighter",
    "date": "2026-10-16",
    "poster": "/1JBlbyXionXPRaqW1UQw7eKkxNP.jpg",
-   "pop": 116.5205
+   "pop": 116.5205,
+   "info": {
+    "id": 1153576,
+    "title": "ストリートファイター／ザ・ムービー",
+    "original": "Street Fighter",
+    "poster": "/1JBlbyXionXPRaqW1UQw7eKkxNP.jpg",
+    "date": "2026-10-13",
+    "jpDate": "2026-10-16",
+    "runtime": 120,
+    "tagline": "伝説が、ここから始まる。",
+    "overview": "舞台は1993年。かつて、共に天才格闘家として名を馳せ、兄弟のような存在であったリュウとケン。ある理由により疎遠になった二人のもとに、謎の女性格闘家・春麗が現れ、“ワールドウォリアー・トーナメント（世界格闘王決定戦）”の招待状が差し出される。世界最強の猛者たち“ストリートファイター”と戦うことになった二人は、その拳で運命を変えることができるのか？",
+    "overviewLang": "ja",
+    "genres": [
+     "アクション",
+     "ファンタジー"
+    ],
+    "countries": [
+     "JP",
+     "US"
+    ],
+    "directors": [
+     "キタオ・サクライ"
+    ],
+    "cast": [
+     "アンドリュー・小路",
+     "ノア・センティネオ",
+     "カリーナ・リャン",
+     "デヴィッド・ダストマルチャン",
+     "アンドリュー・シュルツ",
+     "Joe Anoa'i"
+    ]
+   }
   },
   {
    "id": 1400837,
@@ -39,7 +165,36 @@
    "original": "Other Mommy",
    "date": "2026-11-20",
    "poster": "/fGRNCssTRrhYZxNzykGGCoMsAVq.jpg",
-   "pop": 93.7702
+   "pop": 93.7702,
+   "info": {
+    "id": 1400837,
+    "title": "アザー・マミー",
+    "original": "Other Mommy",
+    "poster": "/fGRNCssTRrhYZxNzykGGCoMsAVq.jpg",
+    "date": "2026-10-07",
+    "jpDate": "2026-11-20",
+    "runtime": 93,
+    "tagline": "",
+    "overview": "Young Bela forms a relationship with a sinister entity in her home that looks uncannily like her own mother, drawing her into a terrifying and increasingly dark world.",
+    "overviewLang": "en",
+    "genres": [
+     "ホラー"
+    ],
+    "countries": [
+     "US"
+    ],
+    "directors": [
+     "ロブ・サヴェージ"
+    ],
+    "cast": [
+     "ジェシカ・チャステイン",
+     "ジェイ・デュプラス",
+     "Arabella Olivia Clark",
+     "カレン・アレン",
+     "アリアン・モーイエド",
+     "ディーチェン・ラックマン"
+    ]
+   }
   },
   {
    "id": 1275779,
@@ -47,7 +202,37 @@
    "original": "Disclosure Day",
    "date": "2026-10-01",
    "poster": "/vDnJLpE2jhu8OVcwpWuYCMF5hRU.jpg",
-   "pop": 90.8678
+   "pop": 90.8678,
+   "info": {
+    "id": 1275779,
+    "title": "ディスクロージャー・デイ",
+    "original": "Disclosure Day",
+    "poster": "/vDnJLpE2jhu8OVcwpWuYCMF5hRU.jpg",
+    "date": "2026-06-10",
+    "jpDate": "2026-10-01",
+    "runtime": 146,
+    "tagline": "",
+    "overview": "気象キャスターのマーガレットとサイバーセキュリティのエキスパート、ダニエル。接点のないはずの二人が衝撃的な機密情報を知ることとなった。やがて、その秘密を明らかにする使命を負った彼らの前に謎の組織が立ちはだかる――。",
+    "overviewLang": "ja",
+    "genres": [
+     "サイエンスフィクション",
+     "スリラー"
+    ],
+    "countries": [
+     "US"
+    ],
+    "directors": [
+     "スティーヴン・スピルバーグ"
+    ],
+    "cast": [
+     "エミリー・ブラント",
+     "ジョシュ・オコナー",
+     "コリン・ファース",
+     "イヴ・ヒューソン",
+     "コールマン・ドミンゴ",
+     "ワイアット・ラッセル"
+    ]
+   }
   },
   {
    "id": 1263337,
@@ -55,7 +240,36 @@
    "original": "Heart of the Beast",
    "date": "2026-09-25",
    "poster": "/mGmnmCtodvzhpnMFQoZkeGDDVjU.jpg",
-   "pop": 79.4377
+   "pop": 79.4377,
+   "info": {
+    "id": 1263337,
+    "title": "ハート・オブ・ビースト",
+    "original": "Heart of the Beast",
+    "poster": "/mGmnmCtodvzhpnMFQoZkeGDDVjU.jpg",
+    "date": "2026-09-19",
+    "jpDate": "2026-09-25",
+    "runtime": 101,
+    "tagline": "生きて、マイホームに還ろう。",
+    "overview": "アラスカ上空を飛行中、不意のアクシデントにより“魔の領域（ハート・オブ・ビースト）”と呼ばれる奥地に不時着した、退役兵のジェームズと元偵察犬で義足のオーディン。立ちはだかる大自然を乗り越え「生きて還る」には、愛する存在のためにすべてを捧げる覚悟が必要だった。",
+    "overviewLang": "ja",
+    "genres": [
+     "アドベンチャー",
+     "スリラー"
+    ],
+    "countries": [
+     "US"
+    ],
+    "directors": [
+     "デヴィッド・エアー"
+    ],
+    "cast": [
+     "ブラッド・ピット",
+     "Ｊ・Ｋ・シモンズ",
+     "アンナ・ラム",
+     "Justin Melnick",
+     "Shaun DeZern"
+    ]
+   }
   },
   {
    "id": 1248832,
@@ -63,7 +277,37 @@
    "original": "Digger",
    "date": "2026-10-09",
    "poster": "/vi2HvWOBtR1pcr4vBoYe43ldkuu.jpg",
-   "pop": 75.6082
+   "pop": 75.6082,
+   "info": {
+    "id": 1248832,
+    "title": "DIGGER／ディガー",
+    "original": "Digger",
+    "poster": "/vi2HvWOBtR1pcr4vBoYe43ldkuu.jpg",
+    "date": "2026-09-28",
+    "jpDate": "2026-10-09",
+    "runtime": 129,
+    "tagline": "ひとりの男。ひとつの計画。 そして、大混乱。",
+    "overview": "石油採掘会社のCEOとして君臨する傲慢な権力者、ディガー・ロックウェル。己の利益しか考えていない彼の欲深い行動のせいで、地球は滅亡の危機に陥ってしまう。大統領から事態の収拾を命じられたディガーは、世界を救うべくシャベルを片手に立ち上がるが……。",
+    "overviewLang": "ja",
+    "genres": [
+     "コメディ",
+     "ドラマ"
+    ],
+    "countries": [
+     "US"
+    ],
+    "directors": [
+     "アレハンドロ・G・イニャリトゥ"
+    ],
+    "cast": [
+     "トム・クルーズ",
+     "リズ・アーメッド",
+     "ジョン・グッドマン",
+     "ザンドラ・ヒュラー",
+     "マイケル・スタールバーグ",
+     "ジェシー・プレモンス"
+    ]
+   }
   },
   {
    "id": 1255833,
@@ -71,7 +315,36 @@
    "original": "Whalefall",
    "date": "2026-10-16",
    "poster": "/vjTYUTgh9nO88i6HZ4YPRhiFL05.jpg",
-   "pop": 75.2818
+   "pop": 75.2818,
+   "info": {
+    "id": 1255833,
+    "title": "クジラに落ちた男",
+    "original": "Whalefall",
+    "poster": "/vjTYUTgh9nO88i6HZ4YPRhiFL05.jpg",
+    "date": "2026-10-14",
+    "jpDate": "2026-10-16",
+    "runtime": 106,
+    "tagline": "",
+    "overview": "Following the death of his father, Jay Gardiner goes diving off the central Coast of California in search of his remains, but is swallowed by a massive sperm whale. While trapped inside its belly with only one hour of oxygen left, Jay comes to realize that the hard-earned lessons his father imparted may be the key to his escape.",
+    "overviewLang": "en",
+    "genres": [
+     "スリラー"
+    ],
+    "countries": [
+     "US"
+    ],
+    "directors": [
+     "ブライアン・ダッフィールド"
+    ],
+    "cast": [
+     "オースティン・エイブラムス",
+     "ジョシュ・ブローリン",
+     "エリザベス・シュー",
+     "ジョン・オーティス",
+     "ジェーン・レヴィ",
+     "エミリー・ラッド"
+    ]
+   }
   },
   {
    "id": 1381071,
@@ -79,7 +352,38 @@
    "original": "ゴジラ-0.0",
    "date": "2026-11-03",
    "poster": "/zpcoFlZwyLnBt7bb5wmvGDCdg06.jpg",
-   "pop": 20.6745
+   "pop": 20.6745,
+   "info": {
+    "id": 1381071,
+    "title": "ゴジラ-0.0",
+    "original": "ゴジラ-0.0",
+    "poster": "/zpcoFlZwyLnBt7bb5wmvGDCdg06.jpg",
+    "date": "2026-11-03",
+    "jpDate": "2026-11-03",
+    "runtime": 135,
+    "tagline": "人類の罪と罰。もう、無(ゼロ)には戻れない。",
+    "overview": "War reduced Japan to zero, and Godzilla plunged it into minus. Two years have passed since then, and the country has faced agonizing struggles to achieve recovery and finally reclaim its daily life. Just as humanity managed to cling to a hard-won peace, a new threat strikes, crushing hope in an instant. There is no third time. Everything ends here.",
+    "overviewLang": "en",
+    "genres": [
+     "サイエンスフィクション",
+     "ホラー",
+     "アクション"
+    ],
+    "countries": [
+     "JP"
+    ],
+    "directors": [
+     "山崎貴"
+    ],
+    "cast": [
+     "神木隆之介",
+     "浜辺美波",
+     "山田裕貴",
+     "佐々木蔵之介",
+     "國村隼",
+     "田中美央"
+    ]
+   }
   }
  ]
 }

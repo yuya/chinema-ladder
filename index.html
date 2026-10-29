@@ -12,7 +12,8 @@
 <meta name="theme-color" content="#111115" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="Cinemaladder">
 <link rel="preconnect" href="https://image.tmdb.org">
-<link rel="dns-prefetch" href="https://cinemaladder-api.twilightwind.workers.dev">
+<link rel="preconnect" href="https://cinemaladder-api.twilightwind.workers.dev" crossorigin>
+<link rel="preload" href="data/trending.json" as="fetch" crossorigin>
 <meta name="description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
 <link rel="canonical" href="https://cinemaladder.com/">
 <meta property="og:url" content="https://cinemaladder.com/">
@@ -48,7 +49,8 @@ body > header{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);z-i
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 12px}
 .hd{max-width:720px;margin:0 auto;display:flex;flex-direction:column}
 /* ヘッダーは画面上部に固定。本文はヘッダーの（広げた状態の）高さ分だけ下げて始める */
-body{padding-top:var(--hh,148px)}
+body{padding-top:var(--hh,110px)}
+.hashist body{padding-top:var(--hh,148px)}   /* 履歴の行があるときの高さ。最初の表示で本文がずれないよう、読み込み前に見当を付ける */
 /* スクロールしたら、サイト名・キャッチコピー・履歴を隠し、アイコンと検索欄を1行にする。
    動きはすべて transform・opacity・背景の高さだけで作り、要素の位置を組み替えない
    （位置が変わるとブラウザが「レイアウトのずれ」として数え、表示品質の評価が下がるため） */
@@ -121,6 +123,7 @@ body > header::before{content:"";position:absolute;inset:0 0 auto;height:100%;ba
 .hist.out{opacity:0;transition:opacity .25s ease}
 @media (prefers-reduced-motion:reduce){.hist .delall,.hist .delall .dl,.hist.out{transition:none}}
 
+main.boot{min-height:100vh}   /* 最初の表示までフッターを画面の外に置き、中身が出たときに押し下げない */
 main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 24px;
   display:flex;flex-direction:column;gap:18px}
 .movie{display:flex;flex-direction:column;gap:18px}
@@ -275,6 +278,7 @@ details[open] > summary::before{transform:rotate(90deg)}
 .top small{display:block;color:var(--muted);font-size:12px}
 @media (prefers-reduced-motion:reduce){a.go{transition:none}}
 </style>
+<script>try{if(JSON.parse(localStorage.getItem("cl_hist")||"[]").length)document.documentElement.classList.add("hashist")}catch(e){}</script>
 </head>
 <body>
 <header>
@@ -295,12 +299,12 @@ details[open] > summary::before{transform:rotate(90deg)}
       <ul class="sug" id="sug" role="listbox" aria-label="作品の候補" hidden></ul>
     </search>
     </div>
-    <div class="fold"><div><nav class="hist" id="hist" aria-labelledby="hist-lbl"></nav></div></div>
+    <div class="fold"><div><nav class="hist" id="hist" aria-labelledby="hist-lbl" hidden></nav></div></div>
   </div>
 </header>
 
 <p class="envbadge" id="envbadge" hidden aria-hidden="true">STAGING</p>
-<main id="out">
+<main id="out" class="boot">
   <p class="emptyst">読み込み中…</p>
   <noscript><p class="emptyst">このサイトを使うには JavaScript を有効にしてください。</p></noscript>
 </main>
@@ -461,8 +465,11 @@ async function getTrending(){
   if(trendList)return trendList;
   // 1. GitHub Actions が毎日作る data/trending.json（トークン不要・誰でも見られる）
   try{
-    const r=await fetch("data/trending.json",{cache:"no-cache"});
-    if(r.ok){const j=await r.json();if(j.items?.length){trendList=j.items;return trendList}}
+    const r=await fetch("data/trending.json");   // 先読み（preload）したものをそのまま使う
+    if(r.ok){const j=await r.json();if(j.items?.length){
+      // 詳しい情報が入っていれば先に置いておき、公開日などの行を待たずに出す（画面のずれを防ぐ）
+      for(const m of j.items)if(m.info&&!infoCache.has(m.id))infoCache.set(m.id,Promise.resolve(m.info));
+      trendList=j.items;return trendList}}
   }catch(e){}
   // 2. ファイルが読めないときは中継サーバーから
   const r=await fetch(TMDB_PROXY.replace(/search$/,"trending"));
@@ -551,7 +558,7 @@ function renderHist(){$("#hist").hidden=!hist.length;$("#hist").innerHTML=hist.l
 function saveHist(){store.set("cl_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
-function renderEmpty(){cur=null;document.title="Cinemaladder";setMeta("",false);$("#out").innerHTML='<section class="emptyst"><h1>観たい映画の名前を入れてください</h1><p>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</p></section>'}
+function renderEmpty(){cur=null;document.title="Cinemaladder";setMeta("",false);$("#out").classList.remove("boot");$("#out").innerHTML='<section class="emptyst"><h1>観たい映画の名前を入れてください</h1><p>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</p></section>'}
 /* 作品名から TMDB の情報を、手元にない場合に取りに行く。
    1. 作品一覧（data/titles.json） 2. 中継サーバーで検索し、タイトルが完全に一致したもの */
 async function lookupMovie(q){
@@ -763,7 +770,7 @@ function render(q,isExample,movie){
       `<li><a class="go" href="${esc(it.u(q,movie))}" target="_blank" rel="${it.pr?.()?"noopener sponsored":"noopener"}" data-q="${esc(q)}"><span class="n"><span class="fav fav-${it.ic}" aria-hidden="true"></span><span class="nm">${it.n}</span></span><span class="d">${it.pr?.()?'<span class="pr">PR</span>':""}${it.d}</span></a></li>`).join("")}</ul>${gr.items.some(it=>it.ic==="x")?ngHTML():""}</section>`;
     if(i===1)h+='<aside class="ad" aria-label="広告"><span class="adl">広告</span>ここにバナー広告（例：320×100）</aside>';
   });
-  $("#out").innerHTML=h+`</article>`;
+  $("#out").innerHTML=h+`</article>`;$("#out").classList.remove("boot");
   fitTitle();
   if(changed)playSwap();
   if(movie?.id)fetchInfoFor(q,movie);

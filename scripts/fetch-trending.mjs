@@ -28,6 +28,30 @@ for (const m of pages.flatMap(p => p.results || [])) {
 const items = [...map.values()].sort((a, b) => b.pop - a.pop).slice(0, 10);
 if (items.length < 3) throw new Error("取得できた作品が少なすぎるため更新を中止しました");
 
+// 最初の画面ですぐ出せるよう、作品の詳しい情報も入れておく（形は中継サーバーの /movie と同じ）
+// 後から届いた文字で画面がずれる（CLS）のを防ぐため。取れなかった作品は今まで通り中継サーバーから読む
+const details = async id => {
+  const m = await get(`/movie/${id}?language=ja-JP&append_to_response=credits,release_dates`);
+  let overview = (m.overview || "").trim(), overviewLang = "ja";
+  if (!overview) {
+    const en = await get(`/movie/${id}?language=en-US`).catch(() => null);
+    if (en?.overview) { overview = en.overview.trim(); overviewLang = "en"; }
+  }
+  const jp = (m.release_dates?.results || []).find(r => r.iso_3166_1 === "JP")?.release_dates || [];
+  const jpDate = (jp.find(d => d.type === 3) || jp[0])?.release_date?.slice(0, 10) || "";
+  const crew = m.credits?.crew || [];
+  return {
+    id: m.id, title: m.title, original: m.original_title, poster: m.poster_path,
+    date: m.release_date || "", jpDate, runtime: m.runtime || 0, tagline: m.tagline || "",
+    overview, overviewLang,
+    genres: (m.genres || []).map(g => g.name),
+    countries: (m.production_countries || []).map(c => c.iso_3166_1),
+    directors: crew.filter(c => c.job === "Director").map(c => c.name).slice(0, 3),
+    cast: (m.credits?.cast || []).slice(0, 6).map(c => c.name),
+  };
+};
+await Promise.all(items.map(async it => { try { it.info = await details(it.id); } catch (e) { console.warn(it.title, e.message); } }));
+
 await mkdir("data", { recursive: true });
 await writeFile("data/trending.json", JSON.stringify({ updated: new Date().toISOString(), items }, null, 1) + "\n");
 console.log(items.map((m, i) => `${i + 1}. ${m.title}`).join("\n"));
