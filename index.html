@@ -111,9 +111,13 @@ body > header::before{content:"";position:absolute;inset:0 0 auto;height:100%;ba
 main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 24px;
   display:flex;flex-direction:column;gap:18px}
 .movie{display:flex;flex-direction:column;gap:18px}
-.now{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center}
+.now{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center}
 /* 共有は控えめに：枠なし・アイコンだけ・作品欄の右下（押せる範囲は 32px 確保） */
-.share{align-self:end;display:grid;place-items:center;width:32px;height:32px;margin:0 -6px -4px 0;border:0;background:transparent;color:var(--muted);border-radius:8px;padding:0}
+/* 共有ボタンは公開日の行の右端にだけ置き、作品名の行の幅は削らない */
+.now .mrow{display:flex;align-items:flex-end;gap:8px}
+.now .mrow .meta{flex:1;min-width:0}
+.now .meta .w{display:inline-block}
+.share{flex:none;display:grid;place-items:center;width:32px;height:32px;margin:0 -6px -6px 0;border:0;background:transparent;color:var(--muted);border-radius:8px;padding:0}
 .share:hover{color:var(--accent);background:var(--accent-soft)}
 .share svg{width:17px;height:17px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:20}
@@ -147,7 +151,7 @@ details.info{background:none;border:0;border-radius:0;padding:0;font-size:14px;m
 .info .cr + .cr{margin-top:-6px}   /* 監督・出演・製作国はひとまとまりに詰める */
 .info .src{font-size:12px}
 .info .src a{color:inherit}
-.now .ex{font-size:12px;color:var(--muted)}
+.now .ex{font-size:12px;color:var(--muted);font-feature-settings:"palt" 1}   /* 「・」「／」まわりの空きを詰める */
 
 .grp{display:flex;flex-direction:column;gap:8px}
 .grp hgroup{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
@@ -323,7 +327,8 @@ const GROUPS=[
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const clean=s=>s.normalize("NFKC").replace(/\s+/g," ").trim();
+// 空白だけ整える（全角の「／」などを半角に変えると、TMDB の作品名と一致しなくなるため NFKC はかけない）
+const clean=s=>s.replace(/[\s\u3000]+/g," ").trim();
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let hist=store.get("cl_hist",[]);
 /* 履歴の作品ごとの TMDB 情報（ポスター・原題・公開年）。履歴から開いたときに使う */
@@ -484,7 +489,7 @@ async function lookupMovie(q){
   try{await loadTitles();const m=findMovie(q);if(m)return m}catch(e){}
   try{
     const r=await fetch(TMDB_PROXY+"?q="+E(q));
-    if(r.ok){const list=await r.json();if(Array.isArray(list)){cache.set(q,list);return list.find(m=>m.title===q)||null}}
+    if(r.ok){const list=await r.json();if(Array.isArray(list)){cache.set(q,list);return list.find(m=>m.title===q)||list.find(m=>norm(m.title)===norm(q))||null}}
   }catch(e){}
   return null;
 }
@@ -509,7 +514,9 @@ const ymd=d=>d?`${+d.slice(0,4)}年${+d.slice(5,7)}月${+d.slice(8,10)}日`:"";
 // 見出しの中に出す1行：公開日・上映時間・ジャンル（ネタバレにならないので常に表示）
 function metaText(d){
   const date=d.jpDate||d.date;
-  return [date?ymd(date)+"公開":"",d.runtime?`${d.runtime}分`:"",d.genres.slice(0,3).join("／")].filter(Boolean).join("・");
+  // 項目ごとに <span class="w"> で包み、「ド／ラマ」のように語の途中で改行しないようにする
+  const items=[date?ymd(date)+"公開":"",d.runtime?`${d.runtime}分`:"",...d.genres.slice(0,3)].filter(Boolean);
+  return items.map((x,i)=>`<span class="w">${esc(x)}${i<items.length-1?(i>=2?"／":"・"):""}</span>`).join("");
 }
 function infoHTML(st,d){
   let body;
@@ -524,7 +531,7 @@ function setInfo(st,d){
   const t=document.createElement("div");t.innerHTML=infoHTML(st,d);
   const n=t.firstElementChild;n.open=el.open;el.replaceWith(n);
   // 詳しい情報が届いたら「公開日・上映時間・ジャンル」に差し替える。届かなければ公開年だけを残す
-  const m=$("#imeta");if(m&&st==="ok")m.textContent=metaText(d);
+  const m=$("#imeta");if(m&&st==="ok")m.innerHTML=metaText(d);
   if(st==="ok")setLD(d);
 }
 // 表示中の作品の情報を取りに行き、届いたら作品情報の欄だけ差し替える
@@ -550,7 +557,7 @@ function setLD(d){
   el.textContent=JSON.stringify(o);
 }
 function nowHTML(q,isExample,movie){
-  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><p class="ex meta" id="imeta">${movie?.date?movie.date.slice(0,4)+"年":""}</p>${isExample==="trend"?'<p class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></header>`;
+  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><div class="mrow"><p class="ex meta" id="imeta">${movie?.date?movie.date.slice(0,4)+"年":""}</p><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>${isExample==="trend"?'<p class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div></header>`;
 }
 /* ===== 作品ごとの URL（?q=作品名&id=TMDBの番号）とページタイトル =====
    サーバーの処理なしで動くよう、クエリ文字列で作品を表す。ブックマーク・共有・戻るボタンに対応。
@@ -636,9 +643,13 @@ function playSwap(){
 /* 作品名から TMDB の情報（原題・ポスター・公開年）を探す。履歴から開いたときなどに使う */
 function findMovie(q){
   if(meta[q])return meta[q];
-  for(const m of trendList||[])if(m.title===q)return m;
-  for(const list of cache.values())for(const m of list||[])if(m.title===q)return m;
-  for(const m of titles||[])if(m.title===q)return m;
+  // まず完全一致、なければ全角半角・記号の違いを無視して一致するものを探す
+  const k=norm(q);
+  for(const pass of [m=>m.title===q,m=>norm(m.title)===k]){
+    for(const m of trendList||[])if(pass(m))return m;
+    for(const list of cache.values())for(const m of list||[])if(pass(m))return m;
+    for(const m of titles||[])if(pass(m))return m;
+  }
   return null;
 }
 function render(q,isExample,movie){
