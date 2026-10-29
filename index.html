@@ -101,6 +101,8 @@ body > header::before{content:"";position:absolute;inset:0 0 auto;height:100%;ba
 .hist .hl::-webkit-scrollbar{display:none}
 .hist .lbl{font-size:12px;font-weight:400;margin:0;color:var(--muted);flex:none;align-self:center}
 .hist .hc{flex:none;display:flex;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:999px;font-size:13px}
+.hist .hc.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}   /* いま見ている作品 */
+.hist .hc.on .x{color:inherit}
 .hist .hc button{border:0;background:transparent;border-radius:999px}
 .hist .hc [data-q]{padding:3px 2px 3px 11px}
 .hist .x{padding:3px 10px 3px 6px;color:var(--muted);line-height:1}
@@ -349,7 +351,16 @@ let hist=store.get("cl_hist",[]);
 /* 検索欄：作品を表示したら、いつも空にする（作品名は見出しと履歴に出ているので、ここでは繰り返さない）。
    欄は「次の作品を探すための空欄」として使う */
 const PH="作品名を入力";
-function setQ(){const q=$("#q");q.value="";q.placeholder=PH}
+function setQ(){const q=$("#q");q.value="";q.placeholder=PH;keepQ=null}
+/* ただし、TMDB の作品に一致しなかった検索（打ち間違いなど）は、直しやすいよう入力した文字を残す。
+   keepQ：一致するか分かるまで様子を見ている検索語。一致したら欄を空に、しなかったら文字を残す */
+let keepQ=null;
+function settleQ(q,found){
+  if(keepQ!==q)return;
+  const box=$("#q");keepQ=null;
+  if(found){if(box.value===q)box.value=""}                                     // 一致した：空にする（その間に打ち直していたら触らない）
+  else if(!box.value&&document.activeElement!==box)box.value=q;               // 一致しなかった：文字を残す
+}
 /* 履歴の作品ごとの TMDB 情報（ポスター・原題・公開年）。履歴から開いたときに使う */
 let meta=store.get("cl_meta",{});
 function saveMeta(q,m){
@@ -497,7 +508,7 @@ function pick(m){setQ();hideSug();remember(m.title);saveMeta(m.title,m);render(m
 
 /* ===== 画面 ===== */
 function remember(q){hist=[q,...hist.filter(x=>x!==q)].slice(0,8);store.set("cl_hist",hist);renderHist()}
-function renderHist(){$("#hist").hidden=!hist.length;$("#hist").innerHTML=hist.length?'<p class="lbl" id="hist-lbl">最近</p><ul class="hl">'+hist.map(h=>`<li class="hc"><button type="button" data-q="${esc(h)}">${esc(h)}</button><button type="button" class="x" data-del="${esc(h)}" aria-label="「${esc(h)}」を履歴から削除">×</button></li>`).join("")+'</ul><button type="button" class="delall" id="delall" aria-label="履歴をすべて削除" title="履歴をすべて削除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>':""}
+function renderHist(){$("#hist").hidden=!hist.length;$("#hist").innerHTML=hist.length?'<p class="lbl" id="hist-lbl">最近</p><ul class="hl">'+hist.map(h=>`<li class="hc${cur&&cur[0]===h?" on":""}"${cur&&cur[0]===h?' aria-current="true"':""}><button type="button" data-q="${esc(h)}">${esc(h)}</button><button type="button" class="x" data-del="${esc(h)}" aria-label="「${esc(h)}」を履歴から削除">×</button></li>`).join("")+'</ul><button type="button" class="delall" id="delall" aria-label="履歴をすべて削除" title="履歴をすべて削除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>':""}
 function saveHist(){store.set("cl_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
@@ -677,7 +688,7 @@ function render(q,isExample,movie){
   if(!movie&&q){
     movie=findMovie(q);
     // 見つからなければ作品一覧を読み込んでもう一度探す（IMDb の原題検索とポスター表示のため）
-    if(!movie)lookupMovie(q).then(m=>{if(!cur||cur[0]!==q||cur[2])return;if(m)fillMovie(m);else setInfo("none")});
+    if(!movie)lookupMovie(q).then(m=>{settleQ(q,!!m);if(!cur||cur[0]!==q||cur[2])return;if(m)fillMovie(m);else setInfo("none")});
   }
   if(movie&&hist.includes(q))saveMeta(q,movie);
   const changed=!cur||cur[0]!==q;   // 作品が変わったときだけ切り替えのアニメーションを付ける
@@ -695,6 +706,7 @@ function render(q,isExample,movie){
   if(changed)playSwap();
   if(movie?.id)fetchInfoFor(q,movie);
   bindTop();
+  renderHist();   // 見ている作品の履歴チップに色を付ける
 }
 function bindTop(){const d=$("#top");if(d)d.addEventListener("toggle",()=>{trendOpen=d.open;store.set("cl_trendOpen",trendOpen)})}
 function updateTop(){
@@ -715,7 +727,9 @@ $("#q").addEventListener("keydown",e=>{
 });
 $("#sug").addEventListener("mousedown",e=>{const li=e.target.closest("li[data-i]");if(li){e.preventDefault();pick(items[+li.dataset.i])}});
 $("#q").addEventListener("blur",()=>setTimeout(hideSug,120));
-$("#f").addEventListener("submit",e=>{e.preventDefault();const q=clean($("#q").value);if(!q)return;hideSug();setQ();remember(q);render(q);collapseTop();$("#q").blur()});
+$("#f").addEventListener("submit",e=>{e.preventDefault();const q=clean($("#q").value);if(!q)return;hideSug();remember(q);
+  if(findMovie(q))setQ();else{$("#q").value=q;keepQ=q}   // 一致する作品が手元にあれば空に、なければ結果を待つ
+  render(q);collapseTop();$("#q").blur()});
 $("#clr").onclick=()=>{setQ();hideSug();$("#q").focus()};   // 入力欄だけ空にして、画面はそのまま
 $("#hist").addEventListener("click",e=>{
   const x=e.target.closest("[data-del]");
@@ -733,7 +747,7 @@ $("#out").addEventListener("click",e=>{if(e.target.closest("#share"))share()});
 // 戻る・進む：保存しておいた状態から描き直す（URL は変えない）
 addEventListener("popstate",e=>{
   const st=e.state;hideSug();
-  if(st?.q){navMode="none";setQ();render(st.q,st.isExample,st.movie);collapseTop()}
+  if(st?.q){navMode="none";setQ();if(!st.movie&&!findMovie(st.q))keepQ=st.q;render(st.q,st.isExample,st.movie);collapseTop()}
   else{const q=new URL(location.href).searchParams.get("q");if(q){navMode="none";setQ();render(q)}else showTrending()}
 });
 $("#out").addEventListener("toggle",e=>{if(e.target.id==="ng")ngOpen=e.target.open;if(e.target.id==="info"){infoOpen=e.target.open;store.set("cl_infoOpen",infoOpen)}},true);
@@ -780,7 +794,7 @@ renderHist();
 const startQ=(()=>{try{return clean(new URL(location.href).searchParams.get("q")||"")}catch(e){return ""}})();
 if(startQ){   // 共有・ブックマークされた URL から開いたとき
   const id=+new URL(location.href).searchParams.get("id")||0;
-  setQ();remember(startQ);navMode="replace";
+  setQ();if(!findMovie(startQ))keepQ=startQ;remember(startQ);navMode="replace";   // 一致しない作品の URL なら、分かった時点で文字を戻す
   render(startQ,false,id&&meta[startQ]?.id===id?meta[startQ]:null);
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}
 else if(hist[0]){setQ();navMode="none";render(hist[0]);
