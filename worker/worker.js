@@ -43,6 +43,36 @@ export default {
       }
     }
 
+    // 作品の詳しい情報（あらすじ・公開日・上映時間・ジャンル・監督・出演など）。作品番号で1本ずつ返す
+    if (url.pathname === "/movie") {
+      const id = url.searchParams.get("id") || "";
+      if (!/^\d{1,9}$/.test(id)) return json({ error: "bad id" }, cors, 400);
+      try {
+        const m = await tmdb(`/movie/${id}?language=ja-JP&append_to_response=credits,release_dates`);
+        let overview = (m.overview || "").trim(), overviewLang = "ja";
+        if (!overview) {   // 日本語のあらすじが未登録なら英語で補う
+          const en = await tmdb(`/movie/${id}?language=en-US`).catch(() => null);
+          if (en?.overview) { overview = en.overview.trim(); overviewLang = "en"; }
+        }
+        // 日本の劇場公開日（種類3）を優先し、なければ日本の最初の公開日、最後に全体の公開日
+        const jp = (m.release_dates?.results || []).find(r => r.iso_3166_1 === "JP")?.release_dates || [];
+        const jpDate = (jp.find(d => d.type === 3) || jp[0])?.release_date?.slice(0, 10) || "";
+        const crew = m.credits?.crew || [];
+        const out = {
+          id: m.id, title: m.title, original: m.original_title, poster: m.poster_path,
+          date: m.release_date || "", jpDate, runtime: m.runtime || 0, tagline: m.tagline || "",
+          overview, overviewLang,
+          genres: (m.genres || []).map(g => g.name),
+          countries: (m.production_countries || []).map(c => c.iso_3166_1),
+          directors: crew.filter(c => c.job === "Director").map(c => c.name).slice(0, 3),
+          cast: (m.credits?.cast || []).slice(0, 6).map(c => c.name),
+        };
+        return json(out, { ...cors, "Cache-Control": "public, max-age=86400" });   // 作品情報はめったに変わらないので1日
+      } catch (e) {
+        return json({ error: String(e.message) }, cors, e.message === "404" ? 404 : 502);
+      }
+    }
+
     if (url.pathname !== "/search") return new Response("Not found", { status: 404, headers: cors });
 
     const q = (url.searchParams.get("q") || "").trim().slice(0, 100);
