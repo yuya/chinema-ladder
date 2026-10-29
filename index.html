@@ -110,7 +110,14 @@ body > header::before{content:"";position:absolute;inset:0 0 auto;height:100%;ba
 .hist .delall{flex:none;display:flex;align-items:center;gap:4px;height:30px;min-width:30px;justify-content:center;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:999px;padding:0 6px;font-size:12px;font-weight:700;white-space:nowrap}
 .hist .delall svg{width:16px;height:16px}
 .hist .delall:hover{color:var(--accent)}
+.hist .delall{transition:color .2s ease,border-color .2s ease,background-color .2s ease,padding .25s ease}
 .hist .delall.warn{color:var(--accent);border-color:var(--accent);background:var(--accent-soft);padding:0 10px 0 8px}
+/* 「全削除」の文字は最初から入れておき、幅と濃さをなめらかに変えて出し入れする */
+.hist .delall .dl{display:inline-block;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width .25s ease,opacity .2s ease}
+.hist .delall.warn .dl{max-width:4em;opacity:1}
+/* 履歴を消すときは、行ごとふわっと消してから空にする */
+.hist.out{opacity:0;transition:opacity .25s ease}
+@media (prefers-reduced-motion:reduce){.hist .delall,.hist .delall .dl,.hist.out{transition:none}}
 
 main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 24px;
   display:flex;flex-direction:column;gap:18px}
@@ -508,7 +515,7 @@ function pick(m){setQ();hideSug();remember(m.title);saveMeta(m.title,m);render(m
 
 /* ===== 画面 ===== */
 function remember(q){hist=[q,...hist.filter(x=>x!==q)].slice(0,8);store.set("cl_hist",hist);renderHist()}
-function renderHist(){$("#hist").hidden=!hist.length;$("#hist").innerHTML=hist.length?'<p class="lbl" id="hist-lbl">最近</p><ul class="hl">'+hist.map(h=>`<li class="hc${cur&&cur[0]===h?" on":""}"${cur&&cur[0]===h?' aria-current="true"':""}><button type="button" data-q="${esc(h)}">${esc(h)}</button><button type="button" class="x" data-del="${esc(h)}" aria-label="「${esc(h)}」を履歴から削除">×</button></li>`).join("")+'</ul><button type="button" class="delall" id="delall" aria-label="履歴をすべて削除" title="履歴をすべて削除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>':""}
+function renderHist(){$("#hist").hidden=!hist.length;$("#hist").innerHTML=hist.length?'<p class="lbl" id="hist-lbl">最近</p><ul class="hl">'+hist.map(h=>`<li class="hc${cur&&cur[0]===h?" on":""}"${cur&&cur[0]===h?' aria-current="true"':""}><button type="button" data-q="${esc(h)}">${esc(h)}</button><button type="button" class="x" data-del="${esc(h)}" aria-label="「${esc(h)}」を履歴から削除">×</button></li>`).join("")+'</ul><button type="button" class="delall" id="delall" aria-label="履歴をすべて削除" title="履歴をすべて削除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg><span class="dl" aria-hidden="true">全削除</span></button>':""}
 function saveHist(){store.set("cl_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
@@ -739,10 +746,14 @@ $("#hist").addEventListener("click",e=>{
   if(x){hist=hist.filter(h=>h!==x.dataset.del);saveHist();return}
   const all=e.target.closest("#delall");
   if(all){   // 誤タップ防止：1回目で確認表示、3秒以内にもう1回押すと削除
-    if(all.classList.contains("warn")){clearTimeout(delTimer);hist=[];saveHist();toast("履歴を削除しました");return}
+    if(all.classList.contains("warn")){
+      clearTimeout(delTimer);toast("履歴を削除しました");
+      const h=$("#hist");h.classList.add("out");   // ふわっと消してから空にする
+      setTimeout(()=>{hist=[];saveHist();h.classList.remove("out")},reduceMotion.matches?0:250);return;
+    }
     // ボタン自体は短い表示にし、説明は画面下のお知らせで出す（狭い画面でも見切れないように）
-    const icon=all.innerHTML;all.classList.add("warn");all.insertAdjacentHTML("beforeend","全削除");toast("もう一度押すと履歴を全部消します");
-    delTimer=setTimeout(()=>{all.classList.remove("warn");all.innerHTML=icon},3000);return;
+    all.classList.add("warn");toast("もう一度押すと履歴を全部消します");
+    delTimer=setTimeout(()=>all.classList.remove("warn"),3000);return;
   }
   const b=e.target.closest("[data-q]");if(!b)return;setQ();remember(b.dataset.q);render(b.dataset.q);collapseTop()});
 $("#q").addEventListener("focus",()=>$("#q").select());
