@@ -14,6 +14,8 @@
 <link rel="preconnect" href="https://image.tmdb.org">
 <link rel="preconnect" href="https://cinemaladder-api.twilightwind.workers.dev" crossorigin>
 <link rel="preload" href="data/trending.json" as="fetch" crossorigin>
+<!-- Google AdSense（サイト運営者ID：ca-pub-9484498289210970） -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9484498289210970" crossorigin="anonymous"></script>
 <meta name="description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
 <link rel="canonical" href="https://cinemaladder.com/">
 <meta property="og:url" content="https://cinemaladder.com/">
@@ -768,7 +770,7 @@ function render(q,isExample,movie){
     const hd=`<h2 id="g${i}">${gr.h}</h2>`;
     h+=`<section class="grp" aria-labelledby="g${i}">${gr.note?`<hgroup>${hd}<p>${gr.note}</p></hgroup>`:hd}<ul class="grid">${gr.items.map(it=>
       `<li><a class="go" href="${esc(it.u(q,movie))}" target="_blank" rel="${it.pr?.()?"noopener sponsored":"noopener"}" data-q="${esc(q)}"><span class="n"><span class="fav fav-${it.ic}" aria-hidden="true"></span><span class="nm">${it.n}</span></span><span class="d">${it.pr?.()?'<span class="pr">PR</span>':""}${it.d}</span></a></li>`).join("")}</ul>${gr.items.some(it=>it.ic==="x")?ngHTML():""}</section>`;
-    if(i===1)h+='<aside class="ad" aria-label="広告"><span class="adl">広告</span>ここにバナー広告（例：320×100）</aside>';
+    // 広告枠：AdSense の審査に通ったら、ここに広告ユニットを置く（それまでは仮の枠を出さない）
   });
   $("#out").innerHTML=h+`</article>`;$("#out").classList.remove("boot");
   fitTitle();
