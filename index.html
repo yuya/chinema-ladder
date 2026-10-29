@@ -78,6 +78,7 @@ body > header::before{content:"";position:absolute;inset:0 0 auto;height:100%;ba
 .sbox{position:relative}
 .search form{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0 6px 0 12px}
 .search form:focus-within{border-color:var(--accent)}
+#q::placeholder{color:var(--muted);opacity:.75}
 .search input{flex:1;min-width:0;border:0;background:transparent;padding:11px 0;outline:none;font-size:16px}
 .search svg{flex:none;width:17px;height:17px;stroke:var(--muted)}
 .clear{border:0;background:transparent;color:var(--muted);padding:6px 8px;font-size:13px}
@@ -121,6 +122,9 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .share{flex:none;display:grid;place-items:center;width:32px;height:32px;margin:0 -6px -6px 0;border:0;background:transparent;color:var(--muted);border-radius:8px;padding:0}
 .share:hover{color:var(--accent);background:var(--accent-soft)}
 .share svg{width:17px;height:17px}
+/* 本番（cinemaladder.com）以外で開いたときだけ右下に薄く出す目印 */
+.envbadge{position:fixed;right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:30;margin:0;pointer-events:none;
+  font-size:10px;font-weight:800;letter-spacing:.14em;color:var(--accent);border:1px solid currentColor;border-radius:6px;padding:2px 6px;background:var(--surface);opacity:.6}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:20}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 /* ポスター枠は画像の有無にかかわらず常に 64×96 を確保し、読み込み後にずれないようにする */
@@ -262,6 +266,7 @@ summary{cursor:pointer;font-weight:700;color:var(--fg)}
   </div>
 </header>
 
+<p class="envbadge" id="envbadge" hidden aria-hidden="true">STAGING</p>
 <main id="out">
   <p class="emptyst">読み込み中…</p>
   <noscript><p class="emptyst">このサイトを使うには JavaScript を有効にしてください。</p></noscript>
@@ -332,6 +337,14 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 const clean=s=>s.replace(/[\s\u3000]+/g," ").trim();
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let hist=store.get("cl_hist",[]);
+/* 検索欄：おすすめ（話題作のランダム表示）や前回の作品を自動で出したときは、作品名を入力済みの文字ではなく
+   薄い文字（placeholder）で見せ、欄に触れたら消す。自分で入力・選択したときは普通の文字で入れる */
+const PH="作品名を入力";let passive=false;
+function setQ(v,pas){
+  const q=$("#q");passive=!!(pas&&v);
+  if(passive){q.value="";q.placeholder=v;q.classList.add("passive")}
+  else{q.value=v||"";q.placeholder=PH;q.classList.remove("passive")}
+}
 /* 履歴の作品ごとの TMDB 情報（ポスター・原題・公開年）。履歴から開いたときに使う */
 let meta=store.get("cl_meta",{});
 function saveMeta(q,m){
@@ -419,11 +432,11 @@ async function showTrending(){
     if(list.length){
       const pool=list.length>1?list.filter(m=>m.id!==lastPick):list;   // 同じ作品が連続しないように
       const m=pool[Math.floor(Math.random()*pool.length)];lastPick=m.id;
-      $("#q").value=m.title;   // 検索ボックスにも同じ作品名を入れる
+      setQ(m.title,true);   // 検索欄には薄い文字で作品名を出す（触れたら消える）
       render(m.title,"trend",m);return;
     }
   }catch(e){}
-  if($("#q").value===before){$("#q").value="";renderEmpty()}
+  if($("#q").value===before){setQ("");renderEmpty()}
 }
 let trendOpen=store.get("cl_trendOpen",false);
 const isUpcoming=d=>d&&d>new Date().toISOString().slice(0,10);
@@ -475,7 +488,7 @@ function onType(){
     }
   },250);
 }
-function pick(m){$("#q").value=m.title;hideSug();remember(m.title);saveMeta(m.title,m);render(m.title,false,m);collapseTop();$("#q").blur()}
+function pick(m){setQ(m.title);hideSug();remember(m.title);saveMeta(m.title,m);render(m.title,false,m);collapseTop();$("#q").blur()}
 
 /* ===== 画面 ===== */
 function remember(q){hist=[q,...hist.filter(x=>x!==q)].slice(0,8);store.set("cl_hist",hist);renderHist()}
@@ -696,7 +709,7 @@ $("#q").addEventListener("keydown",e=>{
 $("#sug").addEventListener("mousedown",e=>{const li=e.target.closest("li[data-i]");if(li){e.preventDefault();pick(items[+li.dataset.i])}});
 $("#q").addEventListener("blur",()=>setTimeout(hideSug,120));
 $("#f").addEventListener("submit",e=>{e.preventDefault();const q=clean($("#q").value);if(!q)return;hideSug();remember(q);render(q);collapseTop();$("#q").blur()});
-$("#clr").onclick=()=>{$("#q").value="";hideSug();$("#q").focus()};   // 入力欄だけ空にして、画面はそのまま
+$("#clr").onclick=()=>{setQ("");hideSug();$("#q").focus()};   // 入力欄だけ空にして、画面はそのまま
 $("#hist").addEventListener("click",e=>{
   const x=e.target.closest("[data-del]");
   if(x){hist=hist.filter(h=>h!==x.dataset.del);saveHist();return}
@@ -707,14 +720,16 @@ $("#hist").addEventListener("click",e=>{
     const icon=all.innerHTML;all.classList.add("warn");all.insertAdjacentHTML("beforeend","全削除");toast("もう一度押すと履歴を全部消します");
     delTimer=setTimeout(()=>{all.classList.remove("warn");all.innerHTML=icon},3000);return;
   }
-  const b=e.target.closest("[data-q]");if(!b)return;$("#q").value=b.dataset.q;remember(b.dataset.q);render(b.dataset.q);collapseTop()});
-$("#q").addEventListener("focus",()=>$("#q").select());
+  const b=e.target.closest("[data-q]");if(!b)return;setQ(b.dataset.q);remember(b.dataset.q);render(b.dataset.q);collapseTop()});
+$("#q").addEventListener("focus",()=>{if(passive)$("#q").placeholder=PH;else $("#q").select()});
+$("#q").addEventListener("blur",()=>{if(passive&&!$("#q").value&&cur)$("#q").placeholder=cur[0]});
+$("#q").addEventListener("input",()=>{if(passive&&$("#q").value){passive=false;$("#q").classList.remove("passive")}},true);
 $("#out").addEventListener("click",e=>{if(e.target.closest("#share"))share()});
 // 戻る・進む：保存しておいた状態から描き直す（URL は変えない）
 addEventListener("popstate",e=>{
   const st=e.state;hideSug();
-  if(st?.q){navMode="none";$("#q").value=st.q;render(st.q,st.isExample,st.movie);collapseTop()}
-  else{const q=new URL(location.href).searchParams.get("q");if(q){navMode="none";$("#q").value=q;render(q)}else showTrending()}
+  if(st?.q){navMode="none";setQ(st.q,st.isExample==="trend");render(st.q,st.isExample,st.movie);collapseTop()}
+  else{const q=new URL(location.href).searchParams.get("q");if(q){navMode="none";setQ(q);render(q)}else showTrending()}
 });
 $("#out").addEventListener("toggle",e=>{if(e.target.id==="ng")ngOpen=e.target.open;if(e.target.id==="info"){infoOpen=e.target.open;store.set("cl_infoOpen",infoOpen)}},true);
 $("#out").addEventListener("submit",e=>{
@@ -729,7 +744,7 @@ $("#out").addEventListener("click",e=>{
   if(e.target.id==="ngreset"){ngWords=DEFAULT_NG.slice();saveNg();refreshNg()}
 });   // タップで全選択し、すぐ打ち替えられるように
 $("#out").addEventListener("click",e=>{if(e.target.id==="shuffle"){showTrending();return}
-  const t=e.target.closest("[data-tid]");if(t){const m=trendList.find(x=>x.id===+t.dataset.tid);if(m){$("#q").value=m.title;remember(m.title);render(m.title,false,m);collapseTop();window.scrollTo({top:0,behavior:"smooth"})}return}const a=e.target.closest("a.go");if(a)remember(a.dataset.q)});
+  const t=e.target.closest("[data-tid]");if(t){const m=trendList.find(x=>x.id===+t.dataset.tid);if(m){setQ(m.title);remember(m.title);render(m.title,false,m);collapseTop();window.scrollTo({top:0,behavior:"smooth"})}return}const a=e.target.closest("a.go");if(a)remember(a.dataset.q)});
 
 /* ===== ヘッダーの縮小 =====
    下にスクロールし始めたら縮め、上端に戻ったら広げる。境目でちらつかないよう、縮める位置と広げる位置を少しずらす */
@@ -755,14 +770,15 @@ addEventListener("scroll",()=>{
   });
 },{passive:true});
 $("#affnote").hidden=!(AFF.amazonTag||AFF.unext||AFF.mvtk);$("#amznote").hidden=!AFF.amazonTag;
+$("#envbadge").hidden=/^(www\.)?cinemaladder\.com$/.test(location.hostname);
 renderHist();
 const startQ=(()=>{try{return clean(new URL(location.href).searchParams.get("q")||"")}catch(e){return ""}})();
 if(startQ){   // 共有・ブックマークされた URL から開いたとき
   const id=+new URL(location.href).searchParams.get("id")||0;
-  $("#q").value=startQ;remember(startQ);navMode="replace";
+  setQ(startQ);remember(startQ);navMode="replace";
   render(startQ,false,id&&meta[startQ]?.id===id?meta[startQ]:null);
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}
-else if(hist[0]){$("#q").value=hist[0];navMode="none";render(hist[0]);
+else if(hist[0]){setQ(hist[0],true);navMode="none";render(hist[0]);
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}   // TOP10リストだけ後から差し替える（画面全体は描き直さない）
 else{$("#out").innerHTML='<p class="emptyst">いま話題の映画を読み込み中…</p>';showTrending()}
 </script>
