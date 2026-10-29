@@ -177,8 +177,9 @@ details.info{background:none;border:0;border-radius:0;padding:0;font-size:14px;m
 .now .ex{font-size:12px;color:var(--muted)}
 /* Enter で候補から自動で選んだときの一言（取り消しリンク付き） */
 .picked{margin:10px 0 0;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;animation:pin .35s ease both}
-.picked button{border:0;background:none;padding:0;font:inherit;color:var(--accent);font-weight:700;cursor:pointer;white-space:nowrap}
-.picked button::before{content:"↩ ";font-weight:400}
+.picked button{border:0;background:none;padding:0;font:inherit;color:var(--accent);font-weight:700;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.picked button::before{content:"";width:14px;height:14px;flex:none;background:currentColor;-webkit-mask:var(--undo) center/contain no-repeat;mask:var(--undo) center/contain no-repeat}
+:root{--undo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 14L4 9l5-5'/%3E%3Cpath d='M4 9h10.5a5.5 5.5 0 0 1 0 11H11'/%3E%3C/svg%3E")}
 @keyframes pin{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.picked{animation:none}}   /* 「・」「／」まわりの空きを詰める */
 
