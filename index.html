@@ -123,7 +123,6 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .now .ph svg{width:24px;height:24px}
 .now .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
 .now .ph img.ok{opacity:1}
-.now .yr{display:block;min-height:1.6em}   /* 公開年の行も先に高さを確保する */
 .now .k{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:700}
 .now h1{margin:0;font-size:clamp(20px,5.6vw,24px);line-height:1.3;text-wrap:balance;word-break:auto-phrase;overflow-wrap:anywhere}
 /* 作品名は語のまとまりごとに改行する（「ディスクロー／ジャー」のように語の途中で切れないように）。
@@ -524,7 +523,8 @@ function setInfo(st,d){
   const el=$("#info");if(!el)return;
   const t=document.createElement("div");t.innerHTML=infoHTML(st,d);
   const n=t.firstElementChild;n.open=el.open;el.replaceWith(n);
-  const m=$("#imeta");if(m)m.textContent=st==="ok"?metaText(d):"";
+  // 詳しい情報が届いたら「公開日・上映時間・ジャンル」に差し替える。届かなければ公開年だけを残す
+  const m=$("#imeta");if(m&&st==="ok")m.textContent=metaText(d);
   if(st==="ok")setLD(d);
 }
 // 表示中の作品の情報を取りに行き、届いたら作品情報の欄だけ差し替える
@@ -550,7 +550,7 @@ function setLD(d){
   el.textContent=JSON.stringify(o);
 }
 function nowHTML(q,isExample,movie){
-  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><p class="ex yr">${movie?.date?`${movie.date.slice(0,4)}年${movie.original&&movie.original!==movie.title?"・"+esc(movie.original):""}`:""}</p><p class="ex meta" id="imeta"></p>${isExample==="trend"?'<p class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></header>`;
+  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><p class="ex meta" id="imeta">${movie?.date?movie.date.slice(0,4)+"年":""}</p>${isExample==="trend"?'<p class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></header>`;
 }
 /* ===== 作品ごとの URL（?q=作品名&id=TMDBの番号）とページタイトル =====
    サーバーの処理なしで動くよう、クエリ文字列で作品を表す。ブックマーク・共有・戻るボタンに対応。
