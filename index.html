@@ -689,7 +689,9 @@ function render(q,isExample,movie){
   if(!movie&&q){
     movie=findMovie(q);
     // 見つからなければ作品一覧を読み込んでもう一度探す（IMDb の原題検索とポスター表示のため）
-    if(!movie)lookupMovie(q).then(m=>{settleQ(q,!!m);if(!cur||cur[0]!==q||cur[2])return;if(m)fillMovie(m);else setInfo("none")});
+    if(!movie)lookupMovie(q).then(m=>{settleQ(q,!!m);
+      // 履歴に入れるのは作品に一致した検索だけ。一致しなかったら、残っていた分も消す
+      if(m)remember(q);else if(hist.includes(q)){hist=hist.filter(h=>h!==q);saveHist()}if(!cur||cur[0]!==q||cur[2])return;if(m)fillMovie(m);else setInfo("none")});
   }
   if(movie&&hist.includes(q))saveMeta(q,movie);
   const changed=!cur||cur[0]!==q;   // 作品が変わったときだけ切り替えのアニメーションを付ける
@@ -728,7 +730,7 @@ $("#q").addEventListener("keydown",e=>{
 });
 $("#sug").addEventListener("mousedown",e=>{const li=e.target.closest("li[data-i]");if(li){e.preventDefault();pick(items[+li.dataset.i])}});
 $("#q").addEventListener("blur",()=>setTimeout(hideSug,120));
-$("#f").addEventListener("submit",e=>{e.preventDefault();const q=clean($("#q").value);if(!q)return;hideSug();remember(q);
+$("#f").addEventListener("submit",e=>{e.preventDefault();const q=clean($("#q").value);if(!q)return;hideSug();if(findMovie(q))remember(q);   // 一致が分からなければ、確かめてから履歴に入れる
   if(findMovie(q))setQ();else{$("#q").value=q;keepQ=q}   // 一致する作品が手元にあれば空に、なければ結果を待つ
   render(q);collapseTop();$("#q").blur()});
 $("#clr").onclick=()=>{setQ();hideSug();$("#q").focus()};   // 入力欄だけ空にして、画面はそのまま
@@ -795,7 +797,7 @@ renderHist();
 const startQ=(()=>{try{return clean(new URL(location.href).searchParams.get("q")||"")}catch(e){return ""}})();
 if(startQ){   // 共有・ブックマークされた URL から開いたとき
   const id=+new URL(location.href).searchParams.get("id")||0;
-  setQ();if(!findMovie(startQ))keepQ=startQ;remember(startQ);navMode="replace";   // 一致しない作品の URL なら、分かった時点で文字を戻す
+  setQ();if(findMovie(startQ))remember(startQ);else keepQ=startQ;navMode="replace";   // 一致しない作品の URL なら、分かった時点で文字を戻す
   render(startQ,false,id&&meta[startQ]?.id===id?meta[startQ]:null);
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}
 else if(hist[0]){setQ();navMode="none";render(hist[0]);
