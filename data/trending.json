@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-28T00:31:42.164Z",
+ "updated": "2026-10-29T00:56:24.993Z",
  "items": [
   {
    "id": 1400940,
@@ -7,7 +7,7 @@
    "original": "Clayface",
    "date": "2026-10-30",
    "poster": "/6ttcIVdQbS6esi5wPEUuVKQN8SX.jpg",
-   "pop": 237.9795
+   "pop": 251.5349
   },
   {
    "id": 1423191,
@@ -15,7 +15,15 @@
    "original": "Resident Evil",
    "date": "2026-10-09",
    "poster": "/wHXSnGH3zQtvpxPwaBXMoS9o8Vl.jpg",
-   "pop": 165.0494
+   "pop": 160.0914
+  },
+  {
+   "id": 1283515,
+   "title": "ヴェリティ／真実",
+   "original": "Verity",
+   "date": "2026-11-06",
+   "poster": "/rmaNMA1seHqpjtnYKzyynFAr1g8.jpg",
+   "pop": 138.1498
   },
   {
    "id": 1153576,
@@ -23,7 +31,15 @@
    "original": "Street Fighter",
    "date": "2026-10-16",
    "poster": "/1JBlbyXionXPRaqW1UQw7eKkxNP.jpg",
-   "pop": 151.1143
+   "pop": 127.6293
+  },
+  {
+   "id": 1400837,
+   "title": "アザー・マミー",
+   "original": "Other Mommy",
+   "date": "2026-11-20",
+   "poster": "/fGRNCssTRrhYZxNzykGGCoMsAVq.jpg",
+   "pop": 97.2845
   },
   {
    "id": 1275779,
@@ -31,7 +47,7 @@
    "original": "Disclosure Day",
    "date": "2026-10-01",
    "poster": "/vDnJLpE2jhu8OVcwpWuYCMF5hRU.jpg",
-   "pop": 101.5708
+   "pop": 96.3132
   },
   {
    "id": 1255833,
@@ -39,15 +55,7 @@
    "original": "Whalefall",
    "date": "2026-10-16",
    "poster": "/vjTYUTgh9nO88i6HZ4YPRhiFL05.jpg",
-   "pop": 94.2277
-  },
-  {
-   "id": 1248832,
-   "title": "DIGGER／ディガー",
-   "original": "Digger",
-   "date": "2026-10-09",
-   "poster": "/vi2HvWOBtR1pcr4vBoYe43ldkuu.jpg",
-   "pop": 88.9653
+   "pop": 79.2953
   },
   {
    "id": 1263337,
@@ -55,15 +63,15 @@
    "original": "Heart of the Beast",
    "date": "2026-09-25",
    "poster": "/mGmnmCtodvzhpnMFQoZkeGDDVjU.jpg",
-   "pop": 80.4941
+   "pop": 77.8195
   },
   {
-   "id": 1283515,
-   "title": "ヴェリティ／真実",
-   "original": "Verity",
-   "date": "2026-11-06",
-   "poster": "/zPHfsaiMZT1HNz1ZS55iyLKZkFG.jpg",
-   "pop": 67.0629
+   "id": 1248832,
+   "title": "DIGGER／ディガー",
+   "original": "Digger",
+   "date": "2026-10-09",
+   "poster": "/vi2HvWOBtR1pcr4vBoYe43ldkuu.jpg",
+   "pop": 76.9765
   },
   {
    "id": 1381071,
@@ -71,15 +79,7 @@
    "original": "ゴジラ-0.0",
    "date": "2026-11-03",
    "poster": "/zpcoFlZwyLnBt7bb5wmvGDCdg06.jpg",
-   "pop": 23.6037
-  },
-  {
-   "id": 467905,
-   "title": "大富豪になるための正しい殺し方",
-   "original": "How to Make a Killing",
-   "date": "2026-11-13",
-   "poster": "/adIG9Tsf9FkUkJ1euYjtktSMOyT.jpg",
-   "pop": 18.0953
+   "pop": 21.0126
   }
  ]
 }
