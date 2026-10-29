@@ -85,7 +85,9 @@ body > header::before{content:"";position:absolute;inset:0 0 auto;height:100%;ba
 
 /* サジェスト */
 .sug{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--line);border-radius:12px;
-  box-shadow:0 8px 24px rgba(0,0,0,.12);overflow:hidden;max-height:60vh;overflow-y:auto;z-index:6;margin:0;padding:4px;list-style:none}
+  box-shadow:0 8px 24px rgba(0,0,0,.12);overflow:hidden;max-height:var(--sugmax,60vh);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;z-index:6;margin:0;padding:4px;list-style:none}
+/* 候補の一覧は、一覧の中だけでスクロールする。端まで行っても後ろのページは動かさない（overscroll-behavior）。
+   高さは、キーボードを除いた見えている範囲に収める（--sugmax を下の fitSug で計算） */
 .sug li{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;align-items:center;padding:6px 8px;border-radius:8px;cursor:pointer}
 .sug li[aria-selected="true"],.sug li:hover{background:var(--accent-soft)}
 .sug img,.sug .noimg{width:36px;height:54px;border-radius:4px;object-fit:cover;background:var(--bg)}
@@ -497,7 +499,15 @@ function trendHTML(){
     `<li><button type="button" data-tid="${m.id}"${cur&&cur[0]===m.title?' class="on" aria-current="true"':""}><span class="rk">${i+1}</span>${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="32" height="48">`:'<span class="noimg"></span>'}<span style="min-width:0"><span class="tt">${esc(m.title)}</span><small>${isUpcoming(m.date)?`公開予定 ${+m.date.slice(5,7)}月${+m.date.slice(8,10)}日`:"上映中"}</small></span></button></li>`).join("")}</ol></details></aside>`;
 }
 
-function showSug(html){const s=$("#sug");s.innerHTML=html;s.hidden=!html;$("#q").setAttribute("aria-expanded",String(!!html))}
+function showSug(html){const s=$("#sug");s.innerHTML=html;s.hidden=!html;$("#q").setAttribute("aria-expanded",String(!!html));if(html)fitSug()}
+// 候補の一覧の高さ：画面に見えている範囲（スマホではキーボードを除いた部分）の下端までに収める
+function fitSug(){
+  const s=$("#sug");if(s.hidden)return;
+  const vv=window.visualViewport,bottom=vv?vv.offsetTop+vv.height:innerHeight;
+  const top=s.getBoundingClientRect().top;
+  s.style.setProperty("--sugmax",Math.max(140,Math.floor(bottom-top-12))+"px");
+}
+window.visualViewport?.addEventListener("resize",fitSug);
 function hideSug(){showSug("");items=[];active=-1}
 function drawSug(){
   showSug(items.map((m,i)=>`<li role="option" id="opt${i}" data-i="${i}" aria-selected="${i===active}">
