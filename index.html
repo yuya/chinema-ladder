@@ -140,8 +140,11 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 /* 本番（cinemaladder.com）以外で開いたときだけ右下に薄く出す目印 */
 .envbadge{position:fixed;right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:30;margin:0;pointer-events:none;
   font-size:10px;font-weight:800;letter-spacing:.14em;color:var(--accent);border:1px solid currentColor;border-radius:6px;padding:2px 6px;background:var(--surface);opacity:.6}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:20}
-.toast.on{opacity:1;transform:translate(-50%,0)}
+/* 画面下のお知らせ。出るときも消えるときも目で追える速さにする */
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;z-index:20;
+  transition:opacity .45s ease,transform .45s ease}
+.toast.on{opacity:1;transform:translate(-50%,0);transition:opacity .35s ease,transform .35s ease}
+@media (prefers-reduced-motion:reduce){.toast,.toast.on{transition:none}}
 /* ポスター枠は画像の有無にかかわらず常に 64×96 を確保し、読み込み後にずれないようにする */
 .now .ph{position:relative;width:64px;height:96px;flex:none;border-radius:6px;overflow:hidden;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--line)}
 .now .ph svg{width:24px;height:24px}
@@ -634,8 +637,16 @@ function syncNav(q,isExample,movie){
 }
 function shareUrl(){return cur?.[0]&&!cur[1]?location.href:cur?.[0]?urlFor(cur[0],cur[2]):location.href}
 let toastTimer=null;
-function toast(msg){let t=$("#toast");if(!t){t=document.createElement("div");t.id="toast";t.className="toast";t.setAttribute("role","status");document.body.append(t)}
-  t.textContent=msg;t.classList.add("on");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("on"),1800)}
+let toastSwap=null;
+function toast(msg){
+  let t=$("#toast");
+  if(!t){t=document.createElement("div");t.id="toast";t.className="toast";t.setAttribute("role","status");document.body.append(t);t.getBoundingClientRect()}   // 置いた直後に一度描画させ、最初の1回もフェードで出す
+  clearTimeout(toastTimer);clearTimeout(toastSwap);
+  const show=()=>{t.textContent=msg;t.classList.add("on");toastTimer=setTimeout(()=>t.classList.remove("on"),2600)};
+  // すでに別のお知らせが出ていたら、いったん消してから入れ替える
+  if(t.classList.contains("on")&&t.textContent!==msg&&!reduceMotion.matches){t.classList.remove("on");toastSwap=setTimeout(show,300)}
+  else show();
+}
 async function share(){
   const url=shareUrl(),title=document.title;
   if(navigator.share){try{await navigator.share({title,url});return}catch(e){if(e.name==="AbortError")return}}
