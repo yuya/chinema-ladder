@@ -152,6 +152,8 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .now .ph img.ok{opacity:1}
 .now .k{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:700}
 .now h1{margin:0;font-size:clamp(20px,5.6vw,24px);line-height:1.3;text-wrap:balance;word-break:auto-phrase;overflow-wrap:anywhere}
+/* 区切りで改行すると3行以上になる長い作品名は、普通の折り返しに切り替えて詰めて並べる（最後の行が1〜2文字だけにならないよう pretty） */
+.now h1.long{text-wrap:pretty;word-break:normal}
 /* 作品名は語のまとまりごとに改行する（「ディスクロー／ジャー」のように語の途中で切れないように）。
    入りきらない長い語だけは途中で折り返す */
 .now h1 .w{display:inline-block;max-width:100%}
@@ -561,7 +563,7 @@ const ymd=d=>d?`${+d.slice(0,4)}年${+d.slice(5,7)}月${+d.slice(8,10)}日`:"";
 function metaText(d){
   const date=d.jpDate||d.date;
   // 項目ごとに <span class="w"> で包み、「ド／ラマ」のように語の途中で改行しないようにする
-  const items=[date?ymd(date)+"公開":"",d.runtime?`${d.runtime}分`:"",...d.genres.slice(0,3)].filter(Boolean);
+  const items=[date?ymd(date)+"公開":"",d.runtime?`${d.runtime}分`:"",...d.genres.slice(0,2)].filter(Boolean);   // ジャンルは2つまで（長い名前で行が増えすぎないように）
   return items.map((x,i)=>`<span class="w">${esc(x)}${i<items.length-1?(i>=2?"／":"・"):""}</span>`).join("");
 }
 function infoHTML(st,d){
@@ -660,12 +662,18 @@ async function share(){
 }
 /* あとから TMDB の情報が分かったとき、画面全体は描き直さず、見出しとリンクだけ差し替える
    （切り替えアニメーションを途中で止めないため） */
+/* 作品名：区切りでの改行で2行に収まらなければ、区切りの指定を外して普通に折り返す */
+function fitTitle(){
+  const h=$("#mt");if(!h||h.classList.contains("long"))return;
+  const lh=parseFloat(getComputedStyle(h).lineHeight)||30;
+  if(h.offsetHeight>lh*2+2){h.textContent=h.textContent;h.classList.add("long")}
+}
 function fillMovie(m){
   fetchInfoFor(cur[0],m);
   const [q,isExample]=cur;cur[2]=m;
   if(hist.includes(q))saveMeta(q,m);
   const now=$("#out .now");
-  if(now){const t=document.createElement("div");t.innerHTML=nowHTML(q,isExample,m);now.replaceWith(t.firstElementChild)}
+  if(now){const t=document.createElement("div");t.innerHTML=nowHTML(q,isExample,m);now.replaceWith(t.firstElementChild);fitTitle()}
   const links=[...document.querySelectorAll("#out a.go")],all=GROUPS.flatMap(g=>g.items);
   links.forEach((a,i)=>{if(all[i])a.href=all[i].u(q,m)});
   try{const p=new URL(location.href).searchParams;if(p.get("q")===q&&!p.get("id")&&m.id)history.replaceState({q,isExample,movie:slim(m)},"",urlFor(q,m))
@@ -730,6 +738,7 @@ function render(q,isExample,movie){
     if(i===1)h+='<aside class="ad" aria-label="広告"><span class="adl">広告</span>ここにバナー広告（例：320×100）</aside>';
   });
   $("#out").innerHTML=h+`</article>`;
+  fitTitle();
   if(changed)playSwap();
   if(movie?.id)fetchInfoFor(q,movie);
   bindTop();
