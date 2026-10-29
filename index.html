@@ -24,12 +24,12 @@
 :root{
   --bg:#F4F4F7;--surface:#FFFFFF;--fg:#17171C;--muted:#5E5E6B;--line:#E1E1E8;
   --brand:#E8607A;   /* ロゴとアイコンのピンク。ライト・ダーク共通 */
-  --accent:#B4233C;--accent-soft:#F8E4E8;--ad:#EEF0F5;
+  --accent:#B4233C;--accent-soft:#F8E4E8;--ad:#EEF0F5;--sk:#E6E6EC;
   --font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI",Meiryo,system-ui,sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){:root{
-  --bg:#111115;--surface:#1A1A20;--fg:#ECECF1;--muted:#A0A0AC;--line:#2C2C35;--accent:#E8607A;--accent-soft:#3A1D25;--ad:#202029;color-scheme:dark}}
+  --bg:#111115;--surface:#1A1A20;--fg:#ECECF1;--muted:#A0A0AC;--line:#2C2C35;--accent:#E8607A;--accent-soft:#3A1D25;--ad:#202029;--sk:#2A2A32;color-scheme:dark}}
 *{box-sizing:border-box}
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 /* 和文の字間を詰める（palt）をサイト全体にかける。部分ごとに付けると漏れが出るため */
@@ -119,6 +119,12 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .now .mrow{display:flex;align-items:flex-end;gap:8px}
 .now .mrow .meta{flex:1;min-width:0}
 .now .meta .w{display:inline-block}
+/* 読み込み中は、行の形をした薄い棒（スケルトン）をゆっくり明滅させ、届いたら文字をふわっと出す */
+.now .meta .sk{display:block;width:72%;max-width:260px;height:.9em;margin-top:.35em;border-radius:5px;background:var(--sk);animation:skp 1.1s ease-in-out infinite}
+@keyframes skp{50%{opacity:.45}}
+.now .meta .in{display:inline;animation:fadein .35s ease both}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.now .meta .sk,.now .meta .in{animation:none}}
 .share{flex:none;display:grid;place-items:center;width:32px;height:32px;margin:0 -6px -6px 0;border:0;background:transparent;color:var(--muted);border-radius:8px;padding:0}
 .share:hover{color:var(--accent);background:var(--accent-soft)}
 .share svg{width:17px;height:17px}
@@ -142,12 +148,8 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
    公開日・上映時間・ジャンルは見出しの中に常に1行で出し、あらすじとキャストは文字のリンクで開く */
 .now .meta{display:block;min-height:1.6em}   /* 情報が届く前から1行分の高さを確保し、ずれを防ぐ */
 details.info{background:none;border:0;border-radius:0;padding:0;font-size:14px;margin-top:-6px}
-.info summary{list-style:none;display:inline-flex;align-items:center;gap:4px;color:var(--accent);font-size:13px;font-weight:700;padding:4px 0}
-.info summary::-webkit-details-marker{display:none}
-.info summary::after{content:"▾";font-size:11px}
-.info[open] summary::after{content:"▴"}
-.info .cl,.info[open] .op{display:none}
-.info[open] .cl{display:inline}
+.info summary{display:inline-flex;gap:6px;color:var(--accent);font-size:13px;font-weight:700;padding:4px 0}
+.info summary::before{width:13px;height:13px}
 .info .body{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:65ch}
 .info .tag{font-weight:700;margin:0}
 .info .ov{margin:0;line-height:1.8;letter-spacing:.02em}   /* 長い文章は詰めすぎると読みにくいので、少しだけ空ける */
@@ -208,6 +210,13 @@ body > footer a:hover{color:var(--accent)}
 body > footer{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px 32px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:10px}
 details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
 summary{cursor:pointer;font-weight:700;color:var(--fg)}
+/* 開閉はサイト全体で同じ形：左の矢印が、開くと下向きに回る。色は文字色に合わせる（TOP10・除外語は文字色、作品情報はリンク色） */
+:root{--chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E")}
+summary{list-style:none;display:flex;align-items:center;gap:8px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"";width:14px;height:14px;flex:none;background:currentColor;-webkit-mask:var(--chev) center/contain no-repeat;mask:var(--chev) center/contain no-repeat;transition:transform .2s ease}
+details[open] > summary::before{transform:rotate(90deg)}
+@media (prefers-reduced-motion:reduce){summary::before{transition:none}}
 .emptyst{display:flex;flex-direction:column;gap:4px;padding:32px 0;color:var(--muted)}
 .emptyst h1{margin:0;color:var(--fg);font-size:17px}
 .topwrap{position:relative}
@@ -538,14 +547,16 @@ function infoHTML(st,d){
     const rows=[["監督",d.directors.join("、")],["出演",d.cast.join("、")],["製作国",d.countries.map(c=>regionJa?.of(c)||c).join("・")]].filter(r=>r[1]);
     body=`${d.tagline?`<p class="tag">${esc(d.tagline)}</p>`:""}${d.overview?`<p class="ov">${esc(d.overview)}</p>${d.overviewLang==="en"?'<p class="lang">日本語のあらすじが未登録のため、英語のあらすじを表示しています。</p>':""}`:'<p class="lang">あらすじは未登録です。</p>'}${rows.map(r=>`<p class="cr">${r[0]}　${esc(r[1])}</p>`).join("")}<p class="src">情報：<a href="https://www.themoviedb.org/movie/${E(d.id)}?language=ja-JP" target="_blank" rel="noopener">TMDB</a></p>`;
   }else body=`<p class="lang${st==="loading"?" ld":""}">${st==="none"?"この作品の情報は見つかりませんでした。":st==="err"?"作品情報を読み込めませんでした。時間をおいて開き直してください。":"読み込み中…"}</p>`;
-  return `<details class="info" id="info"${infoOpen?" open":""}><summary><span class="op">あらすじ・キャストを見る</span><span class="cl">あらすじ・キャストを閉じる</span></summary><div class="body">${body}</div></details>`;
+  return `<details class="info" id="info"${infoOpen?" open":""}><summary>あらすじ・キャスト</summary><div class="body">${body}</div></details>`;
 }
 function setInfo(st,d){
   const el=$("#info");if(!el)return;
   const t=document.createElement("div");t.innerHTML=infoHTML(st,d);
   const n=t.firstElementChild;n.open=el.open;el.replaceWith(n);
   // 詳しい情報が届いたら「公開日・上映時間・ジャンル」に差し替える。届かなければ公開年だけを残す
-  const m=$("#imeta");if(m&&st==="ok")m.innerHTML=metaText(d);
+  const m=$("#imeta");
+  if(m&&st==="ok")m.innerHTML=`<span class="in">${metaText(d)}</span>`;
+  else if(m&&st!=="loading"){const y=cur?.[2]?.date?.slice(0,4);m.innerHTML=y?`<span class="in">${y}年</span>`:""}   // 取れなかったときは分かる範囲（公開年）だけ
   if(st==="ok")setLD(d);
 }
 // 表示中の作品の情報を取りに行き、届いたら作品情報の欄だけ差し替える
@@ -571,7 +582,7 @@ function setLD(d){
   el.textContent=JSON.stringify(o);
 }
 function nowHTML(q,isExample,movie){
-  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><div class="mrow"><p class="ex meta" id="imeta">${movie?.date?movie.date.slice(0,4)+"年":""}</p><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>${isExample==="trend"?'<p class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div></header>`;
+  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><div class="mrow"><p class="ex meta" id="imeta"><span class="sk" aria-label="読み込み中"></span></p><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>${isExample==="trend"?'<p class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div></header>`;
 }
 /* ===== 作品ごとの URL（?q=作品名&id=TMDBの番号）とページタイトル =====
    サーバーの処理なしで動くよう、クエリ文字列で作品を表す。ブックマーク・共有・戻るボタンに対応。
