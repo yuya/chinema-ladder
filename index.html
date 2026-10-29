@@ -784,15 +784,15 @@ async function autoPick(q){
   let list=cache.get(q);
   if(!list){try{list=await Promise.race([searchTMDB(q),new Promise(r=>setTimeout(()=>r(null),1500))])}catch(e){list=null}}   // 候補がまだなら少しだけ待つ
   if(!list?.length)return null;
-  if(rankOf(q,list[0])===0)return list[0];
-  if(list.length===1){
-    const m=list[0],r=rankOf(q,m);
-    if(r===1)return m;   // 入力が作品名の先頭と一致
-    if(r===2){
-      const t=norm(m.title),words=q.split(" ").map(norm).filter(Boolean);
-      if(words.length>=2&&words.every(w=>t.includes(w)))return m;   // 入力した言葉がすべて含まれる（「アンパンマン ルビー」など）
-      if(norm(q).length*2>=t.length)return m;                        // 入力が作品名の半分以上を占める
-    }
+  if(rankOf(q,list[0])===0)return list[0];   // ① 作品名と完全に一致
+  // ② 入力した言葉がすべて入っている候補が、ちょうど1つだけなら選ぶ（順番・間の言葉は問わない）
+  const words=q.split(" ").map(norm).filter(Boolean);
+  const has=m=>{const t=norm(m.title),o=m.original?norm(m.original):"";return words.every(w=>t.includes(w))||words.every(w=>o.includes(w))};
+  const hits=list.filter(has);
+  if(hits.length===1){
+    const m=hits[0];
+    if(words.length>=2)return m;                                      // 「ウルトラマン 仮面」→ ウルトラマンVS仮面ライダー
+    if(rankOf(q,m)===1||norm(q).length*2>=norm(m.title).length)return m;   // 1語なら先頭一致か、作品名の半分以上
   }
   return null;
 }
