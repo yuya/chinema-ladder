@@ -426,6 +426,11 @@ async function searchLocal(q){
 /* 入力中の候補：TMDB の検索（書いた文字の通りに探す）と、作品一覧からの検索（「・」「ー」や全角半角、
    ひらがな・カタカナの違いを無視して探す）を同時に行い、合わせて並べる。
    「スターウォーズ」でも「スター・ウォーズ／フォースの覚醒」などが出るようにするため */
+// 入力 q と作品 m の一致の強さ：0＝完全一致、1＝先頭が一致、2＝途中に含む、3＝その他（記号・表記の違いは無視）
+function rankOf(q,m){
+  const k=norm(q),t=norm(m.title),o=m.original?norm(m.original):"";
+  return t===k||o===k?0:(t.startsWith(k)||o.startsWith(k))?1:(t.includes(k)||o.includes(k))?2:3;
+}
 async function searchTMDB(q){
   if(cache.has(q))return cache.get(q);
   ctrl?.abort();ctrl=new AbortController();const sig=ctrl.signal;
@@ -436,9 +441,7 @@ async function searchTMDB(q){
   const local=searchLocal(q).catch(()=>[]);
   const [r,l]=await Promise.all([remote,local]);
   // 並べ方：入力と（記号を無視して）完全一致 → 先頭が一致 → 途中に含む → その他。同じ順位なら TMDB、作品一覧（人気順）の順
-  const k=norm(q);
-  const rank=m=>{const t=norm(m.title),o=m.original?norm(m.original):"";
-    return t===k||o===k?0:(t.startsWith(k)||o.startsWith(k))?1:(t.includes(k)||o.includes(k))?2:3};
+  const rank=m=>rankOf(q,m);
   const seen=new Set(),all=[];
   for(const m of [...r,...l]){if(seen.has(m.id))continue;seen.add(m.id);all.push(m)}
   const res=all.map((m,i)=>[rank(m),i,m]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).map(x=>x[2]).slice(0,8);
@@ -773,7 +776,23 @@ $("#q").addEventListener("keydown",e=>{
 });
 $("#sug").addEventListener("mousedown",e=>{const li=e.target.closest("li[data-i]");if(li){e.preventDefault();pick(items[+li.dataset.i])}});
 $("#q").addEventListener("blur",()=>setTimeout(hideSug,120));
-$("#f").addEventListener("submit",e=>{e.preventDefault();const q=clean($("#q").value);if(!q)return;hideSug();if(findMovie(q))remember(q);   // 一致が分からなければ、確かめてから履歴に入れる
+/* Enter（スマホの「検索」「決定」）を押したとき、候補から1つに決まるならその作品を選んだことにする。
+   ・一番上の候補が入力と完全に一致（記号・表記の違いは無視）
+   ・候補が1件だけで、入力がその作品名の先頭と一致
+   それ以外（「検索」→「ダークウェブ 検索できない…」のような途中一致など）は、打った文字のまま検索する */
+async function autoPick(q){
+  let list=cache.get(q);
+  if(!list){try{list=await Promise.race([searchTMDB(q),new Promise(r=>setTimeout(()=>r(null),1500))])}catch(e){list=null}}   // 候補がまだなら少しだけ待つ
+  if(!list?.length)return null;
+  if(rankOf(q,list[0])===0)return list[0];
+  if(list.length===1&&rankOf(q,list[0])===1)return list[0];
+  return null;
+}
+$("#f").addEventListener("submit",async e=>{e.preventDefault();const q=clean($("#q").value);if(!q)return;clearTimeout(timer);hideSug();
+  const m=await autoPick(q);
+  if(clean($("#q").value)!==q)return;   // 待っている間に打ち直していたら何もしない
+  if(m){pick(m);return}
+  if(findMovie(q))remember(q);   // 一致が分からなければ、確かめてから履歴に入れる
   if(findMovie(q))setQ();else{$("#q").value=q;keepQ=q}   // 一致する作品が手元にあれば空に、なければ結果を待つ
   render(q);collapseTop();$("#q").blur()});
 $("#clr").onclick=()=>{setQ();hideSug();$("#q").focus()};   // 入力欄だけ空にして、画面はそのまま
