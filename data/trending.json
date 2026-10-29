@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-29T00:55:58.391Z",
+ "updated": "2026-10-29T13:33:10.188Z",
  "items": [
   {
    "id": 1400940,
@@ -7,15 +7,7 @@
    "original": "Clayface",
    "date": "2026-10-30",
    "poster": "/6ttcIVdQbS6esi5wPEUuVKQN8SX.jpg",
-   "pop": 251.5349
-  },
-  {
-   "id": 1423191,
-   "title": "バイオハザード",
-   "original": "Resident Evil",
-   "date": "2026-10-09",
-   "poster": "/wHXSnGH3zQtvpxPwaBXMoS9o8Vl.jpg",
-   "pop": 160.0914
+   "pop": 231.682
   },
   {
    "id": 1283515,
@@ -23,7 +15,15 @@
    "original": "Verity",
    "date": "2026-11-06",
    "poster": "/rmaNMA1seHqpjtnYKzyynFAr1g8.jpg",
-   "pop": 138.1498
+   "pop": 179.6426
+  },
+  {
+   "id": 1423191,
+   "title": "バイオハザード",
+   "original": "Resident Evil",
+   "date": "2026-10-09",
+   "poster": "/wHXSnGH3zQtvpxPwaBXMoS9o8Vl.jpg",
+   "pop": 143.8412
   },
   {
    "id": 1153576,
@@ -31,7 +31,7 @@
    "original": "Street Fighter",
    "date": "2026-10-16",
    "poster": "/1JBlbyXionXPRaqW1UQw7eKkxNP.jpg",
-   "pop": 127.6293
+   "pop": 116.5205
   },
   {
    "id": 1400837,
@@ -39,7 +39,7 @@
    "original": "Other Mommy",
    "date": "2026-11-20",
    "poster": "/fGRNCssTRrhYZxNzykGGCoMsAVq.jpg",
-   "pop": 97.2845
+   "pop": 93.7702
   },
   {
    "id": 1275779,
@@ -47,15 +47,7 @@
    "original": "Disclosure Day",
    "date": "2026-10-01",
    "poster": "/vDnJLpE2jhu8OVcwpWuYCMF5hRU.jpg",
-   "pop": 96.3132
-  },
-  {
-   "id": 1255833,
-   "title": "クジラに落ちた男",
-   "original": "Whalefall",
-   "date": "2026-10-16",
-   "poster": "/vjTYUTgh9nO88i6HZ4YPRhiFL05.jpg",
-   "pop": 79.2953
+   "pop": 90.8678
   },
   {
    "id": 1263337,
@@ -63,7 +55,7 @@
    "original": "Heart of the Beast",
    "date": "2026-09-25",
    "poster": "/mGmnmCtodvzhpnMFQoZkeGDDVjU.jpg",
-   "pop": 77.8195
+   "pop": 79.4377
   },
   {
    "id": 1248832,
@@ -71,7 +63,15 @@
    "original": "Digger",
    "date": "2026-10-09",
    "poster": "/vi2HvWOBtR1pcr4vBoYe43ldkuu.jpg",
-   "pop": 76.9765
+   "pop": 75.6082
+  },
+  {
+   "id": 1255833,
+   "title": "クジラに落ちた男",
+   "original": "Whalefall",
+   "date": "2026-10-16",
+   "poster": "/vjTYUTgh9nO88i6HZ4YPRhiFL05.jpg",
+   "pop": 75.2818
   },
   {
    "id": 1381071,
@@ -79,7 +79,7 @@
    "original": "ゴジラ-0.0",
    "date": "2026-11-03",
    "poster": "/zpcoFlZwyLnBt7bb5wmvGDCdg06.jpg",
-   "pop": 21.0126
+   "pop": 20.6745
   }
  ]
 }
