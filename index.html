@@ -158,7 +158,7 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 .now h1.long{text-wrap:pretty;word-break:normal}
 /* 作品名は語のまとまりごとに改行する（「ディスクロー／ジャー」のように語の途中で切れないように）。
    入りきらない長い語だけは途中で折り返す */
-.now h1 .w{display:inline-block;max-width:100%}
+.now h1 .w{display:inline-block;max-width:100%;white-space:pre-wrap}   /* 作品名の中の空白を消さない */
 /* 作品情報（あらすじなど）。最初はたたんでおき、ネタバレを避けたい人は開かなくて済むようにする */
 /* 作品情報：枠を付けず、本文に直接のせる（TOP10 の箱と見分けがつくように）
    公開日・上映時間・ジャンルは見出しの中に常に1行で出し、あらすじとキャストは文字のリンクで開く */
@@ -778,14 +778,22 @@ $("#sug").addEventListener("mousedown",e=>{const li=e.target.closest("li[data-i]
 $("#q").addEventListener("blur",()=>setTimeout(hideSug,120));
 /* Enter（スマホの「検索」「決定」）を押したとき、候補から1つに決まるならその作品を選んだことにする。
    ・一番上の候補が入力と完全に一致（記号・表記の違いは無視）
-   ・候補が1件だけで、入力がその作品名の先頭と一致
+   ・候補が1件だけで、入力がその作品名の先頭と一致／入力した言葉（2つ以上）がすべて含まれる／作品名の半分以上を占める
    それ以外（「検索」→「ダークウェブ 検索できない…」のような途中一致など）は、打った文字のまま検索する */
 async function autoPick(q){
   let list=cache.get(q);
   if(!list){try{list=await Promise.race([searchTMDB(q),new Promise(r=>setTimeout(()=>r(null),1500))])}catch(e){list=null}}   // 候補がまだなら少しだけ待つ
   if(!list?.length)return null;
   if(rankOf(q,list[0])===0)return list[0];
-  if(list.length===1&&rankOf(q,list[0])===1)return list[0];
+  if(list.length===1){
+    const m=list[0],r=rankOf(q,m);
+    if(r===1)return m;   // 入力が作品名の先頭と一致
+    if(r===2){
+      const t=norm(m.title),words=q.split(" ").map(norm).filter(Boolean);
+      if(words.length>=2&&words.every(w=>t.includes(w)))return m;   // 入力した言葉がすべて含まれる（「アンパンマン ルビー」など）
+      if(norm(q).length*2>=t.length)return m;                        // 入力が作品名の半分以上を占める
+    }
+  }
   return null;
 }
 $("#f").addEventListener("submit",async e=>{e.preventDefault();const q=clean($("#q").value);if(!q)return;clearTimeout(timer);hideSug();
