@@ -668,8 +668,6 @@ function setMeta(q,isExample){
   document.querySelector('meta[property="og:url"]').content=canon.href;
 }
 function syncNav(q,isExample,movie){
-  document.title=q?`${q} - Cinemaladder`:"Cinemaladder";
-  setMeta(q,isExample);
   const st={q,isExample,movie:slim(movie)};
   try{
     if(isExample||navMode==="none")history.replaceState(st,"",location.href);   // おすすめ表示などは URL を変えない
@@ -677,8 +675,13 @@ function syncNav(q,isExample,movie){
     else history.replaceState(st,"",urlFor(q,movie));
   }catch(e){}
   navMode="push";
+  // タブの題名は URL に合わせる。作品の URL（?q=）のときだけ作品名を出し、トップの URL のまま
+  // 話題作や前回の作品を表示しているときは「Cinemaladder」にする（ブックマークや共有で題名がばらつかないように）
+  let onMovie=false;try{onMovie=!!new URL(location.href).searchParams.get("q")}catch(e){}
+  document.title=q&&onMovie?`${q} - Cinemaladder`:"Cinemaladder";
+  setMeta(onMovie?q:"",isExample);   // 説明文・正規URLも URL に合わせる
 }
-function shareUrl(){return cur?.[0]&&!cur[1]?location.href:cur?.[0]?urlFor(cur[0],cur[2]):location.href}
+function shareUrl(){return cur?.[0]?urlFor(cur[0],cur[2]):location.href}   // 共有ボタンは、いつも表示中の作品のページを渡す
 let toastTimer=null;
 let toastSwap=null;
 function toast(msg){
@@ -691,7 +694,7 @@ function toast(msg){
   else show();
 }
 async function share(){
-  const url=shareUrl(),title=document.title;
+  const url=shareUrl(),title=cur?.[0]?`${cur[0]} - Cinemaladder`:document.title;
   if(navigator.share){try{await navigator.share({title,url});return}catch(e){if(e.name==="AbortError")return}}
   try{await navigator.clipboard.writeText(url);toast("リンクをコピーしました")}catch(e){prompt?.("このリンクをコピーしてください",url)}
 }
