@@ -233,6 +233,16 @@ a.go .d{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;tex
 .ad{background:var(--ad);border:1px dashed var(--line);border-radius:12px;padding:14px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:80px}
 .ad .adl{font-size:10px;font-weight:700;letter-spacing:.14em}
 
+/* サイトの説明（ページの下） */
+.guide{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 16px;border-top:1px solid var(--line);font-size:14px;line-height:1.85;color:var(--fg)}
+.guide h2{margin:0 0 8px;font-size:17px}
+.guide h3{margin:24px 0 6px;font-size:15px}
+.guide p{margin:0 0 10px}
+.guide ol{margin:0 0 10px;padding-left:1.4em;list-style:decimal}
+.guide li{margin-bottom:4px}
+.guide dl{margin:0;display:grid;gap:10px}
+.guide dt{font-weight:700}
+.guide dd{margin:0;color:var(--muted)}
 body > footer a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 body > footer a:hover{color:var(--accent)}
 .flinks{display:flex;gap:16px;flex-wrap:wrap}
@@ -310,6 +320,38 @@ details[open] > summary::before{transform:rotate(90deg)}
   <p class="emptyst">読み込み中…</p>
   <noscript><p class="emptyst">このサイトを使うには JavaScript を有効にしてください。</p></noscript>
 </main>
+
+<!-- サイトの説明（JS を使わずに HTML に直接書く。検索エンジンや広告の審査でも読まれる） -->
+<section class="guide" aria-labelledby="gd-h">
+  <h2 id="gd-h">Cinemaladder について</h2>
+  <p>映画を観る前に「面白いのかな」と気になったり、観たあとに「ほかの人はどう感じたんだろう」と知りたくなったりしたとき、レビューサイトを1つずつ開いて同じ作品名を何度も入力するのは手間がかかります。Cinemaladder は、作品名を一度入れるだけで、主なレビューサイト、チケット、SNS、配信サービスの検索結果へまとめて移動できる、映画の評判の「はしご」をするための道具です。</p>
+
+  <h3>使い方</h3>
+  <ol>
+    <li>上の検索欄に、観たい映画や気になっている映画の名前を入れます。途中まで入れると候補が出るので、選ぶと作品のポスターや公開日、あらすじが表示されます。</li>
+    <li>「レビュー」の欄から、気になるサイトを開きます。どのボタンも、そのサイトでその作品を検索した結果のページへ直接つながります。</li>
+    <li>観に行くと決めたら「チケット・上映館」から前売り券や近くの上映館を、家で観るなら「配信」から各サービスでの配信状況を確かめられます。</li>
+  </ol>
+  <p>調べた作品は「最近」に残るので、あとから同じ作品をすぐ開き直せます。作品ごとのページの URL は、共有ボタンから友だちに送ることもできます。</p>
+
+  <h3>評判は、いくつかのサイトを見比べる</h3>
+  <p>同じ映画でも、サイトによって点数や感想の雰囲気がかなり違うことがあります。サイトごとに、使っている人の年齢層や好み、点数の付け方が違うからです。たとえば、気軽に記録を付ける人が多いサイトでは点数が高めにまとまりやすく、長く映画を観てきた人が多いサイトや海外のサイトでは、評価が厳しめに出たり、分かれたりすることがあります。</p>
+  <p>点数だけを見るより、「どのサイトでも評価が高いか」「どのサイトでも感想が割れているか」を見るほうが、自分に合う作品かどうかを判断しやすくなります。気になる作品は、2〜3のサイトの評判を順に見て回るのがおすすめです。</p>
+
+  <h3>リンク先のサイトの特徴</h3>
+  <dl>
+    <dt>Filmarks</dt><dd>国内で利用者がとても多い映画のレビューサービスです。5点満点で評価され、公開されたばかりの作品でも、短い感想がすぐにたくさん集まります。</dd>
+    <dt>映画.com</dt><dd>作品の基本情報やニュースが充実したサイトです。利用者のレビューのほか、予告編や上映スケジュールもまとめて確認できます。</dd>
+    <dt>Movie Walker</dt><dd>映画のニュースや特集記事が多いサイトです。作品の背景やインタビューなど、レビュー以外の読み物も見つかります。</dd>
+    <dt>映画ランド</dt><dd>上映中の作品の評価と、近くの映画館の上映スケジュールを一緒に調べられます。</dd>
+    <dt>KINENOTE</dt><dd>映画雑誌「キネマ旬報」が運営する、映画の記録と感想のサービスです。古い作品や日本映画の情報も豊富です。</dd>
+    <dt>IMDb</dt><dd>世界最大級の映画データベースです。10点満点の評価は世界中の利用者によるもので、海外での評判を知りたいときに役立ちます。</dd>
+    <dt>X・Instagram</dt><dd>公開直後のいちばん新しい感想が見つかります。X の検索では「ネタバレ」などの言葉を含む投稿を除外できるので、観る前でも安心して評判をのぞけます。除外する言葉は自由に変えられます。</dd>
+  </dl>
+
+  <h3>ネタバレを避けたいときは</h3>
+  <p>まだ観ていない作品の評判を調べるときは、点数と短い感想から見るのがおすすめです。長いレビューや SNS の投稿には、結末に触れたものが混ざっていることがあります。Cinemaladder のあらすじは「あらすじ・キャスト」を開いたときだけ表示されるので、気になる人は閉じたままにしておけます。</p>
+</section>
 
 <footer>
   <p id="affnote" hidden>当サイトはアフィリエイトプログラムに参加しており、「PR」の付いたリンクから申し込みや購入があると、運営者が紹介料を受け取ることがあります。<span id="amznote" hidden>Amazonのアソシエイトとして、当サイトは適格販売により収入を得ています。</span></p>
@@ -456,7 +498,7 @@ async function searchTMDB(q){
   // 先頭が一致する作品は少しだけ上げ、文字が含まれない作品（原題での一致など）は少し下げる
   const byId=new Map();
   for(const m of [...r,...l]){const o=byId.get(m.id);if(!o)byId.set(m.id,m);else if(!o.votes&&m.votes)byId.set(m.id,{...o,votes:m.votes,pop:m.pop})}
-  const score=m=>{const rk=rankOf(q,m);return rk===0?99:Math.log10((m.votes||0)+1)+Math.log10((m.pop||0)+1)+(rk===1?.5:rk===3?-1:0)};
+  const score=m=>{const rk=rankOf(q,m);return Math.log10((m.votes||0)+1)+Math.log10((m.pop||0)+1)+(rk===0?99:rk===1?.5:rk===3?-1:0)};
   const res=[...byId.values()].map((m,i)=>[score(m),i,m]).sort((a,b)=>b[0]-a[0]||a[1]-b[1]).map(x=>x[2]).slice(0,8);
   cache.set(q,res);return res;
 }
