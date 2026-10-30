@@ -497,8 +497,11 @@ async function searchTMDB(q){
   // 並べ方：入力と完全一致した作品をいちばん上に。それ以外は「有名な順」（評価数と人気度）。
   // 先頭が一致する作品は少しだけ上げ、文字が含まれない作品（原題での一致など）は少し下げる
   const byId=new Map();
-  for(const m of [...r,...l]){const o=byId.get(m.id);if(!o)byId.set(m.id,m);else if(!o.votes&&m.votes)byId.set(m.id,{...o,votes:m.votes,pop:m.pop})}
-  const score=m=>{const rk=rankOf(q,m);return Math.log10((m.votes||0)+1)+Math.log10((m.pop||0)+1)+(rk===0?99:rk===1?.5:rk===3?-1:0)};
+  for(const m of [...r,...l]){const o=byId.get(m.id);if(!o)byId.set(m.id,m);else if(!o.votes&&m.votes)byId.set(m.id,{...o,votes:m.votes,pop:m.pop,date:o.date||m.date})}
+  // 公開から3か月以内か、1か月以内に公開予定の作品（いま映画館で観られる・もうすぐ観られる作品）は少し上げる
+  const now=Date.now(),D=864e5;
+  const fresh=m=>{const t=/^\d{4}-\d{2}-\d{2}/.test(m.date||"")?Date.parse(m.date):NaN;return t>=now-90*D&&t<=now+30*D};
+  const score=m=>{const rk=rankOf(q,m);return Math.log10((m.votes||0)+1)+Math.log10((m.pop||0)+1)+(rk===0?99:rk===1?.5:rk===3?-1:0)+(fresh(m)?1:0)};
   const res=[...byId.values()].map((m,i)=>[score(m),i,m]).sort((a,b)=>b[0]-a[0]||a[1]-b[1]).map(x=>x[2]).slice(0,8);
   cache.set(q,res);return res;
 }

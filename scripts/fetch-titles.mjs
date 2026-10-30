@@ -46,7 +46,8 @@ for (const list of results) for (const m of list) {
   if (map.has(m.id) || !readable(m.title)) continue;
   // 原題（タイトルと同じなら空）、評価数、人気度。後ろの2つは候補を「有名な順」に並べるために使う
   const orig = m.original_title && m.original_title !== m.title && readable(m.original_title) ? m.original_title : "";
-  const row = [m.id, m.title, (m.release_date || "").slice(0, 4), m.poster_path || "", orig, m.vote_count || 0, Math.round((m.popularity || 0) * 10) / 10];
+  // 公開日は年月日まで入れる（公開まもない作品を候補の上に寄せるため。画面には年だけ出す）
+  const row = [m.id, m.title, m.release_date || "", m.poster_path || "", orig, m.vote_count || 0, Math.round((m.popularity || 0) * 10) / 10];
   map.set(m.id, row);
 }
 const items = [...map.values()];
@@ -55,6 +56,6 @@ if (items.length < 500) throw new Error(`取得できた作品が少なすぎる
 await mkdir("data", { recursive: true });
 // 1行1作品にして、差分を見やすくする
 const body = "{\"updated\":" + JSON.stringify(new Date().toISOString()) +
-  ",\"fields\":[\"id\",\"title\",\"year\",\"poster\",\"original\",\"votes\",\"pop\"],\"items\":[\n" + items.map(r => JSON.stringify(r)).join(",\n") + "\n]}\n";
+  ",\"fields\":[\"id\",\"title\",\"date\",\"poster\",\"original\",\"votes\",\"pop\"],\"items\":[\n" + items.map(r => JSON.stringify(r)).join(",\n") + "\n]}\n";
 await writeFile("data/titles.json", body);
 console.log(`${items.length} 作品 / ${(Buffer.byteLength(body) / 1024).toFixed(0)} KB`);
