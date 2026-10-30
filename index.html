@@ -421,20 +421,18 @@ const norm=s=>(s||"").normalize("NFKC").toLowerCase()
 function loadTitles(){
   if(titles)return Promise.resolve(titles);
   return titlesLoading??=fetch("data/titles.json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(j=>{
-    titles=j.items.map(([id,title,year,poster,original])=>({id,title,date:year,poster,original:original||title,k:norm(title),ko:original?norm(original):""}));
+    titles=j.items.map(([id,title,year,poster,original,votes,pop])=>({id,title,date:year,poster,original:original||title,votes:votes||0,pop:pop||0,k:norm(title),ko:original?norm(original):""}));
     return titles;
   }).catch(e=>{titlesLoading=null;throw e});
 }
 async function searchLocal(q){
   const list=await loadTitles(),k=norm(q);
   if(!k)return [];
-  const head=[],mid=[];   // 前方一致を先に、部分一致を後に（どちらも人気順）
+  const hits=[];   // 前方一致・部分一致をまとめて拾い、並べ替えは searchTMDB でまとめて行う
   for(const m of list){
-    if(m.k.startsWith(k)||m.ko.startsWith(k))head.push(m);
-    else if(m.k.includes(k)||m.ko.includes(k))mid.push(m);
-    if(head.length>=8)break;
+    if(m.k.includes(k)||m.ko.includes(k))hits.push(m);
   }
-  return head.concat(mid).slice(0,8);
+  return hits;
 }
 
 /* 入力中の候補：TMDB の検索（書いた文字の通りに探す）と、作品一覧からの検索（「・」「ー」や全角半角、
@@ -454,11 +452,12 @@ async function searchTMDB(q){
     .catch(e=>{if(e.name==="AbortError")throw e;return []});   // 中継が使えなくても作品一覧の候補は出す
   const local=searchLocal(q).catch(()=>[]);
   const [r,l]=await Promise.all([remote,local]);
-  // 並べ方：入力と（記号を無視して）完全一致 → 先頭が一致 → 途中に含む → その他。同じ順位なら TMDB、作品一覧（人気順）の順
-  const rank=m=>rankOf(q,m);
-  const seen=new Set(),all=[];
-  for(const m of [...r,...l]){if(seen.has(m.id))continue;seen.add(m.id);all.push(m)}
-  const res=all.map((m,i)=>[rank(m),i,m]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).map(x=>x[2]).slice(0,8);
+  // 並べ方：入力と完全一致した作品をいちばん上に。それ以外は「有名な順」（評価数と人気度）。
+  // 先頭が一致する作品は少しだけ上げ、文字が含まれない作品（原題での一致など）は少し下げる
+  const byId=new Map();
+  for(const m of [...r,...l]){const o=byId.get(m.id);if(!o)byId.set(m.id,m);else if(!o.votes&&m.votes)byId.set(m.id,{...o,votes:m.votes,pop:m.pop})}
+  const score=m=>{const rk=rankOf(q,m);return rk===0?99:Math.log10((m.votes||0)+1)+Math.log10((m.pop||0)+1)+(rk===1?.5:rk===3?-1:0)};
+  const res=[...byId.values()].map((m,i)=>[score(m),i,m]).sort((a,b)=>b[0]-a[0]||a[1]-b[1]).map(x=>x[2]).slice(0,8);
   cache.set(q,res);return res;
 }
 /* ===== 話題作TOP10（日本で上映中＋公開予定を人気順に） ===== */
