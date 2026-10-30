@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Cinemaladder</title>
+<title>Cinemaladder - 映画の評判を、はしごする</title>
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -21,7 +21,7 @@
 <meta property="og:url" content="https://cinemaladder.com/">
 <meta property="og:site_name" content="Cinemaladder">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Cinemaladder">
+<meta property="og:title" content="Cinemaladder - 映画の評判を、はしごする">
 <meta property="og:description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
 <style>
 :root{
@@ -560,7 +560,8 @@ function renderHist(){$("#hist").hidden=!hist.length;$("#hist").innerHTML=hist.l
 function saveHist(){store.set("cl_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
-function renderEmpty(){cur=null;document.title="Cinemaladder";setMeta("",false);$("#out").classList.remove("boot");$("#out").innerHTML='<section class="emptyst"><h1>観たい映画の名前を入れてください</h1><p>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</p></section>'}
+const TOP_TITLE="Cinemaladder - 映画の評判を、はしごする";   // トップの URL のときのタブの題名
+function renderEmpty(){cur=null;document.title=TOP_TITLE;setMeta("",false);$("#out").classList.remove("boot");$("#out").innerHTML='<section class="emptyst"><h1>観たい映画の名前を入れてください</h1><p>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</p></section>'}
 /* 作品名から TMDB の情報を、手元にない場合に取りに行く。
    1. 作品一覧（data/titles.json） 2. 中継サーバーで検索し、タイトルが完全に一致したもの */
 async function lookupMovie(q){
@@ -678,7 +679,7 @@ function syncNav(q,isExample,movie){
   // タブの題名は URL に合わせる。作品の URL（?q=）のときだけ作品名を出し、トップの URL のまま
   // 話題作や前回の作品を表示しているときは「Cinemaladder」にする（ブックマークや共有で題名がばらつかないように）
   let onMovie=false;try{onMovie=!!new URL(location.href).searchParams.get("q")}catch(e){}
-  document.title=q&&onMovie?`${q} - Cinemaladder`:"Cinemaladder";
+  document.title=q&&onMovie?`${q} - Cinemaladder`:TOP_TITLE;
   setMeta(onMovie?q:"",isExample);   // 説明文・正規URLも URL に合わせる
 }
 function shareUrl(){return cur?.[0]?urlFor(cur[0],cur[2]):location.href}   // 共有ボタンは、いつも表示中の作品のページを渡す
