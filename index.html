@@ -167,7 +167,7 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 /* 作品情報（あらすじなど）。最初はたたんでおき、ネタバレを避けたい人は開かなくて済むようにする */
 /* 作品情報：枠を付けず、本文に直接のせる（TOP10 の箱と見分けがつくように）
    公開日・上映時間・ジャンルは見出しの中に常に1行で出し、あらすじとキャストは文字のリンクで開く */
-.now .meta{display:block;min-height:1.6em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}   /* 補足の情報なので1行に収め、はみ出す分は「…」にする */   /* 情報が届く前から1行分の高さを確保し、ずれを防ぐ */
+.now .meta{display:block;min-height:1.6em;word-break:normal;line-break:auto}   /* 項目ごとにまとめて次の行へ送らず、行の端まで詰めて折り返す */   /* 情報が届く前から1行分の高さを確保し、ずれを防ぐ */
 details.info{background:none;border:0;border-radius:0;padding:0;font-size:14px;margin-top:-6px}
 .info summary{display:inline-flex;gap:6px;color:var(--accent);font-size:13px;font-weight:700;padding:4px 0}
 .info summary::before{width:13px;height:13px}
@@ -638,7 +638,6 @@ const ymd=d=>d?`${+d.slice(0,4)}年${+d.slice(5,7)}月${+d.slice(8,10)}日`:"";
 const GENRE_SHORT={"サイエンスフィクション":"SF","アニメーション":"アニメ","ドキュメンタリー":"ドキュメンタリー"};   // 長いジャンル名を短く（1行に収めるため）
 function metaText(d){
   const date=d.jpDate||d.date;
-  // 項目ごとに <span class="w"> で包み、「ド／ラマ」のように語の途中で改行しないようにする
   const items=[date?ymd(date)+"公開":"",d.runtime?`${d.runtime}分`:"",...d.genres.slice(0,2).map(g=>GENRE_SHORT[g]||g)].filter(Boolean);   // ジャンルは2つまで
   return items.map((x,i)=>`<span class="w">${esc(x)}${i<items.length-1?(i>=2?"／":"・"):""}</span>`).join("");
 }
