@@ -328,7 +328,7 @@ details[open] > summary::before{transform:rotate(90deg)}
 
   <h3>使い方</h3>
   <ol>
-    <li>上の検索欄に作品名を入れます。途中まで入れると候補が出ます。候補を選ぶと、ポスター、公開日、あらすじが表示されます。</li>
+    <li>上の検索欄に作品名を入れます。途中まで入れると候補が出ます。候補を選ぶと、ポスター、公開日、上映時間、ジャンルが表示されます。あらすじとキャストは「あらすじ・キャスト」を開くと読めます。</li>
     <li>「レビュー」の欄から、開きたいサイトを選びます。どのボタンも、そのサイトでその作品を検索した結果のページにつながります。</li>
     <li>映画館で観るなら「チケット・上映館」から前売券や上映館を、家で観るなら「配信」から各サービスの配信状況を確かめます。</li>
   </ol>
@@ -338,19 +338,19 @@ details[open] > summary::before{transform:rotate(90deg)}
   <p>同じ映画でも、サイトによって点数や感想の傾向が変わることがあります。サイトごとに利用者の層や好み、点数の付け方が違うためと考えられます。</p>
   <p>そのため、1つのサイトの点数だけで決めるより、いくつかのサイトで評価がそろっているか、感想が割れているかを見るほうが、自分に合う作品か判断しやすくなります。</p>
 
-  <h3>リンク先のサイトの特徴</h3>
+  <h3>レビューと SNS のリンク先</h3>
   <dl>
-    <dt>Filmarks</dt><dd>映画の感想を記録・投稿するサービスです。評価は5点満点で、短い感想が多く投稿されます。</dd>
-    <dt>映画.com</dt><dd>作品の基本情報、ニュース、予告編、上映スケジュールを掲載しているサイトです。利用者のレビューも読めます。</dd>
-    <dt>Movie Walker</dt><dd>映画のニュースや特集記事を中心にしたサイトです。作品ページでは利用者のレビューも読めます。</dd>
-    <dt>映画ランド</dt><dd>上映中の作品の評価と、映画館の上映スケジュールを一緒に調べられます。</dd>
-    <dt>KINENOTE</dt><dd>映画雑誌「キネマ旬報」を発行するキネマ旬報社が運営する、映画の鑑賞記録と感想のサービスです。</dd>
-    <dt>IMDb</dt><dd>海外の映画データベースです。評価は10点満点で、世界中の利用者が付けています。海外での評判を知りたいときに使えます。</dd>
-    <dt>X・Instagram</dt><dd>公開直後の新しい感想が見つかります。X の検索では「ネタバレ」などの言葉を含む投稿を除外できます。除外する言葉は自由に変えられます。</dd>
+    <dt>Filmarks</dt><dd>映画の感想を記録・投稿するサービスです。評価は5点満点で、短い感想を中心に読めます。</dd>
+    <dt>映画.com</dt><dd>作品情報と映画ニュースを掲載するサイトです。利用者のレビューのほか、予告編や上映スケジュールも確認できます。</dd>
+    <dt>Movie Walker</dt><dd>映画ニュースや特集記事を中心にしたサイトです。利用者のレビューも読めます。</dd>
+    <dt>映画ランド</dt><dd>上映中の作品の評価と、映画館の上映スケジュールを調べられるサイトです。</dd>
+    <dt>KINENOTE</dt><dd>映画雑誌「キネマ旬報」の発行元が運営する、映画の鑑賞記録と感想のサービスです。</dd>
+    <dt>IMDb</dt><dd>海外の映画データベースです。評価は10点満点で、世界中の利用者が付けています。海外での評判を調べるときに使えます。</dd>
+    <dt>X・Instagram</dt><dd>公開直後の感想を探せます。X は「ネタバレ」などの言葉を含む投稿を除外して検索します。除外する言葉は、作品ページの「X で除外する言葉」で変更できます。</dd>
   </dl>
 
   <h3>ネタバレの避け方</h3>
-  <p>まだ観ていない作品の評判を調べるときは、点数と短い感想から見ると、結末を知ってしまう危険が減ります。長いレビューや SNS の投稿には、結末に触れたものが含まれることがあります。Cinemaladder のあらすじは「あらすじ・キャスト」を開いたときだけ表示されます。</p>
+  <p>長いレビューや SNS の投稿には、結末に触れたものが含まれることがあります。まだ観ていない作品なら、点数と短い感想から読むと、結末を知る危険を減らせます。Cinemaladder では、あらすじは「あらすじ・キャスト」を開いたときだけ表示されます。</p>
 </section>
 
 <footer>
@@ -384,11 +384,11 @@ const IMG = "https://image.tmdb.org/t/p/w92";
 const E=encodeURIComponent;
 const GROUPS=[
  {h:"レビュー",note:"星とレビューを見る",items:[
-  {n:"Filmarks",ic:"filmarks",d:"レビュー数が多い",u:q=>"https://filmarks.com/search/movies?q="+E(q)},
+  {n:"Filmarks",ic:"filmarks",d:"評価・感想",u:q=>"https://filmarks.com/search/movies?q="+E(q)},
   {n:"映画.com",ic:"eiga",d:"評価・作品情報",u:q=>"https://eiga.com/search/"+E(q)+"/"},
   {n:"Movie Walker",ic:"moviewalker",d:"評価・ニュース",u:q=>"https://press.moviewalker.jp/search/free_search.cgi?keyword="+E(q)},
   {n:"映画ランド",ic:"eigaland",d:"評価・上映情報",u:q=>"https://eigaland.com/movie?sort=openDate&q="+E(q)},
-  {n:"KINENOTE",ic:"kinenote",d:"キネマ旬報の評価",u:q=>"https://www.kinenote.com/sp/public/cinema/search_result.aspx?key="+E(q)},
+  {n:"KINENOTE",ic:"kinenote",d:"評価・鑑賞記録",u:q=>"https://www.kinenote.com/sp/public/cinema/search_result.aspx?key="+E(q)},
   // IMDb は日本語タイトルだと見つからないことが多いので、TMDB の原題が分かればそちらで検索する。s=tt&ttype=ft は「映画作品だけ」に絞る指定
   {n:"IMDb",ic:"imdb",d:"海外の評価",u:(q,m)=>"https://www.imdb.com/find/?q="+E(m?.original||q)+"&s=tt&ttype=ft"},
   // p=検索語、ei=文字コード。ほかのパラメータ（ai, ts, aq, fr など）は Yahoo の計測用なので不要
@@ -688,7 +688,7 @@ function pickedHTML(movie){
   return `<p class="picked" id="picked"><span>「${esc(picked.q)}」の候補から選びました</span><button type="button" id="rawq" aria-label="入力どおりに検索し直す" title="入力どおりに検索">戻す</button></p>`;
 }
 function nowHTML(q,isExample,movie){
-  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><div class="mrow"><p class="ex meta" id="imeta"><span class="sk" aria-label="読み込み中"></span></p><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>${isExample==="trend"?'<p class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div></header>`;
+  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><div class="mrow"><p class="ex meta" id="imeta"><span class="sk" aria-label="読み込み中"></span></p><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>${isExample==="trend"?'<p class="ex">日本で上映中・公開予定の作品のうち、TMDB の人気度で上位10本から1本を選んで表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div></header>`;
 }
 /* ===== 作品ごとの URL（?q=作品名&id=TMDBの番号）とページタイトル =====
    サーバーの処理なしで動くよう、クエリ文字列で作品を表す。ブックマーク・共有・戻るボタンに対応。
@@ -702,7 +702,7 @@ function urlFor(q,movie){
 }
 const DESC=document.querySelector('meta[name="description"]').content;
 function setMeta(q,isExample){
-  const desc=q&&!isExample?`「${q}」の評判を、Filmarks、映画.com、Yahoo! などの検索結果で調べられます。チケット、SNS、配信サービスの検索結果へも移動できます。`:DESC;
+  const desc=q&&!isExample?`「${q}」について、Filmarks、映画.com、Yahoo! など各サイトの検索結果へ移動できます。チケット、SNS、配信サービスの検索結果も開けます。`:DESC;
   document.querySelector('meta[name="description"]').content=desc;
   document.querySelector('meta[property="og:description"]').content=desc;
   document.querySelector('meta[property="og:title"]').content=document.title;
