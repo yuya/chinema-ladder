@@ -798,8 +798,10 @@ const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)");
 function playSwap(){
   if(reduceMotion.matches||!Element.prototype.animate)return;
   const els=[...document.querySelectorAll("#out .movie > *")];
+  // 作品の見出し（いちばん上）は動かさずに薄く出すだけにする。文字を動かすと、止まった瞬間に
+  // 小数点以下の位置が画面の画素にそろえ直され、1pxほど跳ねて見えるため。下のグループは少し下から出す
   els.forEach((el,i)=>el.animate(
-    [{opacity:0,transform:"translateY(10px)"},{opacity:1,transform:"none"}],
+    el.classList.contains("now")?[{opacity:0},{opacity:1}]:[{opacity:0,transform:"translateY(10px)"},{opacity:1,transform:"none"}],
     {duration:280,delay:Math.min(i,5)*45,easing:"cubic-bezier(.2,.7,.3,1)",fill:"backwards"}));
   const h1=document.querySelector("#out h1");
   if(h1)h1.animate([{color:"var(--accent)"},{color:"var(--fg)"}],{duration:900,easing:"ease-out"});
