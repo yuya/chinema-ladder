@@ -172,10 +172,13 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 /* 作品情報：枠を付けず、本文に直接のせる（TOP10 の箱と見分けがつくように）
    公開日・上映時間・ジャンルは見出しの中に常に1行で出し、あらすじとキャストは文字のリンクで開く */
 .now .meta{display:block;min-height:1.6em;word-break:normal;line-break:auto}   /* 項目ごとにまとめて次の行へ送らず、行の端まで詰めて折り返す */   /* 情報が届く前から1行分の高さを確保し、ずれを防ぐ */
-details.info{background:none;border:0;border-radius:0;padding:0;font-size:14px;margin-top:-6px}
-.info summary{display:inline-flex;gap:6px;color:var(--accent);font-size:13px;font-weight:700;padding:4px 0}
-.info summary::before{width:13px;height:13px}
-.info .body{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:65ch}
+/* 「あらすじ・キャスト」の開閉ボタンは作品名の下（右の列）に置き、中身は見出しの下に横いっぱいで出す */
+.itg{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:4px 0;margin-top:2px;color:var(--accent);font-size:13px;font-weight:700;cursor:pointer}
+.itg::before{content:"";width:13px;height:13px;flex:none;background:currentColor;-webkit-mask:var(--chev) center/contain no-repeat;mask:var(--chev) center/contain no-repeat;transition:transform .2s ease}
+.itg[aria-expanded="true"]::before{transform:rotate(90deg)}
+@media (prefers-reduced-motion:reduce){.itg::before{transition:none}}
+.info{font-size:14px;margin-top:-8px}
+.info .body{display:flex;flex-direction:column;gap:8px;max-width:65ch}
 .info .tag{font-weight:700;margin:0}
 .info .ov{margin:0;line-height:1.8;letter-spacing:.02em}   /* 長い文章は詰めすぎると読みにくいので、少しだけ空ける */
 .info .lang,.info .cr,.info .src{margin:0;font-size:13px;color:var(--muted)}
@@ -651,13 +654,13 @@ function infoHTML(st,d){
     const rows=[["監督",d.directors.join("、")],["出演",d.cast.join("、")],["製作国",d.countries.map(c=>regionJa?.of(c)||c).join("・")]].filter(r=>r[1]);
     body=`${d.tagline?`<p class="tag">${esc(d.tagline)}</p>`:""}${d.overview?`<p class="ov">${esc(d.overview)}</p>${d.overviewLang==="en"?'<p class="lang">日本語のあらすじが未登録のため、英語のあらすじを表示しています。</p>':""}`:'<p class="lang">あらすじは未登録です。</p>'}${rows.map(r=>`<p class="cr">${r[0]}　${esc(r[1])}</p>`).join("")}<p class="src">情報：<a href="https://www.themoviedb.org/movie/${E(d.id)}?language=ja-JP" target="_blank" rel="noopener">TMDB</a></p>`;
   }else body=`<p class="lang${st==="loading"?" ld":""}">${st==="none"?"この作品の情報は見つかりませんでした。":st==="err"?"作品情報を読み込めませんでした。時間をおいて開き直してください。":"読み込み中…"}</p>`;
-  return `<details class="info" id="info"${infoOpen?" open":""}><summary>あらすじ・キャスト</summary><div class="body">${body}</div></details>`;
+  return `<section class="info" id="info" aria-label="あらすじ・キャスト"${infoOpen?"":" hidden"}><div class="body">${body}</div></section>`;
 }
 function setInfo(st,d){
   const el=$("#info");if(!el)return;
-  if(st==="none"){el.hidden=true;const m=$("#imeta");if(m)m.innerHTML="";return}   // 一致する作品がないときは、中身のない開閉を出さない
+  if(st==="none"){el.hidden=true;const b=$("#itg");if(b)b.hidden=true;const m=$("#imeta");if(m)m.innerHTML="";return}   // 一致する作品がないときは、中身のない開閉を出さない
   const t=document.createElement("div");t.innerHTML=infoHTML(st,d);
-  const n=t.firstElementChild;n.open=el.open;el.replaceWith(n);
+  const n=t.firstElementChild;n.hidden=!infoOpen;el.replaceWith(n);
   // 詳しい情報が届いたら「公開日・上映時間・ジャンル」に差し替える。届かなければ公開年だけを残す
   const m=$("#imeta");
   if(m&&st==="ok")m.innerHTML=`<span class="in">${metaText(d)}</span>`;
@@ -692,7 +695,7 @@ function pickedHTML(movie){
   return `<p class="picked" id="picked"><span>「${esc(picked.q)}」の候補から選びました</span><button type="button" id="rawq" aria-label="入力どおりに検索し直す" title="入力どおりに検索">戻す</button></p>`;
 }
 function nowHTML(q,isExample,movie){
-  return `<header class="now">${isExample==="trend"?'<p class="k">いま話題の作品から表示中<button type="button" class="kl" id="shuffle">ほかの話題作</button></p>':""}<figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="vh">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><div class="mrow"><p class="ex meta" id="imeta"><span class="sk" aria-label="読み込み中"></span></p><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>${isExample&&isExample!=="trend"?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div></header>`;
+  return `<header class="now">${isExample==="trend"?'<p class="k">いま話題の作品から表示中<button type="button" class="kl" id="shuffle">ほかの話題作</button></p>':""}<figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="vh">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><div class="mrow"><p class="ex meta" id="imeta"><span class="sk" aria-label="読み込み中"></span></p><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div><button type="button" class="itg" id="itg" aria-expanded="${infoOpen}" aria-controls="info">あらすじ・キャスト</button>${isExample&&isExample!=="trend"?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div></header>`;
 }
 /* ===== 作品ごとの URL（?q=作品名&id=TMDBの番号）とページタイトル =====
    サーバーの処理なしで動くよう、クエリ文字列で作品を表す。ブックマーク・共有・戻るボタンに対応。
@@ -908,14 +911,17 @@ $("#hist").addEventListener("click",e=>{
   }
   const b=e.target.closest("[data-q]");if(!b)return;setQ();remember(b.dataset.q);render(b.dataset.q);collapseTop()});
 $("#q").addEventListener("focus",()=>$("#q").select());
-$("#out").addEventListener("click",e=>{if(e.target.closest("#share"))share()});
+$("#out").addEventListener("click",e=>{
+  if(e.target.closest("#share"))share();
+  const itg=e.target.closest("#itg");   // 「あらすじ・キャスト」の開閉。開いているかは次の作品でも引き継ぐ
+  if(itg){infoOpen=!infoOpen;store.set("cl_infoOpen",infoOpen);itg.setAttribute("aria-expanded",infoOpen);const p=$("#info");if(p)p.hidden=!infoOpen}});
 // 戻る・進む：保存しておいた状態から描き直す（URL は変えない）
 addEventListener("popstate",e=>{
   const st=e.state;hideSug();
   if(st?.q){navMode="none";setQ();if(!st.movie&&!findMovie(st.q))keepQ=st.q;render(st.q,st.isExample,st.movie);collapseTop()}
   else{const q=new URL(location.href).searchParams.get("q");if(q){navMode="none";setQ();render(q)}else showTrending()}
 });
-$("#out").addEventListener("toggle",e=>{if(e.target.id==="ng")ngOpen=e.target.open;if(e.target.id==="info"){infoOpen=e.target.open;store.set("cl_infoOpen",infoOpen)}},true);
+$("#out").addEventListener("toggle",e=>{if(e.target.id==="ng")ngOpen=e.target.open;},true);
 $("#out").addEventListener("submit",e=>{
   if(e.target.id!=="ngadd")return;e.preventDefault();
   const words=$("#ngin").value.split(/[,、，]/).map(w=>w.normalize("NFKC").trim()).filter(Boolean);
