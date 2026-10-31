@@ -134,7 +134,9 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 /* 右の列：作品名と公開日などは上に、「あらすじ・キャスト」と共有ボタンはポスターの下端にそろえる */
 .now > div{display:flex;flex-direction:column;min-width:0}
 .now .irow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
-.now .irow .itg{padding:2px 0;margin-top:0}
+.now .irow{padding-top:2px}
+.now .irow .itg{padding:2px 0;margin-top:0;font-size:12px}
+.now .irow .itg::before{width:12px;height:12px}
 .now .irow .share{margin:-6px -6px -6px 0}   /* 押せる範囲は32pxのまま、行の高さは文字に合わせる */
 /* 共有は控えめに：枠なし・アイコンだけ・作品欄の右下（押せる範囲は 32px 確保） */
 /* 共有ボタンは公開日の行の右端にだけ置き、作品名の行の幅は削らない */
