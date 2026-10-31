@@ -36,7 +36,7 @@
 *{box-sizing:border-box}
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 /* 和文の字間を詰める（palt）をサイト全体にかける。部分ごとに付けると漏れが出るため */
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.6;font-feature-settings:"palt" 1}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.6;font-feature-settings:"palt" 1;text-autospace:normal}   /* 和文と英数字のあいだに、ブラウザが細い空きを入れる（文中には半角スペースを入れない） */
 button,input{font:inherit;color:inherit;font-feature-settings:inherit}
 button{cursor:pointer}
 [hidden]{display:none!important}
@@ -296,10 +296,10 @@ details[open] > summary::before{transform:rotate(90deg)}
 <header>
   <div class="hd">
     <div class="fold"><div>
-    <div class="brand"><a class="logo" href="./" aria-label="Cinemaladder トップへ"><span class="name"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg>Cinema<span class="lad">ladder</span></span></a><p class="tagline">映画の評判を、はしごする</p></div>
+    <div class="brand"><a class="logo" href="./" aria-label="Cinemaladderトップへ"><span class="name"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg>Cinema<span class="lad">ladder</span></span></a><p class="tagline">映画の評判を、はしごする</p></div>
     </div></div>
     <div class="srow">
-    <a class="mini" href="./" aria-label="Cinemaladder トップへ" tabindex="-1"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg></a>
+    <a class="mini" href="./" aria-label="Cinemaladderトップへ" tabindex="-1"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg></a>
     <search class="sbox search">
       <form id="f" action="./" method="get">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -318,13 +318,13 @@ details[open] > summary::before{transform:rotate(90deg)}
 <p class="envbadge" id="envbadge" hidden aria-hidden="true">STAGING</p>
 <main id="out" class="boot">
   <p class="emptyst">読み込み中…</p>
-  <noscript><p class="emptyst">このサイトを使うには JavaScript を有効にしてください。</p></noscript>
+  <noscript><p class="emptyst">このサイトを使うにはJavaScriptを有効にしてください。</p></noscript>
 </main>
 
 <!-- サイトの説明（JS を使わずに HTML に直接書く。検索エンジンや広告の審査でも読まれる） -->
 <section class="guide" aria-labelledby="gd-h">
-  <h2 id="gd-h">Cinemaladder について</h2>
-  <p>映画の評判を調べるとき、レビューサイトを1つずつ開いて同じ作品名を入れ直すのは手間がかかります。Cinemaladder は、作品名を1回入れるだけで、主なレビューサイト、チケット、SNS、配信サービスの検索結果へ移動できるサイトです。いくつものサイトの評判を順に見て回る「はしご」を、短い手順で済ませるために作りました。</p>
+  <h2 id="gd-h">Cinemaladderについて</h2>
+  <p>映画の評判を調べるとき、レビューサイトを1つずつ開いて同じ作品名を入れ直すのは手間がかかります。Cinemaladderは、作品名を1回入れるだけで、主なレビューサイト、チケット、SNS、配信サービスの検索結果へ移動できるサイトです。いくつものサイトの評判を順に見て回る「はしご」を、短い手順で済ませるために作りました。</p>
 
   <h3>使い方</h3>
   <ol>
@@ -332,13 +332,13 @@ details[open] > summary::before{transform:rotate(90deg)}
     <li>「レビュー」の欄から、開きたいサイトを選びます。どのボタンも、そのサイトでその作品を検索した結果のページにつながります。</li>
     <li>映画館で観るなら「チケット・上映館」から前売券や上映館を、家で観るなら「配信」から各サービスの配信状況を確かめます。</li>
   </ol>
-  <p>調べた作品は「最近」に残り、あとから同じ作品をすぐ開き直せます。作品ごとのページの URL は、共有ボタンで送れます。</p>
+  <p>調べた作品は「最近」に残り、あとから同じ作品をすぐ開き直せます。作品ごとのページのURLは、共有ボタンで送れます。</p>
 
   <h3>サイトごとの評価の違い</h3>
   <p>同じ映画でも、サイトによって点数や感想の傾向が変わることがあります。サイトごとに利用者の層や好み、点数の付け方が違うためと考えられます。</p>
   <p>そのため、1つのサイトの点数だけで決めるより、いくつかのサイトで評価がそろっているか、感想が割れているかを見るほうが、自分に合う作品か判断しやすくなります。</p>
 
-  <h3>レビューと SNS のリンク先</h3>
+  <h3>レビューとSNSのリンク先</h3>
   <dl>
     <dt>Filmarks</dt><dd>映画の感想を記録・投稿するサービスです。評価は5点満点で、短い感想を中心に読めます。</dd>
     <dt>映画.com</dt><dd>作品情報と映画ニュースを掲載するサイトです。利用者のレビューのほか、予告編や上映スケジュールも確認できます。</dd>
@@ -346,17 +346,17 @@ details[open] > summary::before{transform:rotate(90deg)}
     <dt>映画ランド</dt><dd>上映中の作品の評価と、映画館の上映スケジュールを調べられるサイトです。</dd>
     <dt>KINENOTE</dt><dd>映画雑誌「キネマ旬報」の発行元が運営する、映画の鑑賞記録と感想のサービスです。</dd>
     <dt>IMDb</dt><dd>海外の映画データベースです。評価は10点満点で、世界中の利用者が付けています。海外での評判を調べるときに使えます。</dd>
-    <dt>X・Instagram</dt><dd>公開直後の感想を探せます。X は「ネタバレ」などの言葉を含む投稿を除外して検索します。除外する言葉は、作品ページの「X で除外する言葉」で変更できます。</dd>
+    <dt>X・Instagram</dt><dd>公開直後の感想を探せます。Xは「ネタバレ」などの言葉を含む投稿を除外して検索します。除外する言葉は、作品ページの「Xで除外する言葉」で変更できます。</dd>
   </dl>
 
   <h3>ネタバレの避け方</h3>
-  <p>長いレビューや SNS の投稿には、結末に触れたものが含まれることがあります。まだ観ていない作品なら、点数と短い感想から読むと、結末を知る危険を減らせます。Cinemaladder では、あらすじは「あらすじ・キャスト」を開いたときだけ表示されます。</p>
+  <p>長いレビューやSNSの投稿には、結末に触れたものが含まれることがあります。まだ観ていない作品なら、点数と短い感想から読むと、結末を知る危険を減らせます。Cinemaladderでは、あらすじは「あらすじ・キャスト」を開いたときだけ表示されます。</p>
 </section>
 
 <footer>
   <p id="affnote" hidden>当サイトはアフィリエイトプログラムに参加しており、「PR」の付いたリンクから申し込みや購入があると、運営者が紹介料を受け取ることがあります。<span id="amznote" hidden>Amazonのアソシエイトとして、当サイトは適格販売により収入を得ています。</span></p>
   <p class="flinks"><a href="about">運営者情報</a><a href="privacy">プライバシーポリシー</a></p>
-  <p>作品情報とポスター画像は <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> から取得しています。This product uses the <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> API but is not endorsed or certified by TMDB.</p>
+  <p>作品情報とポスター画像は<a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a>から取得しています。This product uses the <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> API but is not endorsed or certified by TMDB.</p>
 </footer>
 
 <script>
@@ -392,7 +392,7 @@ const GROUPS=[
   // IMDb は日本語タイトルだと見つからないことが多いので、TMDB の原題が分かればそちらで検索する。s=tt&ttype=ft は「映画作品だけ」に絞る指定
   {n:"IMDb",ic:"imdb",d:"海外の評価",u:(q,m)=>"https://www.imdb.com/find/?q="+E(m?.original||q)+"&s=tt&ttype=ft"},
   // p=検索語、ei=文字コード。ほかのパラメータ（ai, ts, aq, fr など）は Yahoo の計測用なので不要
-  {n:"Yahoo! 検索",ic:"yahoo",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
+  {n:"Yahoo!検索",ic:"yahoo",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
   {n:"Google",ic:"google",d:"ネットの記事",u:q=>"https://www.google.com/search?q="+E(withEiga(q))+"&hl=ja"},
  ]},
  {h:"チケット・上映館",note:"",items:[
@@ -555,12 +555,12 @@ const TOP_SOURCE="https://www.themoviedb.org/movie/now-playing?language=ja-JP";
 let trendFailed=false;
 function trendHTML(){
   // 閉じた details の中身は隠れるので、リンクは details の外（外枠の右上）に置く
-  const link=`<a class="toplink" href="${TOP_SOURCE}" target="_blank" rel="noopener" aria-label="TMDB の上映中の映画一覧を開く" title="TMDB の上映中の映画一覧"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>`;
-  const head=`<aside class="topwrap" aria-label="いま話題の映画">${link}<details class="top" id="top"${trendOpen?" open":""}><summary>いま話題の映画 TOP10</summary>`;
+  const link=`<a class="toplink" href="${TOP_SOURCE}" target="_blank" rel="noopener" aria-label="TMDBの上映中の映画一覧を開く" title="TMDBの上映中の映画一覧"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>`;
+  const head=`<aside class="topwrap" aria-label="いま話題の映画">${link}<details class="top" id="top"${trendOpen?" open":""}><summary>いま話題の映画TOP10</summary>`;
   // 読み込み前も同じ高さの仮の行を出しておき、届いたときに下の内容がずれないようにする
   if(!trendList?.length)return head+(trendFailed?'<ol><li class="msg">読み込めませんでした。時間をおいて開き直してください。</li></ol></details></aside>':`<ol aria-busy="true">${'<li><div class="sk"><span class="rk"></span><span class="noimg"></span><span><i></i><i></i></span></div></li>'.repeat(10)}</ol></details></aside>`);
   return head+`<ol>${trendList.map((m,i)=>
-    `<li><button type="button" data-tid="${m.id}"${cur&&cur[0]===m.title?' class="on" aria-current="true"':""}><span class="rk">${i+1}</span>${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="32" height="48">`:'<span class="noimg"></span>'}<span style="min-width:0"><span class="tt">${esc(m.title)}</span><small>${isUpcoming(m.date)?`公開予定 ${+m.date.slice(5,7)}月${+m.date.slice(8,10)}日`:"上映中"}</small></span></button></li>`).join("")}</ol></details></aside>`;
+    `<li><button type="button" data-tid="${m.id}"${cur&&cur[0]===m.title?' class="on" aria-current="true"':""}><span class="rk">${i+1}</span>${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="32" height="48">`:'<span class="noimg"></span>'}<span style="min-width:0"><span class="tt">${esc(m.title)}</span><small>${isUpcoming(m.date)?`公開予定${+m.date.slice(5,7)}月${+m.date.slice(8,10)}日`:"上映中"}</small></span></button></li>`).join("")}</ol></details></aside>`;
 }
 
 function showSug(html){const s=$("#sug");s.innerHTML=html;s.hidden=!html;$("#q").setAttribute("aria-expanded",String(!!html));if(html)fitSug()}
@@ -588,7 +588,7 @@ function onType(){
       const r=await searchTMDB(q);
       if(clean($("#q").value)!==q)return;
       items=r;active=-1;
-      r.length?drawSug():showSug('<li class="msg">候補にありません。Enter でそのまま検索できます。</li>');
+      r.length?drawSug():showSug('<li class="msg">候補にありません。Enterでそのまま検索できます。</li>');
     }catch(e){
       if(e.name==="AbortError")return;
       items=[];
@@ -688,7 +688,7 @@ function pickedHTML(movie){
   return `<p class="picked" id="picked"><span>「${esc(picked.q)}」の候補から選びました</span><button type="button" id="rawq" aria-label="入力どおりに検索し直す" title="入力どおりに検索">戻す</button></p>`;
 }
 function nowHTML(q,isExample,movie){
-  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><div class="mrow"><p class="ex meta" id="imeta"><span class="sk" aria-label="読み込み中"></span></p><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>${isExample==="trend"?'<p class="ex">日本で上映中・公開予定の作品のうち、TMDB の人気度で上位10本から1本を選んで表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div></header>`;
+  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><div class="mrow"><p class="ex meta" id="imeta"><span class="sk" aria-label="読み込み中"></span></p><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>${isExample==="trend"?'<p class="ex">日本で上映中・公開予定の作品のうち、TMDBの人気度で上位10本から1本を選んで表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div></header>`;
 }
 /* ===== 作品ごとの URL（?q=作品名&id=TMDBの番号）とページタイトル =====
    サーバーの処理なしで動くよう、クエリ文字列で作品を表す。ブックマーク・共有・戻るボタンに対応。
@@ -702,7 +702,7 @@ function urlFor(q,movie){
 }
 const DESC=document.querySelector('meta[name="description"]').content;
 function setMeta(q,isExample){
-  const desc=q&&!isExample?`「${q}」について、Filmarks、映画.com、Yahoo! など各サイトの検索結果へ移動できます。チケット、SNS、配信サービスの検索結果も開けます。`:DESC;
+  const desc=q&&!isExample?`「${q}」について、Filmarks、映画.com、Yahoo!など各サイトの検索結果へ移動できます。チケット、SNS、配信サービスの検索結果も開けます。`:DESC;
   document.querySelector('meta[name="description"]').content=desc;
   document.querySelector('meta[property="og:description"]').content=desc;
   document.querySelector('meta[property="og:title"]').content=document.title;
@@ -765,7 +765,7 @@ function fillMovie(m){
 /* X の除外語の編集パネル（チップの × で削除、入力欄で追加） */
 let ngOpen=false;
 function ngHTML(){
-  return `<details class="ng" id="ng"${ngOpen?" open":""}><summary>X で除外する言葉 <span class="cnt">${ngWords.length}語</span></summary>
+  return `<details class="ng" id="ng"${ngOpen?" open":""}><summary>Xで除外する言葉 <span class="cnt">${ngWords.length}語</span></summary>
   <div class="ngbody">${ngWords.length?`<ul class="chips" aria-label="除外する言葉">${ngWords.map(w=>`<li class="chip">${esc(w)}<button type="button" data-ngdel="${esc(w)}" aria-label="「${esc(w)}」を除外しない">×</button></li>`).join("")}</ul>`:'<p class="ngnone">除外する言葉はありません</p>'}
   <form class="ngadd" id="ngadd"><input id="ngin" type="text" maxlength="20" placeholder="言葉を追加（例：泣ける）" autocomplete="off" enterkeyhint="done" aria-label="除外する言葉"><button type="submit">追加</button></form>
   <button type="button" class="ngreset" id="ngreset">初期設定に戻す</button></div></details>`;
