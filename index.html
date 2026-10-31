@@ -815,6 +815,7 @@ function render(q,isExample,movie){
   if(movie&&hist.includes(q))saveMeta(q,movie);
   const changed=!cur||cur[0]!==q;   // 作品が変わったときだけ切り替えのアニメーションを付ける
   cur=[q,isExample,movie];
+  store.set("cl_last",isExample?"":q);   // 次に開いたとき、同じ作品を出すかどうかの判断に使う
   syncNav(q,isExample,movie);
   setLD(null);
   let h=trendHTML()+`<article class="movie" aria-labelledby="mt">`+nowHTML(q,isExample,movie)+pickedHTML(movie)+infoHTML("loading");
@@ -884,15 +885,22 @@ function searchRaw(q){
   if(findMovie(q))setQ();else{$("#q").value=q;keepQ=q}   // 一致する作品が手元にあれば空に、なければ結果を待つ
   render(q);collapseTop();$("#q").blur()}
 $("#clr").onclick=()=>{setQ();hideSug();$("#q").focus()};   // 入力欄だけ空にして、画面はそのまま
+/* 表示中の作品を履歴から消したら、URL をトップに戻す。
+   画面はそのままにし、次に開き直したとき（リロード）は話題作からランダムに選ぶ */
+function forgetShown(){
+  if(!cur||cur[1]||hist.includes(cur[0]))return;
+  try{history.replaceState(null,"",location.pathname)}catch(e){}
+  document.title=TOP_TITLE;setMeta("",false);
+}
 $("#hist").addEventListener("click",e=>{
   const x=e.target.closest("[data-del]");
-  if(x){hist=hist.filter(h=>h!==x.dataset.del);saveHist();return}
+  if(x){hist=hist.filter(h=>h!==x.dataset.del);saveHist();forgetShown();return}
   const all=e.target.closest("#delall");
   if(all){   // 誤タップ防止：1回目で確認表示、3秒以内にもう1回押すと削除
     if(all.classList.contains("warn")){
       clearTimeout(delTimer);toast("履歴を削除しました");
       const h=$("#hist");h.classList.add("out");   // ふわっと消してから空にする
-      setTimeout(()=>{hist=[];saveHist();h.classList.remove("out")},reduceMotion.matches?0:250);return;
+      setTimeout(()=>{hist=[];saveHist();forgetShown();h.classList.remove("out")},reduceMotion.matches?0:250);return;
     }
     // ボタン自体は短い表示にし、説明は画面下のお知らせで出す（狭い画面でも見切れないように）
     all.classList.add("warn");toast("もう一度押すと履歴をすべて消します");
@@ -948,13 +956,15 @@ addEventListener("scroll",()=>{
 $("#affnote").hidden=!(AFF.amazonTag||AFF.unext||AFF.mvtk);$("#amznote").hidden=!AFF.amazonTag;
 $("#envbadge").hidden=/^(www\.)?cinemaladder\.com$/.test(location.hostname);
 renderHist();
+// 前回最後に見ていた作品。履歴から消されていたら、話題作からランダムに選ぶ（記録がない古い利用者は履歴の先頭）
+function lastShown(){const l=store.get("cl_last",null);return l==null?hist[0]:hist.includes(l)?l:null}
 const startQ=(()=>{try{return clean(new URL(location.href).searchParams.get("q")||"")}catch(e){return ""}})();
 if(startQ){   // 共有・ブックマークされた URL から開いたとき
   const id=+new URL(location.href).searchParams.get("id")||0;
   setQ();if(findMovie(startQ))remember(startQ);else keepQ=startQ;navMode="replace";   // 一致しない作品の URL なら、分かった時点で文字を戻す
   render(startQ,false,id&&meta[startQ]?.id===id?meta[startQ]:null);
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}
-else if(hist[0]){setQ();navMode="none";render(hist[0]);
+else if(lastShown()){setQ();navMode="none";render(lastShown());
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}   // TOP10リストだけ後から差し替える（画面全体は描き直さない）
 else{$("#out").innerHTML='<p class="emptyst">いま話題の映画を読み込み中…</p>';showTrending()}
 </script>
