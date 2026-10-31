@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Cinemaladder</title>
+<title>Cinemaladder - 映画の評判を、はしごする</title>
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -16,13 +16,13 @@
 <link rel="preload" href="data/trending.json" as="fetch" crossorigin>
 <!-- Google AdSense（サイト運営者ID：ca-pub-9484498289210970） -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9484498289210970" crossorigin="anonymous"></script>
-<meta name="description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
+<meta name="description" content="作品名を1回入れるだけで、映画のレビューサイト、チケット、SNS、配信サービスの検索結果へ移動できます。">
 <link rel="canonical" href="https://cinemaladder.com/">
 <meta property="og:url" content="https://cinemaladder.com/">
 <meta property="og:site_name" content="Cinemaladder">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Cinemaladder">
-<meta property="og:description" content="作品名を1回入れるだけで、映画のレビューサイト・チケット・SNS・配信をまとめて見られます。">
+<meta property="og:title" content="Cinemaladder - 映画の評判を、はしごする">
+<meta property="og:description" content="作品名を1回入れるだけで、映画のレビューサイト、チケット、SNS、配信サービスの検索結果へ移動できます。">
 <style>
 :root{
   --bg:#F4F4F7;--surface:#FFFFFF;--fg:#17171C;--muted:#5E5E6B;--line:#E1E1E8;
@@ -36,7 +36,7 @@
 *{box-sizing:border-box}
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 /* 和文の字間を詰める（palt）をサイト全体にかける。部分ごとに付けると漏れが出るため */
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.6;font-feature-settings:"palt" 1}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.6;font-feature-settings:"palt" 1;text-autospace:normal}   /* 和文と英数字のあいだに、ブラウザが細い空きを入れる（文中には半角スペースを入れない） */
 button,input{font:inherit;color:inherit;font-feature-settings:inherit}
 button{cursor:pointer}
 [hidden]{display:none!important}
@@ -129,19 +129,25 @@ main.boot{min-height:100vh}   /* 最初の表示までフッターを画面の�
 main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 24px;
   display:flex;flex-direction:column;gap:18px}
 .movie{display:flex;flex-direction:column;gap:18px}
-.now{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center}
+.now{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:stretch}
+.now .ph{align-self:start}   /* ポスターは上にそろえる（作品名が1行なら文字の列と同じ高さなので、上下ともそろう） */
+/* 右の列：作品名と公開日などは上に、「あらすじ・キャスト」と共有ボタンはポスターの下端にそろえる */
+.now > div{display:flex;flex-direction:column;min-width:0}
+.now .irow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+.now .irow{padding-top:2px}
+.now .irow .itg{padding:2px 0;margin-top:0;font-size:12px}
+.now .irow .itg::before{width:12px;height:12px}
+.now .irow .share{margin:-6px -6px -6px 0}   /* 押せる範囲は32pxのまま、行の高さは文字に合わせる */
 /* 共有は控えめに：枠なし・アイコンだけ・作品欄の右下（押せる範囲は 32px 確保） */
 /* 共有ボタンは公開日の行の右端にだけ置き、作品名の行の幅は削らない */
-.now .mrow{display:flex;align-items:flex-end;gap:8px}
-.now .mrow .meta{flex:1;min-width:0}
-.now .meta .w{display:inline-block}
+.now .meta .w{display:inline}
 /* 読み込み中は、行の形をした薄い棒（スケルトン）をゆっくり明滅させ、届いたら文字をふわっと出す */
 .now .meta .sk{display:block;width:72%;max-width:260px;height:.9em;margin-top:.35em;border-radius:5px;background:var(--sk);animation:skp 1.1s ease-in-out infinite}
 @keyframes skp{50%{opacity:.45}}
 .now .meta .in{display:inline;animation:fadein .35s ease both}
 @keyframes fadein{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.now .meta .sk,.now .meta .in{animation:none}}
-.share{flex:none;display:grid;place-items:center;width:32px;height:32px;margin:0 -6px -6px 0;border:0;background:transparent;color:var(--muted);border-radius:8px;padding:0}
+.share{flex:none;display:grid;place-items:center;width:32px;height:32px;margin:0 -6px 0 0;border:0;background:transparent;color:var(--muted);border-radius:8px;padding:0}
 .share:hover{color:var(--accent);background:var(--accent-soft)}
 .share svg{width:17px;height:17px}
 /* 本番（cinemaladder.com）以外で開いたときだけ右下に薄く出す目印 */
@@ -152,13 +158,17 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
   transition:opacity .45s ease,transform .45s ease}
 .toast.on{opacity:1;transform:translate(-50%,0);transition:opacity .35s ease,transform .35s ease}
 @media (prefers-reduced-motion:reduce){.toast,.toast.on{transition:none}}
-/* ポスター枠は画像の有無にかかわらず常に 64×96 を確保し、読み込み後にずれないようにする */
-.now .ph{position:relative;width:64px;height:96px;flex:none;border-radius:6px;overflow:hidden;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--line)}
+/* ポスター枠は画像の有無にかかわらず常に 54×80 を確保し、読み込み後にずれないようにする */
+.now .ph{position:relative;width:54px;height:80px;flex:none;border-radius:6px;overflow:hidden;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--line)}
 .now .ph svg{width:24px;height:24px}
 .now .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
 .now .ph img.ok{opacity:1}
 .now .k{font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:700}
-.now h1{margin:0;font-size:clamp(20px,5.6vw,24px);line-height:1.3;text-wrap:balance;word-break:auto-phrase;overflow-wrap:anywhere}
+/* 話題作を表示しているときだけ、ポスターと見出しの上に横いっぱいで出す1行（ふだんの「検索中の作品」は画面には出さない） */
+.now > .k{grid-column:1/-1;margin:0 0 -6px}
+.now .k .kl{border:0;background:none;padding:0;margin-left:10px;font:inherit;letter-spacing:.04em;font-weight:400;color:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.now .k .kl:hover{color:var(--accent)}
+.now h1{margin:0 0 1px;font-size:clamp(22px,6.4vw,26px);line-height:1.2;text-wrap:balance;word-break:auto-phrase;overflow-wrap:anywhere}
 /* 区切りで改行すると3行以上になる長い作品名は、普通の折り返しに切り替えて詰めて並べる（最後の行が1〜2文字だけにならないよう pretty） */
 .now h1.long{text-wrap:pretty;word-break:normal}
 /* 作品名は語のまとまりごとに改行する（「ディスクロー／ジャー」のように語の途中で切れないように）。
@@ -167,11 +177,16 @@ main{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-lef
 /* 作品情報（あらすじなど）。最初はたたんでおき、ネタバレを避けたい人は開かなくて済むようにする */
 /* 作品情報：枠を付けず、本文に直接のせる（TOP10 の箱と見分けがつくように）
    公開日・上映時間・ジャンルは見出しの中に常に1行で出し、あらすじとキャストは文字のリンクで開く */
-.now .meta{display:block;min-height:1.6em}   /* 情報が届く前から1行分の高さを確保し、ずれを防ぐ */
-details.info{background:none;border:0;border-radius:0;padding:0;font-size:14px;margin-top:-6px}
-.info summary{display:inline-flex;gap:6px;color:var(--accent);font-size:13px;font-weight:700;padding:4px 0}
-.info summary::before{width:13px;height:13px}
-.info .body{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:65ch}
+.now .meta{display:block;min-height:1.6em;white-space:nowrap;overflow-x:auto;scrollbar-width:none}   /* 1行に固定し、入りきらないときは横にスクロール（履歴の一覧と同じ） */
+.now .meta::-webkit-scrollbar{display:none}
+.now .meta.more{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);padding-right:20px}   /* 続きがあるときだけ右端を薄くする */   /* 情報が届く前から1行分の高さを確保し、ずれを防ぐ */
+/* 「あらすじ・キャスト」の開閉ボタンは作品名の下（右の列）に置き、中身は見出しの下に横いっぱいで出す */
+.itg{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:4px 0;margin-top:2px;color:var(--accent);font-size:13px;font-weight:700;cursor:pointer}
+.itg::before{content:"";width:13px;height:13px;flex:none;background:currentColor;-webkit-mask:var(--chev) center/contain no-repeat;mask:var(--chev) center/contain no-repeat;transition:transform .2s ease}
+.itg[aria-expanded="true"]::before{transform:rotate(90deg)}
+@media (prefers-reduced-motion:reduce){.itg::before{transition:none}}
+.info{font-size:14px;margin-top:-8px}
+.info .body{display:flex;flex-direction:column;gap:8px;max-width:65ch}
 .info .tag{font-weight:700;margin:0}
 .info .ov{margin:0;line-height:1.8;letter-spacing:.02em}   /* 長い文章は詰めすぎると読みにくいので、少しだけ空ける */
 .info .lang,.info .cr,.info .src{margin:0;font-size:13px;color:var(--muted)}
@@ -233,6 +248,16 @@ a.go .d{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;tex
 .ad{background:var(--ad);border:1px dashed var(--line);border-radius:12px;padding:14px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:80px}
 .ad .adl{font-size:10px;font-weight:700;letter-spacing:.14em}
 
+/* サイトの説明（ページの下） */
+.guide{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 16px;border-top:1px solid var(--line);font-size:14px;line-height:1.85;color:var(--fg)}
+.guide h2{margin:0 0 8px;font-size:17px}
+.guide h3{margin:24px 0 6px;font-size:15px}
+.guide p{margin:0 0 10px}
+.guide ol{margin:0 0 10px;padding-left:1.4em;list-style:decimal}
+.guide li{margin-bottom:4px}
+.guide dl{margin:0;display:grid;gap:10px}
+.guide dt{font-weight:700}
+.guide dd{margin:0;color:var(--muted)}
 body > footer a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 body > footer a:hover{color:var(--accent)}
 .flinks{display:flex;gap:16px;flex-wrap:wrap}
@@ -286,10 +311,10 @@ details[open] > summary::before{transform:rotate(90deg)}
 <header>
   <div class="hd">
     <div class="fold"><div>
-    <div class="brand"><a class="logo" href="./" aria-label="Cinemaladder トップへ"><span class="name"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg>Cinema<span class="lad">ladder</span></span></a><p class="tagline">映画の評判を、はしごする</p></div>
+    <div class="brand"><a class="logo" href="./" aria-label="Cinemaladderトップへ"><span class="name"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg>Cinema<span class="lad">ladder</span></span></a><p class="tagline">映画の評判を、はしごする</p></div>
     </div></div>
     <div class="srow">
-    <a class="mini" href="./" aria-label="Cinemaladder トップへ" tabindex="-1"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg></a>
+    <a class="mini" href="./" aria-label="Cinemaladderトップへ" tabindex="-1"><svg class="mark" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#141418"/><path d="M22 9.2A9 9 0 1 0 22 22.8" fill="none" stroke="#FFFFFF" stroke-width="4.2"/><rect x="21.5" y="6" width="3.6" height="20" fill="#E8607A"/></svg></a>
     <search class="sbox search">
       <form id="f" action="./" method="get">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -308,13 +333,45 @@ details[open] > summary::before{transform:rotate(90deg)}
 <p class="envbadge" id="envbadge" hidden aria-hidden="true">STAGING</p>
 <main id="out" class="boot">
   <p class="emptyst">読み込み中…</p>
-  <noscript><p class="emptyst">このサイトを使うには JavaScript を有効にしてください。</p></noscript>
+  <noscript><p class="emptyst">このサイトを使うにはJavaScriptを有効にしてください。</p></noscript>
 </main>
+
+<!-- サイトの説明（JS を使わずに HTML に直接書く。検索エンジンや広告の審査でも読まれる） -->
+<section class="guide" aria-labelledby="gd-h">
+  <h2 id="gd-h">Cinemaladderについて</h2>
+  <p>映画の評判を調べるとき、レビューサイトを1つずつ開いて同じ作品名を入れ直すのは手間がかかります。Cinemaladderは、作品名を1回入れるだけで、主なレビューサイト、チケット、SNS、配信サービスの検索結果へ移動できるサイトです。いくつものサイトの評判を順に見て回る「はしご」を、短い手順で済ませるために作りました。</p>
+
+  <h3>使い方</h3>
+  <ol>
+    <li>上の検索欄に作品名を入れます。途中まで入れると候補が出ます。候補を選ぶと、ポスター、公開日、上映時間、ジャンルが表示されます。あらすじとキャストは「あらすじ・キャスト」を開くと読めます。</li>
+    <li>「レビュー」の欄から、開きたいサイトを選びます。どのボタンも、そのサイトでその作品を検索した結果のページにつながります。</li>
+    <li>映画館で観るなら「チケット・上映館」から前売券や上映館を、家で観るなら「配信」から各サービスの配信状況を確かめます。</li>
+  </ol>
+  <p>調べた作品は「最近」に残り、あとから同じ作品をすぐ開き直せます。作品ごとのページのURLは、共有ボタンで送れます。</p>
+
+  <h3>サイトごとの評価の違い</h3>
+  <p>同じ映画でも、サイトによって点数や感想の傾向が変わることがあります。サイトごとに利用者の層や好み、点数の付け方が違うためと考えられます。</p>
+  <p>そのため、1つのサイトの点数だけで決めるより、いくつかのサイトで評価がそろっているか、感想が割れているかを見るほうが、自分に合う作品か判断しやすくなります。</p>
+
+  <h3>レビューとSNSのリンク先</h3>
+  <dl>
+    <dt>Filmarks</dt><dd>映画の感想を記録・投稿するサービスです。評価は5点満点で、短い感想を中心に読めます。</dd>
+    <dt>映画.com</dt><dd>作品情報と映画ニュースを掲載するサイトです。利用者のレビューのほか、予告編や上映スケジュールも確認できます。</dd>
+    <dt>Movie Walker</dt><dd>映画ニュースや特集記事を中心にしたサイトです。利用者のレビューも読めます。</dd>
+    <dt>映画ランド</dt><dd>上映中の作品の評価と、映画館の上映スケジュールを調べられるサイトです。</dd>
+    <dt>KINENOTE</dt><dd>映画雑誌「キネマ旬報」の発行元が運営する、映画の鑑賞記録と感想のサービスです。</dd>
+    <dt>IMDb</dt><dd>海外の映画データベースです。評価は10点満点で、世界中の利用者が付けています。海外での評判を調べるときに使えます。</dd>
+    <dt>X・Instagram</dt><dd>公開直後の感想を探せます。Xは「ネタバレ」などの言葉を含む投稿を除外して検索します。除外する言葉は、作品ページの「Xで除外する言葉」で変更できます。</dd>
+  </dl>
+
+  <h3>ネタバレの避け方</h3>
+  <p>長いレビューやSNSの投稿には、結末に触れたものが含まれることがあります。まだ観ていない作品なら、点数と短い感想から読むと、結末を知る危険を減らせます。Cinemaladderでは、あらすじは「あらすじ・キャスト」を開いたときだけ表示されます。</p>
+</section>
 
 <footer>
   <p id="affnote" hidden>当サイトはアフィリエイトプログラムに参加しており、「PR」の付いたリンクから申し込みや購入があると、運営者が紹介料を受け取ることがあります。<span id="amznote" hidden>Amazonのアソシエイトとして、当サイトは適格販売により収入を得ています。</span></p>
   <p class="flinks"><a href="about">運営者情報</a><a href="privacy">プライバシーポリシー</a></p>
-  <p>作品情報とポスター画像は <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> から取得しています。This product uses the <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> API but is not endorsed or certified by TMDB.</p>
+  <p>作品情報とポスター画像は<a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a>から取得しています。This product uses the <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a> API but is not endorsed or certified by TMDB.</p>
 </footer>
 
 <script>
@@ -342,15 +399,15 @@ const IMG = "https://image.tmdb.org/t/p/w92";
 const E=encodeURIComponent;
 const GROUPS=[
  {h:"レビュー",note:"星とレビューを見る",items:[
-  {n:"Filmarks",ic:"filmarks",d:"レビュー数が多い",u:q=>"https://filmarks.com/search/movies?q="+E(q)},
+  {n:"Filmarks",ic:"filmarks",d:"評価・感想",u:q=>"https://filmarks.com/search/movies?q="+E(q)},
   {n:"映画.com",ic:"eiga",d:"評価・作品情報",u:q=>"https://eiga.com/search/"+E(q)+"/"},
   {n:"Movie Walker",ic:"moviewalker",d:"評価・ニュース",u:q=>"https://press.moviewalker.jp/search/free_search.cgi?keyword="+E(q)},
   {n:"映画ランド",ic:"eigaland",d:"評価・上映情報",u:q=>"https://eigaland.com/movie?sort=openDate&q="+E(q)},
-  {n:"KINENOTE",ic:"kinenote",d:"キネマ旬報の評価",u:q=>"https://www.kinenote.com/sp/public/cinema/search_result.aspx?key="+E(q)},
+  {n:"KINENOTE",ic:"kinenote",d:"評価・鑑賞記録",u:q=>"https://www.kinenote.com/sp/public/cinema/search_result.aspx?key="+E(q)},
   // IMDb は日本語タイトルだと見つからないことが多いので、TMDB の原題が分かればそちらで検索する。s=tt&ttype=ft は「映画作品だけ」に絞る指定
   {n:"IMDb",ic:"imdb",d:"海外の評価",u:(q,m)=>"https://www.imdb.com/find/?q="+E(m?.original||q)+"&s=tt&ttype=ft"},
   // p=検索語、ei=文字コード。ほかのパラメータ（ai, ts, aq, fr など）は Yahoo の計測用なので不要
-  {n:"Yahoo! 検索",ic:"yahoo",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
+  {n:"Yahoo!検索",ic:"yahoo",d:"評価・口コミ・記事",u:q=>"https://search.yahoo.co.jp/search?p="+E(withEiga(q))+"&ei=UTF-8"},
   {n:"Google",ic:"google",d:"ネットの記事",u:q=>"https://www.google.com/search?q="+E(withEiga(q))+"&hl=ja"},
  ]},
  {h:"チケット・上映館",note:"",items:[
@@ -421,20 +478,18 @@ const norm=s=>(s||"").normalize("NFKC").toLowerCase()
 function loadTitles(){
   if(titles)return Promise.resolve(titles);
   return titlesLoading??=fetch("data/titles.json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(j=>{
-    titles=j.items.map(([id,title,year,poster,original])=>({id,title,date:year,poster,original:original||title,k:norm(title),ko:original?norm(original):""}));
+    titles=j.items.map(([id,title,year,poster,original,votes,pop])=>({id,title,date:year,poster,original:original||title,votes:votes||0,pop:pop||0,k:norm(title),ko:original?norm(original):""}));
     return titles;
   }).catch(e=>{titlesLoading=null;throw e});
 }
 async function searchLocal(q){
   const list=await loadTitles(),k=norm(q);
   if(!k)return [];
-  const head=[],mid=[];   // 前方一致を先に、部分一致を後に（どちらも人気順）
+  const hits=[];   // 前方一致・部分一致をまとめて拾い、並べ替えは searchTMDB でまとめて行う
   for(const m of list){
-    if(m.k.startsWith(k)||m.ko.startsWith(k))head.push(m);
-    else if(m.k.includes(k)||m.ko.includes(k))mid.push(m);
-    if(head.length>=8)break;
+    if(m.k.includes(k)||m.ko.includes(k))hits.push(m);
   }
-  return head.concat(mid).slice(0,8);
+  return hits;
 }
 
 /* 入力中の候補：TMDB の検索（書いた文字の通りに探す）と、作品一覧からの検索（「・」「ー」や全角半角、
@@ -454,11 +509,15 @@ async function searchTMDB(q){
     .catch(e=>{if(e.name==="AbortError")throw e;return []});   // 中継が使えなくても作品一覧の候補は出す
   const local=searchLocal(q).catch(()=>[]);
   const [r,l]=await Promise.all([remote,local]);
-  // 並べ方：入力と（記号を無視して）完全一致 → 先頭が一致 → 途中に含む → その他。同じ順位なら TMDB、作品一覧（人気順）の順
-  const rank=m=>rankOf(q,m);
-  const seen=new Set(),all=[];
-  for(const m of [...r,...l]){if(seen.has(m.id))continue;seen.add(m.id);all.push(m)}
-  const res=all.map((m,i)=>[rank(m),i,m]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).map(x=>x[2]).slice(0,8);
+  // 並べ方：入力と完全一致した作品をいちばん上に。それ以外は「有名な順」（評価数と人気度）。
+  // 先頭が一致する作品は少しだけ上げ、文字が含まれない作品（原題での一致など）は少し下げる
+  const byId=new Map();
+  for(const m of [...r,...l]){const o=byId.get(m.id);if(!o)byId.set(m.id,m);else if(!o.votes&&m.votes)byId.set(m.id,{...o,votes:m.votes,pop:m.pop,date:o.date||m.date})}
+  // 公開から3か月以内か、1か月以内に公開予定の作品（いま映画館で観られる・もうすぐ観られる作品）は少し上げる
+  const now=Date.now(),D=864e5;
+  const fresh=m=>{const t=/^\d{4}-\d{2}-\d{2}/.test(m.date||"")?Date.parse(m.date):NaN;return t>=now-90*D&&t<=now+30*D};
+  const score=m=>{const rk=rankOf(q,m);return Math.log10((m.votes||0)+1)+Math.log10((m.pop||0)+1)+(rk===0?99:rk===1?.5:rk===3?-1:0)+(fresh(m)?1:0)};
+  const res=[...byId.values()].map((m,i)=>[score(m),i,m]).sort((a,b)=>b[0]-a[0]||a[1]-b[1]).map(x=>x[2]).slice(0,8);
   cache.set(q,res);return res;
 }
 /* ===== 話題作TOP10（日本で上映中＋公開予定を人気順に） ===== */
@@ -511,12 +570,12 @@ const TOP_SOURCE="https://www.themoviedb.org/movie/now-playing?language=ja-JP";
 let trendFailed=false;
 function trendHTML(){
   // 閉じた details の中身は隠れるので、リンクは details の外（外枠の右上）に置く
-  const link=`<a class="toplink" href="${TOP_SOURCE}" target="_blank" rel="noopener" aria-label="TMDB の上映中の映画一覧を開く" title="TMDB の上映中の映画一覧"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>`;
-  const head=`<aside class="topwrap" aria-label="いま話題の映画">${link}<details class="top" id="top"${trendOpen?" open":""}><summary>いま話題の映画 TOP10</summary>`;
+  const link=`<a class="toplink" href="${TOP_SOURCE}" target="_blank" rel="noopener" aria-label="TMDBの上映中の映画一覧を開く" title="TMDBの上映中の映画一覧"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>`;
+  const head=`<aside class="topwrap" aria-label="いま話題の映画">${link}<details class="top" id="top"${trendOpen?" open":""}><summary>いま話題の映画TOP10</summary>`;
   // 読み込み前も同じ高さの仮の行を出しておき、届いたときに下の内容がずれないようにする
   if(!trendList?.length)return head+(trendFailed?'<ol><li class="msg">読み込めませんでした。時間をおいて開き直してください。</li></ol></details></aside>':`<ol aria-busy="true">${'<li><div class="sk"><span class="rk"></span><span class="noimg"></span><span><i></i><i></i></span></div></li>'.repeat(10)}</ol></details></aside>`);
   return head+`<ol>${trendList.map((m,i)=>
-    `<li><button type="button" data-tid="${m.id}"${cur&&cur[0]===m.title?' class="on" aria-current="true"':""}><span class="rk">${i+1}</span>${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="32" height="48">`:'<span class="noimg"></span>'}<span style="min-width:0"><span class="tt">${esc(m.title)}</span><small>${isUpcoming(m.date)?`公開予定 ${+m.date.slice(5,7)}月${+m.date.slice(8,10)}日`:"上映中"}</small></span></button></li>`).join("")}</ol></details></aside>`;
+    `<li><button type="button" data-tid="${m.id}"${cur&&cur[0]===m.title?' class="on" aria-current="true"':""}><span class="rk">${i+1}</span>${m.poster?`<img src="${IMG}${esc(m.poster)}" alt="" loading="lazy" width="32" height="48">`:'<span class="noimg"></span>'}<span style="min-width:0"><span class="tt">${esc(m.title)}</span><small>${isUpcoming(m.date)?`公開予定${+m.date.slice(5,7)}月${+m.date.slice(8,10)}日`:"上映中"}</small></span></button></li>`).join("")}</ol></details></aside>`;
 }
 
 function showSug(html){const s=$("#sug");s.innerHTML=html;s.hidden=!html;$("#q").setAttribute("aria-expanded",String(!!html));if(html)fitSug()}
@@ -544,11 +603,11 @@ function onType(){
       const r=await searchTMDB(q);
       if(clean($("#q").value)!==q)return;
       items=r;active=-1;
-      r.length?drawSug():showSug('<li class="msg">候補にありません。Enter でそのまま検索できます。</li>');
+      r.length?drawSug():showSug('<li class="msg">候補にありません。Enterでそのまま検索できます。</li>');
     }catch(e){
       if(e.name==="AbortError")return;
       items=[];
-      showSug('<li class="msg">候補を取得できませんでした。そのまま検索はできます。</li>');
+      showSug('<li class="msg">候補を取得できませんでした。そのまま検索できます。</li>');
     }
   },250);
 }
@@ -560,7 +619,8 @@ function renderHist(){$("#hist").hidden=!hist.length;$("#hist").innerHTML=hist.l
 function saveHist(){store.set("cl_hist",hist);renderHist()}
 let delTimer=null;
 let cur=null;
-function renderEmpty(){cur=null;document.title="Cinemaladder";setMeta("",false);$("#out").classList.remove("boot");$("#out").innerHTML='<section class="emptyst"><h1>観たい映画の名前を入れてください</h1><p>レビュー、チケット、SNS、配信の検索結果へまとめて飛べます。</p></section>'}
+const TOP_TITLE="Cinemaladder - 映画の評判を、はしごする";   // トップの URL のときのタブの題名
+function renderEmpty(){cur=null;document.title=TOP_TITLE;setMeta("",false);$("#out").classList.remove("boot");$("#out").innerHTML='<section class="emptyst"><h1>観たい映画の名前を入れてください</h1><p>レビューサイト、チケット、SNS、配信サービスの検索結果へ移動できます。</p></section>'}
 /* 作品名から TMDB の情報を、手元にない場合に取りに行く。
    1. 作品一覧（data/titles.json） 2. 中継サーバーで検索し、タイトルが完全に一致したもの */
 async function lookupMovie(q){
@@ -590,10 +650,10 @@ function loadInfo(id){
 const regionJa=typeof Intl!=="undefined"&&Intl.DisplayNames?new Intl.DisplayNames(["ja"],{type:"region"}):null;
 const ymd=d=>d?`${+d.slice(0,4)}年${+d.slice(5,7)}月${+d.slice(8,10)}日`:"";
 // 見出しの中に出す1行：公開日・上映時間・ジャンル（ネタバレにならないので常に表示）
+const GENRE_SHORT={"サイエンスフィクション":"SF","アニメーション":"アニメ","ドキュメンタリー":"ドキュメンタリー"};   // 長いジャンル名を短く（1行に収めるため）
 function metaText(d){
   const date=d.jpDate||d.date;
-  // 項目ごとに <span class="w"> で包み、「ド／ラマ」のように語の途中で改行しないようにする
-  const items=[date?ymd(date)+"公開":"",d.runtime?`${d.runtime}分`:"",...d.genres.slice(0,2)].filter(Boolean);   // ジャンルは2つまで（長い名前で行が増えすぎないように）
+  const items=[date?ymd(date)+"公開":"",d.runtime?`${d.runtime}分`:"",...d.genres.slice(0,2).map(g=>GENRE_SHORT[g]||g)].filter(Boolean);   // ジャンルは2つまで
   return items.map((x,i)=>`<span class="w">${esc(x)}${i<items.length-1?(i>=2?"／":"・"):""}</span>`).join("");
 }
 function infoHTML(st,d){
@@ -602,16 +662,17 @@ function infoHTML(st,d){
     const rows=[["監督",d.directors.join("、")],["出演",d.cast.join("、")],["製作国",d.countries.map(c=>regionJa?.of(c)||c).join("・")]].filter(r=>r[1]);
     body=`${d.tagline?`<p class="tag">${esc(d.tagline)}</p>`:""}${d.overview?`<p class="ov">${esc(d.overview)}</p>${d.overviewLang==="en"?'<p class="lang">日本語のあらすじが未登録のため、英語のあらすじを表示しています。</p>':""}`:'<p class="lang">あらすじは未登録です。</p>'}${rows.map(r=>`<p class="cr">${r[0]}　${esc(r[1])}</p>`).join("")}<p class="src">情報：<a href="https://www.themoviedb.org/movie/${E(d.id)}?language=ja-JP" target="_blank" rel="noopener">TMDB</a></p>`;
   }else body=`<p class="lang${st==="loading"?" ld":""}">${st==="none"?"この作品の情報は見つかりませんでした。":st==="err"?"作品情報を読み込めませんでした。時間をおいて開き直してください。":"読み込み中…"}</p>`;
-  return `<details class="info" id="info"${infoOpen?" open":""}><summary>あらすじ・キャスト</summary><div class="body">${body}</div></details>`;
+  return `<section class="info" id="info" aria-label="あらすじ・キャスト"${infoOpen?"":" hidden"}><div class="body">${body}</div></section>`;
 }
 function setInfo(st,d){
   const el=$("#info");if(!el)return;
-  if(st==="none"){el.hidden=true;const m=$("#imeta");if(m)m.innerHTML="";return}   // 一致する作品がないときは、中身のない開閉を出さない
+  if(st==="none"){el.hidden=true;const b=$("#itg");if(b)b.hidden=true;const m=$("#imeta");if(m)m.innerHTML="";return}   // 一致する作品がないときは、中身のない開閉を出さない
   const t=document.createElement("div");t.innerHTML=infoHTML(st,d);
-  const n=t.firstElementChild;n.open=el.open;el.replaceWith(n);
+  const n=t.firstElementChild;n.hidden=!infoOpen;el.replaceWith(n);
   // 詳しい情報が届いたら「公開日・上映時間・ジャンル」に差し替える。届かなければ公開年だけを残す
   const m=$("#imeta");
   if(m&&st==="ok")m.innerHTML=`<span class="in">${metaText(d)}</span>`;
+  if(m){m.classList.remove("more");m.classList.toggle("more",m.scrollWidth>m.clientWidth+1)}
   else if(m&&st!=="loading"){const y=cur?.[2]?.date?.slice(0,4);m.innerHTML=y?`<span class="in">${y}年</span>`:""}   // 取れなかったときは分かる範囲（公開年）だけ
   if(st==="ok")setLD(d);
 }
@@ -643,7 +704,7 @@ function pickedHTML(movie){
   return `<p class="picked" id="picked"><span>「${esc(picked.q)}」の候補から選びました</span><button type="button" id="rawq" aria-label="入力どおりに検索し直す" title="入力どおりに検索">戻す</button></p>`;
 }
 function nowHTML(q,isExample,movie){
-  return `<header class="now"><figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="64" height="96" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="k">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><div class="mrow"><p class="ex meta" id="imeta"><span class="sk" aria-label="読み込み中"></span></p><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>${isExample==="trend"?'<p class="ex">いま話題の作品（日本で上映中・公開予定の人気上位10本）からランダムに表示しています。 <button type="button" class="clear" id="shuffle" style="padding:0;text-decoration:underline">ほかの話題作</button></p>':isExample?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div></header>`;
+  return `<header class="now">${isExample==="trend"?'<p class="k">いま話題の作品から表示中<button type="button" class="kl" id="shuffle">ほかの話題作</button></p>':""}<figure class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>${movie?.poster?`<img src="${IMG}${esc(movie.poster)}" alt="${esc(q)} のポスター" width="54" height="80" decoding="async" onload="this.classList.add('ok')">`:""}</figure><div><p class="vh">検索中の作品</p><h1 id="mt">${wrapWords(q)}</h1><p class="ex meta" id="imeta"><span class="sk" aria-label="読み込み中"></span></p><div class="irow"><button type="button" class="itg" id="itg" aria-expanded="${infoOpen}" aria-controls="info">あらすじ・キャスト</button><button type="button" class="share" id="share" aria-label="この作品のページのリンクを共有" title="リンクを共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>${isExample&&isExample!=="trend"?'<p class="ex">例として表示しています。上の欄に観たい作品名を入れてください。</p>':""}</div></header>`;
 }
 /* ===== 作品ごとの URL（?q=作品名&id=TMDBの番号）とページタイトル =====
    サーバーの処理なしで動くよう、クエリ文字列で作品を表す。ブックマーク・共有・戻るボタンに対応。
@@ -657,7 +718,7 @@ function urlFor(q,movie){
 }
 const DESC=document.querySelector('meta[name="description"]').content;
 function setMeta(q,isExample){
-  const desc=q&&!isExample?`「${q}」の評判を、Filmarks・映画.com・Yahoo! など各サイトの検索結果からまとめて確認できます。チケット、SNS、配信サービスへもすぐ移動できます。`:DESC;
+  const desc=q&&!isExample?`「${q}」について、Filmarks、映画.com、Yahoo!など各サイトの検索結果へ移動できます。チケット、SNS、配信サービスの検索結果も開けます。`:DESC;
   document.querySelector('meta[name="description"]').content=desc;
   document.querySelector('meta[property="og:description"]').content=desc;
   document.querySelector('meta[property="og:title"]').content=document.title;
@@ -668,8 +729,6 @@ function setMeta(q,isExample){
   document.querySelector('meta[property="og:url"]').content=canon.href;
 }
 function syncNav(q,isExample,movie){
-  document.title=q?`${q} - Cinemaladder`:"Cinemaladder";
-  setMeta(q,isExample);
   const st={q,isExample,movie:slim(movie)};
   try{
     if(isExample||navMode==="none")history.replaceState(st,"",location.href);   // おすすめ表示などは URL を変えない
@@ -677,8 +736,13 @@ function syncNav(q,isExample,movie){
     else history.replaceState(st,"",urlFor(q,movie));
   }catch(e){}
   navMode="push";
+  // タブの題名は URL に合わせる。作品の URL（?q=）のときだけ作品名を出し、トップの URL のまま
+  // 話題作や前回の作品を表示しているときは「Cinemaladder」にする（ブックマークや共有で題名がばらつかないように）
+  let onMovie=false;try{onMovie=!!new URL(location.href).searchParams.get("q")}catch(e){}
+  document.title=q&&onMovie?`${q} - Cinemaladder`:TOP_TITLE;
+  setMeta(onMovie?q:"",isExample);   // 説明文・正規URLも URL に合わせる
 }
-function shareUrl(){return cur?.[0]&&!cur[1]?location.href:cur?.[0]?urlFor(cur[0],cur[2]):location.href}
+function shareUrl(){return cur?.[0]?urlFor(cur[0],cur[2]):location.href}   // 共有ボタンは、いつも表示中の作品のページを渡す
 let toastTimer=null;
 let toastSwap=null;
 function toast(msg){
@@ -691,7 +755,7 @@ function toast(msg){
   else show();
 }
 async function share(){
-  const url=shareUrl(),title=document.title;
+  const url=shareUrl(),title=cur?.[0]?`${cur[0]} - Cinemaladder`:document.title;
   if(navigator.share){try{await navigator.share({title,url});return}catch(e){if(e.name==="AbortError")return}}
   try{await navigator.clipboard.writeText(url);toast("リンクをコピーしました")}catch(e){prompt?.("このリンクをコピーしてください",url)}
 }
@@ -717,7 +781,7 @@ function fillMovie(m){
 /* X の除外語の編集パネル（チップの × で削除、入力欄で追加） */
 let ngOpen=false;
 function ngHTML(){
-  return `<details class="ng" id="ng"${ngOpen?" open":""}><summary>X で除外する言葉 <span class="cnt">${ngWords.length}語</span></summary>
+  return `<details class="ng" id="ng"${ngOpen?" open":""}><summary>Xで除外する言葉 <span class="cnt">${ngWords.length}語</span></summary>
   <div class="ngbody">${ngWords.length?`<ul class="chips" aria-label="除外する言葉">${ngWords.map(w=>`<li class="chip">${esc(w)}<button type="button" data-ngdel="${esc(w)}" aria-label="「${esc(w)}」を除外しない">×</button></li>`).join("")}</ul>`:'<p class="ngnone">除外する言葉はありません</p>'}
   <form class="ngadd" id="ngadd"><input id="ngin" type="text" maxlength="20" placeholder="言葉を追加（例：泣ける）" autocomplete="off" enterkeyhint="done" aria-label="除外する言葉"><button type="submit">追加</button></form>
   <button type="button" class="ngreset" id="ngreset">初期設定に戻す</button></div></details>`;
@@ -734,8 +798,10 @@ const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)");
 function playSwap(){
   if(reduceMotion.matches||!Element.prototype.animate)return;
   const els=[...document.querySelectorAll("#out .movie > *")];
+  // 作品の見出し（いちばん上）は動かさずに薄く出すだけにする。文字を動かすと、止まった瞬間に
+  // 小数点以下の位置が画面の画素にそろえ直され、1pxほど跳ねて見えるため。下のグループは少し下から出す
   els.forEach((el,i)=>el.animate(
-    [{opacity:0,transform:"translateY(10px)"},{opacity:1,transform:"none"}],
+    el.classList.contains("now")?[{opacity:0},{opacity:1}]:[{opacity:0,transform:"translateY(10px)"},{opacity:1,transform:"none"}],
     {duration:280,delay:Math.min(i,5)*45,easing:"cubic-bezier(.2,.7,.3,1)",fill:"backwards"}));
   const h1=document.querySelector("#out h1");
   if(h1)h1.animate([{color:"var(--accent)"},{color:"var(--fg)"}],{duration:900,easing:"ease-out"});
@@ -763,6 +829,7 @@ function render(q,isExample,movie){
   if(movie&&hist.includes(q))saveMeta(q,movie);
   const changed=!cur||cur[0]!==q;   // 作品が変わったときだけ切り替えのアニメーションを付ける
   cur=[q,isExample,movie];
+  store.set("cl_last",isExample?"":q);   // 次に開いたとき、同じ作品を出すかどうかの判断に使う
   syncNav(q,isExample,movie);
   setLD(null);
   let h=trendHTML()+`<article class="movie" aria-labelledby="mt">`+nowHTML(q,isExample,movie)+pickedHTML(movie)+infoHTML("loading");
@@ -832,30 +899,40 @@ function searchRaw(q){
   if(findMovie(q))setQ();else{$("#q").value=q;keepQ=q}   // 一致する作品が手元にあれば空に、なければ結果を待つ
   render(q);collapseTop();$("#q").blur()}
 $("#clr").onclick=()=>{setQ();hideSug();$("#q").focus()};   // 入力欄だけ空にして、画面はそのまま
+/* 表示中の作品を履歴から消したら、URL をトップに戻す。
+   画面はそのままにし、次に開き直したとき（リロード）は話題作からランダムに選ぶ */
+function forgetShown(){
+  if(!cur||cur[1]||hist.includes(cur[0]))return;
+  try{history.replaceState(null,"",location.pathname)}catch(e){}
+  document.title=TOP_TITLE;setMeta("",false);
+}
 $("#hist").addEventListener("click",e=>{
   const x=e.target.closest("[data-del]");
-  if(x){hist=hist.filter(h=>h!==x.dataset.del);saveHist();return}
+  if(x){hist=hist.filter(h=>h!==x.dataset.del);saveHist();forgetShown();return}
   const all=e.target.closest("#delall");
   if(all){   // 誤タップ防止：1回目で確認表示、3秒以内にもう1回押すと削除
     if(all.classList.contains("warn")){
       clearTimeout(delTimer);toast("履歴を削除しました");
       const h=$("#hist");h.classList.add("out");   // ふわっと消してから空にする
-      setTimeout(()=>{hist=[];saveHist();h.classList.remove("out")},reduceMotion.matches?0:250);return;
+      setTimeout(()=>{hist=[];saveHist();forgetShown();h.classList.remove("out")},reduceMotion.matches?0:250);return;
     }
     // ボタン自体は短い表示にし、説明は画面下のお知らせで出す（狭い画面でも見切れないように）
-    all.classList.add("warn");toast("もう一度押すと履歴を全部消します");
+    all.classList.add("warn");toast("もう一度押すと履歴をすべて消します");
     delTimer=setTimeout(()=>all.classList.remove("warn"),3000);return;
   }
   const b=e.target.closest("[data-q]");if(!b)return;setQ();remember(b.dataset.q);render(b.dataset.q);collapseTop()});
 $("#q").addEventListener("focus",()=>$("#q").select());
-$("#out").addEventListener("click",e=>{if(e.target.closest("#share"))share()});
+$("#out").addEventListener("click",e=>{
+  if(e.target.closest("#share"))share();
+  const itg=e.target.closest("#itg");   // 「あらすじ・キャスト」の開閉。開いているかは次の作品でも引き継ぐ
+  if(itg){infoOpen=!infoOpen;store.set("cl_infoOpen",infoOpen);itg.setAttribute("aria-expanded",infoOpen);const p=$("#info");if(p)p.hidden=!infoOpen}});
 // 戻る・進む：保存しておいた状態から描き直す（URL は変えない）
 addEventListener("popstate",e=>{
   const st=e.state;hideSug();
   if(st?.q){navMode="none";setQ();if(!st.movie&&!findMovie(st.q))keepQ=st.q;render(st.q,st.isExample,st.movie);collapseTop()}
   else{const q=new URL(location.href).searchParams.get("q");if(q){navMode="none";setQ();render(q)}else showTrending()}
 });
-$("#out").addEventListener("toggle",e=>{if(e.target.id==="ng")ngOpen=e.target.open;if(e.target.id==="info"){infoOpen=e.target.open;store.set("cl_infoOpen",infoOpen)}},true);
+$("#out").addEventListener("toggle",e=>{if(e.target.id==="ng")ngOpen=e.target.open;},true);
 $("#out").addEventListener("submit",e=>{
   if(e.target.id!=="ngadd")return;e.preventDefault();
   const words=$("#ngin").value.split(/[,、，]/).map(w=>w.normalize("NFKC").trim()).filter(Boolean);
@@ -896,13 +973,15 @@ addEventListener("scroll",()=>{
 $("#affnote").hidden=!(AFF.amazonTag||AFF.unext||AFF.mvtk);$("#amznote").hidden=!AFF.amazonTag;
 $("#envbadge").hidden=/^(www\.)?cinemaladder\.com$/.test(location.hostname);
 renderHist();
+// 前回最後に見ていた作品。履歴から消されていたら、話題作からランダムに選ぶ（記録がない古い利用者は履歴の先頭）
+function lastShown(){const l=store.get("cl_last",null);return l==null?hist[0]:hist.includes(l)?l:null}
 const startQ=(()=>{try{return clean(new URL(location.href).searchParams.get("q")||"")}catch(e){return ""}})();
 if(startQ){   // 共有・ブックマークされた URL から開いたとき
   const id=+new URL(location.href).searchParams.get("id")||0;
   setQ();if(findMovie(startQ))remember(startQ);else keepQ=startQ;navMode="replace";   // 一致しない作品の URL なら、分かった時点で文字を戻す
   render(startQ,false,id&&meta[startQ]?.id===id?meta[startQ]:null);
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}
-else if(hist[0]){setQ();navMode="none";render(hist[0]);
+else if(lastShown()){setQ();navMode="none";render(lastShown());
   getTrending().catch(()=>{trendFailed=true}).finally(updateTop)}   // TOP10リストだけ後から差し替える（画面全体は描き直さない）
 else{$("#out").innerHTML='<p class="emptyst">いま話題の映画を読み込み中…</p>';showTrending()}
 </script>

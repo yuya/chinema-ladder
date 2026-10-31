@@ -87,8 +87,10 @@ export default {
     if (!r.ok) return json({ error: r.status }, cors, 502);
 
     const j = await r.json();
-    const out = (j.results || []).slice(0, 8).map(m => ({
+    // 並べ替えはブラウザ側で行う（有名さ＝評価数と人気度も返す）ので、多めの20件まで返す
+    const out = (j.results || []).slice(0, 20).map(m => ({
       id: m.id, title: m.title, original: m.original_title, date: m.release_date, poster: m.poster_path,
+      votes: m.vote_count || 0, pop: Math.round((m.popularity || 0) * 10) / 10,
     }));
     return json(out, { ...cors, "Cache-Control": "public, max-age=3600" });
   },
