@@ -1,0 +1,22 @@
+# Cinemaladder
+
+> 映画の作品名を1回入れるだけで、映画レビューサイト、チケット、SNS、配信サービスの検索結果へ移動できる日本語のサイトです。Cinemaladder自体はレビューや点数を集めたり掲載したりしていません。
+
+作品ごとのページは `https://cinemaladder.com/?q=作品名` の形です（作品名はURLエンコードします）。TMDBの作品番号が分かっている場合は `&id=番号` を付けられます。ページには、その作品について次のサイトの検索結果へのリンクが並びます。
+
+- レビュー：Filmarks、映画.com、Movie Walker、映画ランド、KINENOTE、IMDb、Yahoo!検索、Google
+- チケット・上映館：ムビチケ、映画.comの上映中検索
+- SNS：X（「ネタバレ」などの言葉を含む投稿を除外して検索）、Instagram（ハッシュタグ）
+- 配信：U-NEXT、Prime Video、Netflix、Filmarksの配信サービス一覧
+
+作品の公開日、上映時間、ジャンル、あらすじ、監督、出演者は、TMDBから取得して表示しています。
+
+## ページ
+
+- [トップ](https://cinemaladder.com/): 作品名の検索と、日本で上映中・公開予定の話題作の表示
+- [運営者情報](https://cinemaladder.com/about): 運営者、お問い合わせ先、免責事項
+- [プライバシーポリシー](https://cinemaladder.com/privacy): 端末に保存する情報、外部送信、アクセス解析と広告
+
+## 例
+
+- [「ゴジラ-1.0」の作品ページ](https://cinemaladder.com/?q=%E3%82%B4%E3%82%B8%E3%83%A9-1.0)

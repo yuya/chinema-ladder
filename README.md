@@ -16,6 +16,7 @@
 - `.github/workflows/trending.yml` … 毎日 6:17（日本時間）に上のスクリプトを実行し、staging と main の両方を更新。定期実行は既定ブランチの設定しか動かないため、このファイルは main にも置く
 - `icons/` … 各サイトのファビコンの元画像。Actions が足りない分だけ取得し、`scripts/inline-icons.py` が index.html の CSS に埋め込む（通信回数を減らすため。表示には icons/ を直接使わない）
 - `brand/icon.svg` … サイトのアイコンの元絵。`node scripts/build-brand.mjs` で favicon.svg / favicon.ico / apple-touch-icon.png / brand/*.png を書き出す
+- `robots.txt` / `sitemap.xml` / `llms.txt` … 検索エンジンと AI 向けの案内（llms.txt はサイトの説明と作品ページの URL の形）
 - `manifest.webmanifest` … ホーム画面に追加したときの名前・アイコン・色
 - `.nojekyll` … GitHub Pages で Jekyll 変換を無効化
 
